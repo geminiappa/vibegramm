@@ -1,2 +1,3 @@
 
 # Vibegram — no external Python dependencies
+psycopg2-binary
