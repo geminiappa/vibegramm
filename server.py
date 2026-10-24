@@ -533,6 +533,7 @@ class VibegramHandler(http.server.SimpleHTTPRequestHandler):
             if sender in USERS:
                 USERS[sender]['typing_to'] = to
                 USERS[sender]['typing_time'] = now
+                # Typing is transient; profile/channel state is persisted by its own endpoints.
             return self.send_json({'ok': True})
 
         # Загрузка медиа
@@ -544,11 +545,13 @@ class VibegramHandler(http.server.SimpleHTTPRequestHandler):
             try:
                 _, encoded = data_url.split(',', 1)
                 binary = base64.b64decode(encoded)
+                if len(binary) > 25 * 1024 * 1024:
+                    return self.send_json({'error': 'Файл больше 25 МБ'}, 413)
                 filename = f"media_{now}_{len(MESSAGES)}.{ext}"
                 filepath = os.path.join(UPLOAD_DIR, filename)
                 with open(filepath, 'wb') as f:
                     f.write(binary)
-                return self.send_json({'ok': True, 'url': f"/{UPLOAD_DIR}/{filename}"})
+                return self.send_json({'ok': True, 'url': f"/uploads/{filename}"})
             except Exception as e:
                 return self.send_json({'error': str(e)}, 500)
 
@@ -598,13 +601,19 @@ class VibegramHandler(http.server.SimpleHTTPRequestHandler):
                             f"⭐ Запрос Vibegram Premium принят для @{sender}.\n"
                             "Premium выдаётся только Создателем через этот бот. Ожидайте решения."
                         )
-                        if VERIFY_BOT_ADMIN and VERIFY_BOT_ADMIN in USERS:
+                        creator_username = VERIFY_BOT_ADMIN
+                        if not creator_username:
+                            creator_username = next((name for name, obj in USERS.items()
+                                if not obj.get('is_channel') and not obj.get('is_bot') and int(obj.get('id') or obj.get('uid') or 0) == 1), None)
+                        if creator_username and creator_username in USERS:
                             MESSAGES.append({
                                 'id': f"msg_{now + 1}_{len(MESSAGES)}_premium_request",
-                                'sender': 'verify_bot', 'to': VERIFY_BOT_ADMIN,
-                                'text': f"⭐ ЗАПРОС VIBEGRAM PREMIUM\nПользователь: @{sender} (ID: {sender_id})\nДля выдачи: /premium @{sender} on\nДля отказа/снятия: /premium @{sender} off",
-                                'time': now + 1, 'read': False, 'reactions': {}
+                                'sender': 'verify_bot', 'to': creator_username,
+                                'text': f"⭐ ЗАПРОС VIBEGRAM PREMIUM\nПользователь: @{sender} (ID: {sender_id})\nДля выдачи: /premium @{sender} on\nДля отказа: /premium @{sender} off",
+                                'time': now + 1, 'read': False, 'reactions': {},
+                                'premium_request': {'applicant': sender, 'status': 'pending'}
                             })
+                        save_db()
                     elif len(parts) == 3 and parts[1].lstrip('@') in USERS and parts[2] in ('on', 'off'):
                         target_premium = parts[1].lstrip('@')
                         if not is_creator:
@@ -702,6 +711,25 @@ class VibegramHandler(http.server.SimpleHTTPRequestHandler):
             MESSAGES.append(msg)
             save_db()
             return self.send_json({'ok': True, 'message': msg})
+
+        # Закрепление чата в боковом списке пользователя (хранится в PostgreSQL/JSON вместе с PINS)
+        if parsed.path == '/api/chat-pin':
+            me = str(body.get('me') or '').strip().lower().lstrip('@')
+            peer = str(body.get('peer') or '').strip().lower().lstrip('@')
+            pinned = bool(body.get('pinned'))
+            if not me or not peer:
+                return self.send_json({'error': 'Invalid users'}, 400)
+            key = f'chatlist:{me}'
+            current = PINS.get(key, [])
+            if not isinstance(current, list):
+                current = []
+            if pinned and peer not in current:
+                current.insert(0, peer)
+            elif not pinned and peer in current:
+                current.remove(peer)
+            PINS[key] = current
+            save_db()
+            return self.send_json({'ok': True, 'pinned': current})
 
         # Закрепление / открепление сообщения
         if parsed.path == '/api/pin':

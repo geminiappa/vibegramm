@@ -1669,7 +1669,7 @@
     document.addEventListener('click', (e) => {
       const media = e.target.closest('[data-fullimg], .msg-media-box img, .msg-media-box video, .message img, .message video, .channel-post img, .channel-post video');
       if (!media || media.closest('#lightboxOverlay')) return;
-      const url = media.getAttribute('data-fullimg') || media.currentSrc || media.src || media.getAttribute('src');
+      const url = media.getAttribute('data-fullimg') || media.getAttribute('data-src') || media.currentSrc || media.src || media.getAttribute('src');
       if (url) { e.preventDefault(); e.stopPropagation(); openMediaViewer(url, media.tagName.toLowerCase()==='video' ? 'video' : 'image'); }
     }, true);
 
@@ -2226,9 +2226,13 @@
         if (m.sender === other && m.to === me && !m.read && other !== me) item.unreadCount++;
       });
 
+      const pinnedChatNames = (pinsMap[`chatlist:${me}`] || []);
       return Array.from(convMap.values()).sort((a, b) => {
         if (a.peer.username === 'verify_bot') return -1;
         if (b.peer.username === 'verify_bot') return 1;
+        const ap = pinnedChatNames.includes(a.peer.username) ? 1 : 0;
+        const bp = pinnedChatNames.includes(b.peer.username) ? 1 : 0;
+        if (ap !== bp) return bp - ap;
         return (b.lastMsg?.time || 0) - (a.lastMsg?.time || 0);
       });
     }
@@ -2271,7 +2275,7 @@
               <div class="chat-name">
                 ${peer.is_channel ? '<span>📢</span>' : ''}
                 <span>${escapeHtml(peer.name)}</span>
-                ${renderBadgesHtml(peer)}
+                ${renderBadgesHtml(peer)} ${(pinsMap[`chatlist:${me}`] || []).includes(peer.username) ? '<span title="Закреплённый чат">📌</span>' : ''}
               </div>
               <div class="chat-time">${outTicks}<span>${lastMsg ? formatTime(lastMsg.time) : ''}</span></div>
             </div>
@@ -2282,6 +2286,14 @@
           </div>
         `;
         item.addEventListener('click', () => openChatWith(peer.username));
+        item.addEventListener('contextmenu', async (ev) => {
+          ev.preventDefault(); ev.stopPropagation();
+          const isPinned = (pinsMap[`chatlist:${me}`] || []).includes(peer.username);
+          await fetch('/api/chat-pin', { method: 'POST', headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ me, peer: peer.username, pinned: !isPinned }) });
+          await pollServer();
+          showCustomIosBanner(!isPinned ? 'Чат закреплён' : 'Чат откреплён', `@${peer.username}`);
+        });
         chatListEl.appendChild(item);
       });
 
@@ -2351,9 +2363,12 @@
       activeChatAvatar.textContent = peer.avatar ? '' : (isBotChat ? '🤖' : (peer.is_channel ? '📢' : getInitials(peer.name)));
 
       activeChatName.innerHTML = `${peer.is_channel ? '<span>📢</span>' : ''}<span class="user-nav-link" data-open-user="${escapeHtml(peer.username)}" title="Открыть профиль">${escapeHtml(peer.name)}</span> ${renderBadgesHtml(peer)}`;
-      activeChatStatus.textContent = peer.is_channel
-        ? `@${peer.username} • подписчиков: ${(peer.subscribers || []).length}`
-        : (isBotChat ? 'общедоступный бот верификации • пароль: ID 1' : `@${peer.username} • ID: ${peer.uid}`);
+      const peerTypingNow = !peer.is_channel && !isBotChat && peer.typing_to === me && (Date.now() - Number(peer.typing_time || 0) < 5000);
+      activeChatStatus.textContent = peerTypingNow
+        ? 'печатает…'
+        : (peer.is_channel
+          ? `@${peer.username} • подписчиков: ${(peer.subscribers || []).length}`
+          : (isBotChat ? 'общедоступный бот верификации' : `@${peer.username} • ID: ${peer.uid || peer.id || '—'}`));
 
       if (isBotChat) {
         verifyBotPanel.classList.add('active');
