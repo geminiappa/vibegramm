@@ -7,16 +7,21 @@ import os
 import base64
 from urllib.parse import urlparse, parse_qs
 
-PORT = 8080
-DB_FILE = 'vibegram_db.json'
-UPLOAD_DIR = 'uploads'
+PORT = int(os.environ.get('PORT', '8000'))
+
+# Пути к базе данных и загруженным файлам
+BASE_DIR = os.path.dirname(os.path.abspath(__file__))
+os.chdir(BASE_DIR)
+
+DB_FILE = os.path.join(BASE_DIR, 'vibegram_db.json')
+UPLOAD_DIR = os.path.join(BASE_DIR, 'uploads')
 
 os.makedirs(UPLOAD_DIR, exist_ok=True)
 
-USERS = {}          # username -> профиль пользователя или канала
-MESSAGES = []       # список всех сообщений и постов
-PINS = {}           # закрепленные сообщения
-VERIFY_BOT_ADMIN = None  # username создателя, привязавшего бота по ID 1
+USERS = {}
+MESSAGES = []
+PINS = {}
+VERIFY_BOT_ADMIN = None
 
 def get_chat_key(u1, u2):
     a = u1.strip().lower().lstrip('@')
