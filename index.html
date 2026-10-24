@@ -1,0 +1,3425 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+  <title>Vibegram iOS</title>
+  <style>
+    :root {
+      --bg-main: #000000;
+      --bg-wallpaper: #070b11;
+      --bg-panel: rgba(24, 24, 28, 0.86);
+      --bg-panel-solid: #16171b;
+      --bg-hover: rgba(255, 255, 255, 0.07);
+      --bg-active: #0a84ff;
+      --bg-input: rgba(44, 44, 46, 0.85);
+      --msg-out: linear-gradient(135deg, #0a84ff 0%, #5e5ce6 100%);
+      --msg-in: #1c1c1e;
+      --text-primary: #ffffff;
+      --text-secondary: #8e8e93;
+      --accent: #0a84ff;
+      --accent-purple: #5e5ce6;
+      --online: #30d158;
+      --danger: #ff453a;
+      --border: rgba(255, 255, 255, 0.09);
+      --spring: cubic-bezier(0.22, 1, 0.36, 1);
+      --bounce: cubic-bezier(0.34, 1.56, 0.64, 1);
+    }
+
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+      font-family: -apple-system, BlinkMacSystemFont, "SF Pro Text", "SF Pro Display", "Segoe UI", Roboto, sans-serif;
+      -webkit-tap-highlight-color: transparent;
+      -webkit-font-smoothing: antialiased;
+    }
+
+    ::-webkit-scrollbar { width: 4px; height: 4px; }
+    ::-webkit-scrollbar-thumb { background: rgba(255,255,255,0.18); border-radius: 10px; }
+
+    body, html {
+      width: 100%;
+      height: 100vh;
+      height: 100dvh;
+      background: var(--bg-main);
+      color: var(--text-primary);
+      overflow: hidden;
+      user-select: none;
+    }
+
+    .app { display: flex; width: 100%; height: 100%; position: relative; }
+
+    /* Экран авторизации и добавления аккаунта в стиле iOS */
+    .auth-screen {
+      position: fixed;
+      inset: 0;
+      background: radial-gradient(circle at 50% 15%, rgba(10, 132, 255, 0.25), #000000 72%);
+      z-index: 9000;
+      display: none;
+      align-items: center;
+      justify-content: center;
+      padding: 18px;
+    }
+    .auth-screen.active { display: flex; }
+
+    .auth-card {
+      width: 100%;
+      max-width: 390px;
+      background: rgba(28, 28, 30, 0.88);
+      backdrop-filter: blur(30px) saturate(190%);
+      -webkit-backdrop-filter: blur(30px) saturate(190%);
+      border: 1px solid var(--border);
+      border-radius: 28px;
+      padding: 28px 22px;
+      box-shadow: 0 24px 60px rgba(0,0,0,0.75);
+      display: flex;
+      flex-direction: column;
+      gap: 14px;
+      text-align: center;
+      animation: popIn 0.32s var(--spring);
+      position: relative;
+    }
+
+    .auth-close-btn {
+      position: absolute;
+      top: 14px;
+      right: 14px;
+      width: 30px;
+      height: 30px;
+      border-radius: 50%;
+      background: rgba(255,255,255,0.1);
+      border: none;
+      color: #fff;
+      font-size: 18px;
+      cursor: pointer;
+      display: none;
+      align-items: center;
+      justify-content: center;
+    }
+
+    .auth-logo {
+      width: 68px;
+      height: 68px;
+      border-radius: 20px;
+      margin: 0 auto;
+      background: linear-gradient(135deg, #0a84ff, #5e5ce6);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 32px;
+      box-shadow: 0 10px 26px rgba(10, 132, 255, 0.45);
+    }
+
+    .auth-field { display: flex; flex-direction: column; gap: 5px; text-align: left; }
+    .auth-field label { font-size: 12px; font-weight: 600; color: #64d2ff; padding-left: 4px; }
+    .auth-input {
+      width: 100%;
+      background: rgba(44, 44, 46, 0.9);
+      border: 1px solid rgba(255,255,255,0.1);
+      border-radius: 14px;
+      padding: 12px 14px;
+      color: #fff;
+      font-size: 15px;
+      outline: none;
+      transition: 0.2s;
+    }
+    .auth-input:focus { border-color: var(--accent); box-shadow: 0 0 0 3px rgba(10,132,255,0.22); }
+    .code-input { text-align: center; letter-spacing: 8px; font-size: 22px; font-weight: 800; border-color: #64d2ff; }
+
+    /* Боковое меню (Drawer) с мультиаккаунтом */
+    .drawer-overlay { position: fixed; inset: 0; background: rgba(0,0,0,0.6); backdrop-filter: blur(5px); z-index: 4000; display: none; }
+    .drawer-overlay.open { display: block; }
+    .side-drawer {
+      position: fixed;
+      top: 0; left: 0; bottom: 0;
+      width: 310px;
+      background: #141417;
+      border-right: 1px solid var(--border);
+      z-index: 4001;
+      transform: translateX(-100%);
+      transition: transform 0.3s var(--spring);
+      display: flex;
+      flex-direction: column;
+      box-shadow: 14px 0 40px rgba(0,0,0,0.75);
+    }
+    .side-drawer.open { transform: translateX(0); }
+
+    .drawer-profile-card {
+      padding: 20px 18px 14px;
+      background: radial-gradient(circle at 85% 15%, rgba(10, 132, 255, 0.32), #1c1c21 85%);
+      border-bottom: 1px solid var(--border);
+      display: flex;
+      flex-direction: column;
+      gap: 9px;
+    }
+    .drawer-top-row { display: flex; align-items: center; justify-content: space-between; }
+    .drawer-id-pill {
+      background: rgba(100, 210, 255, 0.14);
+      border: 1px solid rgba(100, 210, 255, 0.35);
+      color: #64d2ff;
+      font-size: 11.5px;
+      font-weight: 800;
+      padding: 3px 10px;
+      border-radius: 12px;
+    }
+    .drawer-name { font-size: 17px; font-weight: 800; color: #fff; display: flex; align-items: center; gap: 6px; }
+    .drawer-subinfo { font-size: 12.5px; color: #aeaeb2; display: flex; flex-direction: column; gap: 3px; }
+    .copy-username-chip {
+      display: inline-flex;
+      align-items: center;
+      gap: 4px;
+      color: #64d2ff;
+      font-weight: 600;
+      cursor: pointer;
+      width: fit-content;
+      padding: 2px 6px;
+      margin-left: -6px;
+      border-radius: 7px;
+      transition: background 0.15s;
+    }
+    .copy-username-chip:hover { background: rgba(100, 210, 255, 0.15); }
+    .copy-username-chip:active { transform: scale(0.95); }
+
+    .drawer-scroll { flex: 1; overflow-y: auto; padding: 10px; display: flex; flex-direction: column; gap: 12px; }
+    .drawer-group {
+      background: #1c1c1e;
+      border: 1px solid var(--border);
+      border-radius: 16px;
+      padding: 5px;
+      display: flex;
+      flex-direction: column;
+      gap: 2px;
+    }
+    .drawer-group-title { font-size: 11px; font-weight: 700; text-transform: uppercase; color: var(--text-secondary); padding: 5px 10px 3px; letter-spacing: 0.4px; }
+    .drawer-btn {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      padding: 9px 11px;
+      border-radius: 12px;
+      background: none;
+      border: none;
+      color: var(--text-primary);
+      font-size: 14px;
+      font-weight: 600;
+      cursor: pointer;
+      text-align: left;
+      transition: 0.15s;
+    }
+    .drawer-btn:hover { background: var(--bg-hover); }
+    .drawer-btn:active { transform: scale(0.98); }
+    .drawer-ico { width: 30px; height: 30px; border-radius: 8px; display: flex; align-items: center; justify-content: center; font-size: 15px; flex-shrink: 0; color: #fff; }
+
+    /* Список аккаунтов в боковом меню */
+    .account-switch-row {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      padding: 7px 10px;
+      border-radius: 12px;
+      cursor: pointer;
+      transition: background 0.15s;
+    }
+    .account-switch-row:hover { background: var(--bg-hover); }
+    .account-switch-row.active-acc { background: rgba(10, 132, 255, 0.14); }
+    .acc-active-dot {
+      margin-left: auto;
+      color: #30d158;
+      font-weight: 800;
+      font-size: 14px;
+    }
+
+    /* Стопка уведомлений iPhone Dynamic Island / iOS Banner */
+    .toast-stack {
+      position: fixed;
+      top: 12px;
+      left: 50%;
+      transform: translateX(-50%);
+      width: calc(100% - 24px);
+      max-width: 380px;
+      z-index: 9999;
+      pointer-events: none;
+      height: 110px;
+    }
+    .ios-toast {
+      position: absolute;
+      top: 0; left: 0;
+      width: 100%;
+      pointer-events: auto;
+      background: rgba(28, 28, 30, 0.9);
+      backdrop-filter: blur(28px) saturate(190%);
+      -webkit-backdrop-filter: blur(28px) saturate(190%);
+      border: 1px solid rgba(255, 255, 255, 0.14);
+      box-shadow: 0 16px 38px rgba(0,0,0,0.65);
+      border-radius: 24px;
+      padding: 11px 15px;
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      cursor: pointer;
+      transition: 0.32s var(--spring);
+      animation: toastIn 0.35s var(--bounce);
+    }
+    @keyframes toastIn { from { transform: translateY(-50px) scale(0.9); opacity: 0; } to { transform: translateY(0) scale(1); opacity: 1; } }
+    .ios-toast[data-depth="0"] { transform: translateY(0) scale(1); opacity: 1; z-index: 30; }
+    .ios-toast[data-depth="1"] { transform: translateY(10px) scale(0.95); opacity: 0.85; z-index: 20; }
+    .ios-toast[data-depth="2"] { transform: translateY(20px) scale(0.9); opacity: 0.6; z-index: 10; }
+    .ios-toast[data-depth="3"] { opacity: 0; pointer-events: none; }
+
+    /* Премиум SVG-эмодзи и Галочка Верификации */
+    .prem-svg-badge, .verified-badge {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      width: 18px;
+      height: 18px;
+      vertical-align: middle;
+      cursor: pointer;
+      flex-shrink: 0;
+      transition: transform 0.2s var(--bounce);
+    }
+    .prem-svg-badge { animation: floatBadge 2.6s ease-in-out infinite; filter: drop-shadow(0 2px 6px rgba(94, 92, 230, 0.55)); }
+    .prem-svg-badge:hover, .verified-badge:hover { transform: scale(1.25); }
+    @keyframes floatBadge { 0%, 100% { transform: translateY(0); } 50% { transform: translateY(-2px); } }
+
+    /* Левая панель списка чатов в стиле iOS */
+    .sidebar {
+      width: 360px;
+      min-width: 300px;
+      height: 100%;
+      background: var(--bg-panel-solid);
+      border-right: 1px solid var(--border);
+      display: flex;
+      flex-direction: column;
+      z-index: 10;
+    }
+    .sidebar-header {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      padding: 11px 14px;
+      background: var(--bg-panel);
+      backdrop-filter: blur(25px);
+      border-bottom: 1px solid var(--border);
+    }
+    .brand-title {
+      font-weight: 800;
+      font-size: 18px;
+      letter-spacing: -0.3px;
+      background: linear-gradient(90deg, #fff, #64d2ff);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+    }
+    .icon-btn {
+      background: none;
+      border: none;
+      color: var(--accent);
+      cursor: pointer;
+      padding: 7px;
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      transition: 0.18s;
+    }
+    .icon-btn:hover { background: var(--bg-hover); }
+    .search-wrapper { flex: 1; position: relative; display: flex; align-items: center; }
+    .search-input {
+      width: 100%;
+      background: rgba(118, 118, 128, 0.24);
+      border: 1px solid transparent;
+      border-radius: 12px;
+      padding: 8px 28px 8px 12px;
+      color: #fff;
+      font-size: 14px;
+      outline: none;
+      transition: 0.2s;
+    }
+    .search-input::placeholder { color: var(--text-secondary); }
+    .search-input:focus { border-color: var(--accent); background: rgba(118, 118, 128, 0.32); }
+    .clear-search { position: absolute; right: 8px; background: none; border: none; color: var(--text-secondary); cursor: pointer; font-size: 16px; display: none; }
+
+    .chat-list { flex: 1; overflow-y: auto; padding: 6px 8px; }
+    .section-title { padding: 7px 12px; font-size: 11px; font-weight: 700; text-transform: uppercase; color: var(--text-secondary); }
+
+    .chat-item {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      padding: 9px 11px;
+      margin-bottom: 2px;
+      border-radius: 16px;
+      cursor: pointer;
+      transition: background 0.18s, transform 0.15s var(--spring);
+    }
+    .chat-item:hover { background: var(--bg-hover); }
+    .chat-item:active { transform: scale(0.985); }
+    .chat-item.active {
+      background: var(--accent);
+      box-shadow: 0 6px 18px rgba(10, 132, 255, 0.28);
+    }
+    .chat-item.active .chat-preview,
+    .chat-item.active .chat-time { color: rgba(255, 255, 255, 0.85); }
+
+    .avatar-wrap { position: relative; flex-shrink: 0; }
+    .avatar {
+      width: 50px;
+      height: 50px;
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-weight: 700;
+      font-size: 18px;
+      color: #fff;
+      flex-shrink: 0;
+      text-transform: uppercase;
+      background-size: cover;
+      background-position: center;
+    }
+    .online-dot {
+      position: absolute;
+      bottom: 1px; right: 1px;
+      width: 13px; height: 13px;
+      background: var(--online);
+      border: 2.5px solid var(--bg-panel-solid);
+      border-radius: 50%;
+    }
+    .chat-info { flex: 1; min-width: 0; }
+    .chat-top { display: flex; justify-content: space-between; align-items: center; margin-bottom: 3px; gap: 6px; }
+    .chat-name { font-size: 15.5px; font-weight: 600; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; display: flex; align-items: center; gap: 4px; letter-spacing: -0.2px; }
+    .chat-time { font-size: 12px; color: var(--text-secondary); flex-shrink: 0; display: flex; align-items: center; gap: 3px; }
+    .chat-bottom { display: flex; justify-content: space-between; align-items: center; gap: 8px; }
+    .chat-preview { font-size: 13.5px; color: var(--text-secondary); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+    .unread-badge {
+      background: var(--accent);
+      color: #fff;
+      font-size: 12px;
+      font-weight: 700;
+      min-width: 21px;
+      height: 21px;
+      padding: 0 6px;
+      border-radius: 11px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+    .chat-item.active .unread-badge { background: #fff; color: var(--accent); }
+
+    /* Правая панель чата в стиле iOS */
+    .chat-area {
+      flex: 1;
+      height: 100%;
+      display: flex;
+      flex-direction: column;
+      background:
+        radial-gradient(circle at 80% 18%, rgba(10, 132, 255, 0.12), transparent 42%),
+        radial-gradient(circle at 20% 82%, rgba(94, 92, 230, 0.12), transparent 42%),
+        var(--bg-wallpaper);
+      position: relative;
+    }
+    .no-chat-selected {
+      margin: auto;
+      background: rgba(28, 28, 30, 0.78);
+      backdrop-filter: blur(20px);
+      padding: 10px 20px;
+      border-radius: 20px;
+      font-size: 13.5px;
+      color: var(--text-secondary);
+      text-align: center;
+      border: 1px solid var(--border);
+    }
+    .chat-view { display: none; flex-direction: column; height: 100%; width: 100%; }
+    .chat-view.active { display: flex; }
+
+    /* Матовая верхняя шапка чата как на iPhone */
+    .chat-header {
+      height: 60px;
+      background: rgba(24, 24, 28, 0.78);
+      backdrop-filter: blur(28px) saturate(190%);
+      -webkit-backdrop-filter: blur(28px) saturate(190%);
+      border-bottom: 1px solid var(--border);
+      display: flex;
+      align-items: center;
+      padding: 0 14px;
+      gap: 12px;
+      flex-shrink: 0;
+      z-index: 15;
+    }
+    .back-btn { display: none; font-size: 20px; font-weight: 600; color: var(--accent); }
+    .chat-header-info { flex: 1; cursor: pointer; min-width: 0; }
+    .chat-header-title { font-size: 16px; font-weight: 700; display: flex; align-items: center; gap: 5px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; letter-spacing: -0.2px; }
+    .chat-header-status { font-size: 12px; color: var(--text-secondary); }
+    .chat-header-status.online { color: var(--online); }
+    .header-sub-pill { background: var(--accent); color: #fff; border: none; padding: 6px 14px; border-radius: 16px; font-size: 12.5px; font-weight: 700; cursor: pointer; }
+    .header-sub-pill.joined { background: rgba(255,255,255,0.1); color: var(--text-secondary); }
+
+    .pinned-banner {
+      display: none;
+      align-items: center;
+      justify-content: space-between;
+      background: rgba(24, 24, 28, 0.85);
+      backdrop-filter: blur(20px);
+      border-bottom: 1px solid var(--border);
+      padding: 6px 14px;
+      gap: 10px;
+      cursor: pointer;
+    }
+    .pinned-banner.active { display: flex; }
+    .pinned-content { flex: 1; min-width: 0; border-left: 3px solid var(--accent); padding-left: 9px; }
+    .pinned-label { font-size: 11.5px; font-weight: 700; color: var(--accent); }
+    .pinned-text { font-size: 12.5px; color: #fff; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+
+    .bot-top-panel {
+      display: none;
+      background: rgba(10, 132, 255, 0.12);
+      border-bottom: 1px solid rgba(10, 132, 255, 0.25);
+      padding: 8px 14px;
+      align-items: center;
+      justify-content: space-between;
+      gap: 10px;
+      font-size: 12.5px;
+    }
+    .bot-top-panel.active { display: flex; }
+
+    /* =========================================================================
+       ПУЗЫРИ СООБЩЕНИЙ И ГАЛОЧКИ ПРОЧТЕНИЯ В СТИЛЕ IPHONE (iOS TELEGRAM)
+       ========================================================================= */
+    .messages-container {
+      flex: 1;
+      overflow-y: auto;
+      padding: 16px 14px;
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+      scroll-behavior: smooth;
+    }
+    .msg-empty {
+      margin: auto;
+      text-align: center;
+      color: var(--text-secondary);
+      background: rgba(28, 28, 30, 0.82);
+      backdrop-filter: blur(20px);
+      border: 1px solid var(--border);
+      padding: 18px 22px;
+      border-radius: 22px;
+      font-size: 13.5px;
+      max-width: 290px;
+      line-height: 1.5;
+    }
+    .channel-post-row {
+      display: flex;
+      align-items: flex-end;
+      gap: 9px;
+      align-self: center;
+      width: 100%;
+      max-width: 520px;
+      animation: msgPop 0.28s var(--spring);
+    }
+
+    .message {
+      max-width: 72%;
+      padding: 8px 13px 6px 13px;
+      border-radius: 20px;
+      font-size: 15px;
+      line-height: 1.36;
+      letter-spacing: -0.1px;
+      position: relative;
+      word-wrap: break-word;
+      display: flex;
+      flex-direction: column;
+      cursor: pointer;
+      box-shadow: 0 4px 14px rgba(0, 0, 0, 0.22);
+      transition: transform 0.18s var(--spring), filter 0.18s;
+    }
+    .message:active { transform: scale(0.98); }
+    .message.msg-enter { animation: msgPop 0.28s var(--spring); }
+    @keyframes msgPop { from { transform: translateY(14px) scale(0.95); opacity: 0; } to { transform: translateY(0) scale(1); opacity: 1; } }
+
+    /* Исходящее сообщение в стиле iOS */
+    .message.out {
+      align-self: flex-end;
+      background: var(--msg-out);
+      color: #ffffff;
+      border-bottom-right-radius: 5px;
+    }
+
+    /* Входящее сообщение в стиле iOS */
+    .message.in {
+      align-self: flex-start;
+      background: var(--msg-in);
+      color: #ffffff;
+      border: 1px solid rgba(255, 255, 255, 0.06);
+      border-bottom-left-radius: 5px;
+    }
+
+    .message.channel-post {
+      flex: 1;
+      max-width: 100%;
+      background: rgba(28, 28, 32, 0.95);
+      border: 1px solid var(--border);
+      border-radius: 20px;
+      border-bottom-left-radius: 5px;
+      padding: 11px 14px 9px;
+    }
+    .channel-post-header { font-size: 13.5px; font-weight: 700; color: #64d2ff; margin-bottom: 4px; display: flex; align-items: center; gap: 5px; }
+    .channel-comments-bar { margin-top: 8px; padding-top: 8px; border-top: 1px solid var(--border); display: flex; align-items: center; justify-content: space-between; font-size: 13px; font-weight: 600; color: #64d2ff; cursor: pointer; }
+
+    .bot-verify-actions { display: flex; gap: 8px; margin-top: 9px; }
+    .bot-verify-btn { flex: 1; padding: 8px 10px; border-radius: 12px; border: none; font-size: 12.5px; font-weight: 700; cursor: pointer; color: #fff; }
+    .bot-verify-btn.approve { background: linear-gradient(135deg, #30d158, #00b894); }
+    .bot-verify-btn.reject { background: rgba(255, 69, 58, 0.22); border: 1px solid rgba(255, 69, 58, 0.45); color: #ff6961; }
+    .bot-status-stamp { margin-top: 7px; padding: 6px 9px; border-radius: 10px; background: rgba(0,0,0,0.28); font-size: 12px; font-weight: 700; text-align: center; }
+
+    .msg-media-box { position: relative; border-radius: 15px; overflow: hidden; margin-bottom: 5px; background: #090d14; max-height: 340px; display: flex; align-items: center; justify-content: center; }
+    .msg-media-box img, .msg-media-box video { width: 100%; max-height: 340px; object-fit: cover; display: block; border-radius: 15px; }
+    .media-badge { position: absolute; top: 8px; left: 8px; background: rgba(0,0,0,0.6); backdrop-filter: blur(8px); color: #fff; font-size: 10px; font-weight: 700; padding: 2px 7px; border-radius: 8px; }
+    .msg-reply-quote { background: rgba(0,0,0,0.22); border-left: 3px solid rgba(255,255,255,0.75); border-radius: 8px; padding: 4px 9px; margin-bottom: 5px; font-size: 12.5px; }
+    .msg-reply-author { font-weight: 700; color: #fff; }
+    .msg-forwarded-tag { font-size: 12px; font-weight: 600; color: rgba(255,255,255,0.85); margin-bottom: 3px; }
+
+    .reactions-list { display: flex; flex-wrap: wrap; gap: 5px; margin-top: 5px; }
+    .reaction-pill {
+      display: inline-flex;
+      align-items: center;
+      gap: 4px;
+      background: rgba(0, 0, 0, 0.26);
+      border: 1px solid rgba(255, 255, 255, 0.16);
+      padding: 2px 9px;
+      border-radius: 14px;
+      font-size: 12.5px;
+      color: #fff;
+      cursor: pointer;
+      animation: popIn 0.25s var(--bounce);
+    }
+    .reaction-pill.mine { background: rgba(255, 255, 255, 0.24); border-color: #fff; }
+
+    /* Мета-строка и галочки прочтения iOS */
+    .msg-meta {
+      align-self: flex-end;
+      font-size: 11px;
+      color: rgba(255, 255, 255, 0.68);
+      margin-top: 2px;
+      display: inline-flex;
+      align-items: center;
+      gap: 4px;
+      line-height: 1;
+    }
+
+    .ios-ticks {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      vertical-align: middle;
+      transition: transform 0.22s var(--bounce), color 0.2s;
+    }
+    .ios-ticks.sent { color: rgba(255, 255, 255, 0.65); }
+    .ios-ticks.read {
+      color: #ffffff;
+      filter: drop-shadow(0 0 4px rgba(255, 255, 255, 0.45));
+    }
+    .chat-time .ios-ticks.read { color: #64d2ff; filter: none; }
+
+    /* Контекстное меню iOS */
+    .context-wrap { position: fixed; z-index: 5000; display: none; flex-direction: column; gap: 6px; animation: popIn 0.18s var(--bounce); }
+    .context-wrap.open { display: flex; }
+    .reaction-picker-bar { background: rgba(28, 28, 30, 0.92); backdrop-filter: blur(25px); border: 1px solid var(--border); border-radius: 24px; padding: 4px 10px; display: flex; gap: 5px; box-shadow: 0 10px 25px rgba(0,0,0,0.55); }
+    .react-emoji-btn { background: none; border: none; font-size: 20px; cursor: pointer; padding: 3px; transition: 0.18s var(--bounce); }
+    .react-emoji-btn:hover { transform: scale(1.35) translateY(-2px); }
+    .context-menu { background: rgba(28, 28, 30, 0.92); backdrop-filter: blur(25px); border: 1px solid var(--border); border-radius: 16px; padding: 5px; min-width: 190px; box-shadow: 0 12px 28px rgba(0,0,0,0.6); display: flex; flex-direction: column; }
+    .context-item { display: flex; align-items: center; gap: 9px; padding: 9px 12px; border-radius: 10px; border: none; background: none; color: #fff; font-size: 14px; cursor: pointer; text-align: left; }
+    .context-item:hover { background: var(--bg-hover); }
+    .context-item.danger { color: var(--danger); }
+
+    /* Нижняя панель ввода сообщения в стиле iMessage / Telegram iOS */
+    .reply-bar { display: none; align-items: center; justify-content: space-between; background: rgba(24, 24, 28, 0.88); backdrop-filter: blur(25px); border-top: 1px solid var(--border); padding: 7px 14px; gap: 10px; }
+    .reply-bar.active { display: flex; }
+    .reply-bar-content { flex: 1; min-width: 0; border-left: 3px solid var(--accent); padding-left: 9px; }
+    .reply-bar-title { font-size: 12px; font-weight: 700; color: var(--accent); }
+    .reply-bar-text { font-size: 12.5px; color: var(--text-secondary); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+
+    .chat-input-bar {
+      background: rgba(24, 24, 28, 0.84);
+      backdrop-filter: blur(28px) saturate(190%);
+      -webkit-backdrop-filter: blur(28px) saturate(190%);
+      border-top: 1px solid var(--border);
+      padding: 9px 14px;
+      display: flex;
+      align-items: center;
+      gap: 9px;
+      position: relative;
+    }
+    .attach-btn { width: 36px; height: 36px; border-radius: 50%; background: none; border: none; color: var(--text-secondary); cursor: pointer; display: flex; align-items: center; justify-content: center; font-size: 19px; }
+    .attach-btn:hover { color: #fff; }
+    .msg-input {
+      flex: 1;
+      background: rgba(44, 44, 46, 0.9);
+      border: 1px solid rgba(255, 255, 255, 0.12);
+      border-radius: 22px;
+      padding: 10px 16px;
+      color: #fff;
+      font-size: 15px;
+      outline: none;
+      transition: border-color 0.2s;
+    }
+    .msg-input:focus { border-color: var(--accent); }
+    .send-btn {
+      width: 36px;
+      height: 36px;
+      border-radius: 50%;
+      background: var(--accent);
+      border: none;
+      color: #fff;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      flex-shrink: 0;
+      font-size: 15px;
+      box-shadow: 0 4px 12px rgba(10, 132, 255, 0.4);
+      transition: transform 0.15s var(--bounce);
+    }
+    .send-btn:active { transform: scale(0.9); }
+
+    /* Кнопка выбора профиля ТОЛЬКО для комментариев */
+    .send-as-btn { width: 34px; height: 34px; border-radius: 50%; border: 2px solid var(--accent); cursor: pointer; display: flex; align-items: center; justify-content: center; font-size: 12px; font-weight: 700; color: #fff; background-size: cover; background-position: center; flex-shrink: 0; }
+    .send-as-popup { position: absolute; bottom: 58px; left: 12px; background: rgba(28, 28, 30, 0.96); backdrop-filter: blur(25px); border: 1px solid var(--border); border-radius: 16px; padding: 6px; min-width: 230px; box-shadow: 0 12px 30px rgba(0,0,0,0.65); display: none; flex-direction: column; gap: 4px; z-index: 200; }
+    .send-as-popup.open { display: flex; }
+    .send-as-option { display: flex; align-items: center; gap: 9px; padding: 7px 9px; border-radius: 10px; cursor: pointer; }
+    .send-as-option:hover { background: var(--bg-hover); }
+    .send-as-option.selected { background: rgba(10, 132, 255, 0.2); }
+
+    .channel-readonly-bar { background: rgba(24, 24, 28, 0.88); backdrop-filter: blur(25px); border-top: 1px solid var(--border); padding: 9px 16px; display: none; justify-content: center; }
+    .channel-sub-bottom-btn { width: 100%; max-width: 400px; padding: 10px; border-radius: 14px; border: none; font-size: 14.5px; font-weight: 700; cursor: pointer; background: var(--accent); color: #fff; }
+    .channel-sub-bottom-btn.joined { background: rgba(255,255,255,0.08); color: var(--text-secondary); }
+
+    /* Модальные окна в стиле iOS Sheet */
+    .modal-overlay { position: fixed; inset: 0; background: rgba(0,0,0,0.68); backdrop-filter: blur(10px); display: none; align-items: center; justify-content: center; z-index: 1000; padding: 14px; }
+    .modal-overlay.open { display: flex; }
+    @keyframes popIn { from { transform: scale(0.92); opacity: 0; } to { transform: scale(1); opacity: 1; } }
+
+    .tg-settings-modal, .ios-sheet-modal {
+      background: #1c1c1e;
+      width: 100%;
+      max-width: 415px;
+      border-radius: 28px;
+      overflow: hidden;
+      box-shadow: 0 24px 60px rgba(0,0,0,0.8);
+      border: 1px solid var(--border);
+      max-height: 92vh;
+      display: flex;
+      flex-direction: column;
+      animation: popIn 0.25s var(--spring);
+    }
+    .tg-profile-banner, .ios-hero {
+      position: relative;
+      padding: 22px 18px 14px;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      text-align: center;
+      background: radial-gradient(circle at 50% 0%, rgba(10, 132, 255, 0.32), #1c1c1e 78%);
+      border-bottom: 1px solid var(--border);
+    }
+    .tg-banner-top { width: 100%; display: flex; justify-content: space-between; align-items: center; margin-bottom: 6px; }
+    .tg-avatar-container { position: relative; margin-bottom: 8px; cursor: pointer; }
+    .tg-avatar-main, .ios-hero-avatar { width: 86px; height: 86px; border-radius: 50%; font-size: 28px; font-weight: 800; color: #fff; display: flex; align-items: center; justify-content: center; background-size: cover; background-position: center; border: 3px solid rgba(255,255,255,0.16); }
+    .tg-cam-fab { position: absolute; bottom: 0; right: 0; width: 28px; height: 28px; border-radius: 50%; background: var(--accent); border: 2px solid #1c1c1e; color: #fff; display: flex; align-items: center; justify-content: center; font-size: 13px; }
+    .color-picker-row { display: flex; gap: 7px; margin-top: 6px; }
+    .color-dot { width: 20px; height: 20px; border-radius: 50%; cursor: pointer; border: 2px solid transparent; }
+    .color-dot.selected { border-color: #fff; transform: scale(1.15); }
+
+    .sticker-picker-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 8px; padding: 8px 16px; }
+    .sticker-choice-btn { height: 44px; border-radius: 12px; border: 1.5px solid var(--border); background: rgba(255,255,255,0.05); cursor: pointer; display: flex; align-items: center; justify-content: center; gap: 6px; color: #fff; font-size: 12px; font-weight: 600; transition: 0.18s; }
+    .sticker-choice-btn.selected { border-color: var(--accent); background: rgba(10, 132, 255, 0.18); }
+
+    .tg-settings-scroll { overflow-y: auto; padding: 10px 12px 14px; display: flex; flex-direction: column; gap: 10px; background: #000000; flex: 1; }
+    .tg-section-box { background: #1c1c1e; border-radius: 16px; padding: 6px 0; border: 1px solid var(--border); }
+    .tg-section-header { padding: 5px 16px; font-size: 11px; font-weight: 700; color: var(--text-secondary); text-transform: uppercase; }
+    .tg-row-item { display: flex; align-items: center; gap: 12px; padding: 8px 16px; }
+    .tg-row-icon { width: 30px; height: 30px; border-radius: 8px; display: flex; align-items: center; justify-content: center; color: #fff; flex-shrink: 0; font-size: 15px; }
+    .tg-row-body { flex: 1; display: flex; flex-direction: column; min-width: 0; }
+    .tg-inline-input, .tg-inline-select { width: 100%; background: transparent; border: none; color: #fff; font-size: 14.5px; font-weight: 500; outline: none; padding: 2px 0; border-bottom: 1px solid transparent; }
+    .tg-inline-input:focus { border-bottom-color: var(--accent); }
+    .tg-inline-select option { background: #1c1c1e; color: #fff; }
+    .tg-row-hint { font-size: 11px; color: var(--text-secondary); }
+    .tg-save-footer { padding: 12px 16px; background: #1c1c1e; border-top: 1px solid var(--border); }
+    .btn-primary { width: 100%; background: var(--accent); color: #fff; border: none; padding: 12px; border-radius: 14px; font-weight: 700; font-size: 14.5px; cursor: pointer; }
+
+    .ios-switch { position: relative; width: 44px; height: 24px; display: inline-block; flex-shrink: 0; }
+    .ios-switch input { opacity: 0; width: 0; height: 0; }
+    .ios-slider { position: absolute; cursor: pointer; inset: 0; background: rgba(255,255,255,0.16); border-radius: 24px; transition: 0.22s; }
+    .ios-slider:before { position: absolute; content: ""; height: 20px; width: 20px; left: 2px; bottom: 2px; background: #fff; border-radius: 50%; transition: 0.22s; }
+    .ios-switch input:checked + .ios-slider { background: #30d158; }
+    .ios-switch input:checked + .ios-slider:before { transform: translateX(20px); }
+
+    .admin-card-item { background: rgba(255,255,255,0.04); border: 1px solid var(--border); border-radius: 12px; padding: 9px 12px; margin: 5px 16px; display: flex; flex-direction: column; gap: 6px; }
+    .admin-perms-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 5px; font-size: 11.5px; color: #dfe6e9; }
+
+    .ios-close-pill { position: absolute; top: 12px; right: 12px; width: 28px; height: 28px; border-radius: 50%; background: rgba(255,255,255,0.12); border: none; color: #fff; font-size: 17px; cursor: pointer; }
+    .ios-actions-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 7px; width: 100%; margin-top: 10px; }
+    .ios-action-btn { background: rgba(255,255,255,0.07); border: 1px solid var(--border); border-radius: 14px; padding: 8px 4px; display: flex; flex-direction: column; align-items: center; gap: 4px; color: var(--accent); font-size: 11px; font-weight: 600; cursor: pointer; }
+    .ios-action-btn.danger-btn { color: var(--danger); }
+    .ios-sheet-body { padding: 12px 14px 18px; overflow-y: auto; display: flex; flex-direction: column; gap: 10px; background: #000000; }
+    .ios-card-group { background: #1c1c1e; border-radius: 16px; overflow: hidden; border: 1px solid var(--border); }
+    .ios-cell { padding: 10px 14px; border-bottom: 1px solid var(--border); }
+    .ios-cell:last-child { border-bottom: none; }
+    .ios-cell-label { font-size: 11px; color: var(--text-secondary); margin-bottom: 2px; }
+    .ios-cell-val { font-size: 14.5px; color: #fff; word-break: break-word; }
+
+    .comments-list-box { flex: 1; overflow-y: auto; padding: 12px; display: flex; flex-direction: column; gap: 9px; max-height: 52vh; background: #000; }
+    .comment-bubble { display: flex; gap: 9px; align-items: flex-start; }
+    .comment-card { flex: 1; background: #1c1c1e; border: 1px solid var(--border); border-radius: 16px; padding: 8px 12px; font-size: 13.5px; }
+    .comment-author { font-weight: 700; font-size: 12px; color: #64d2ff; margin-bottom: 2px; display: flex; align-items: center; gap: 4px; }
+
+    .shared-media-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 4px; border-radius: 12px; overflow: hidden; }
+    .shared-media-item { aspect-ratio: 1/1; background: #0b1119; cursor: pointer; overflow: hidden; }
+    .shared-media-item img, .shared-media-item video { width: 100%; height: 100%; object-fit: cover; }
+
+    /* Редактор медиа */
+    .editor-overlay { position: fixed; inset: 0; background: #000; z-index: 8000; display: none; flex-direction: column; }
+    .editor-overlay.open { display: flex; }
+    .editor-top-bar { height: 52px; padding: 0 14px; display: flex; align-items: center; justify-content: space-between; background: #141417; }
+    .editor-stage { flex: 1; display: flex; align-items: center; justify-content: center; overflow: hidden; padding: 10px; }
+    #photoEditorCanvas, #videoEditorPreview { max-width: 100%; max-height: 100%; border-radius: 14px; }
+    .editor-controls { background: #141417; padding: 10px 14px; display: flex; flex-direction: column; gap: 8px; }
+    .editor-tool-row { display: flex; align-items: center; gap: 7px; overflow-x: auto; }
+    .tool-chip { background: rgba(255,255,255,0.08); border: 1px solid var(--border); color: #fff; padding: 5px 10px; border-radius: 14px; font-size: 12px; cursor: pointer; white-space: nowrap; }
+    .tool-chip.active { background: var(--accent); }
+    .lightbox-overlay { position: fixed; inset: 0; background: rgba(0,0,0,0.92); z-index: 9500; display: none; align-items: center; justify-content: center; padding: 16px; }
+    .lightbox-overlay.open { display: flex; }
+    .lightbox-overlay img { max-width: 96%; max-height: 90vh; border-radius: 14px; }
+
+    @media (max-width: 768px) {
+      .sidebar { width: 100%; min-width: 100%; }
+      .chat-area { position: fixed; inset: 0; z-index: 20; transform: translateX(100%); transition: transform 0.28s var(--spring); }
+      .app.mobile-chat-open .chat-area { transform: translateX(0); }
+      .back-btn { display: flex; }
+      .message { max-width: 84%; }
+    }
+  </style>
+</head>
+<body>
+
+  <div class="toast-stack" id="toastStack"></div>
+
+  <!-- АВТОРИЗАЦИЯ И ДОБАВЛЕНИЕ НОВЫХ АККАУНТОВ -->
+  <div class="auth-screen" id="authScreen">
+    <div class="auth-card" id="authStep1">
+      <button type="button" class="auth-close-btn" id="cancelAddAccountBtn" title="Отмена">&times;</button>
+      <div class="auth-logo">⚡</div>
+      <div style="font-size:21px;font-weight:800;color:#fff;" id="authHeaderTitle">Вход в Vibegram</div>
+      <div style="font-size:13px;color:var(--text-secondary);">Укажите уникальный @username (у @paveldurov всегда ID: 1), телефон и Email для получения кода.</div>
+      <div class="auth-field">
+        <label>Имя и уникальный @username</label>
+        <div style="display:flex;gap:8px;">
+          <input type="text" id="regNameInput" class="auth-input" placeholder="Имя" style="flex:1;">
+          <input type="text" id="regUsernameInput" class="auth-input" placeholder="@username" style="flex:1;">
+        </div>
+      </div>
+      <div class="auth-field">
+        <label>Номер телефона</label>
+        <input type="tel" id="regPhoneInput" class="auth-input" value="+375 (29) ">
+      </div>
+      <div class="auth-field">
+        <label>Email для получения кода</label>
+        <input type="email" id="regEmailInput" class="auth-input" placeholder="you@vibegram.org">
+      </div>
+      <button type="button" class="btn-primary" id="sendEmailCodeBtn">Получить код на Email</button>
+    </div>
+
+    <div class="auth-card" id="authStep2" style="display:none;">
+      <div class="auth-logo">📩</div>
+      <div style="font-size:20px;font-weight:800;color:#fff;">Код подтверждения</div>
+      <div style="font-size:13px;color:var(--text-secondary);" id="authEmailSentDesc"></div>
+      <input type="text" id="regCodeInput" class="auth-input code-input" maxlength="6" placeholder="••••••">
+      <div id="authCodeHintBox" style="font-size:12.5px;color:#64d2ff;background:rgba(10,132,255,0.14);padding:8px 12px;border-radius:12px;"></div>
+      <button type="button" class="btn-primary" id="verifyEmailCodeBtn">Подтвердить и войти</button>
+      <button type="button" class="icon-btn" id="backToStep1Btn" style="margin:0 auto;font-size:13px;border-radius:10px;">← Назад</button>
+    </div>
+  </div>
+
+  <!-- БОКОВОЕ МЕНЮ (С ПЕРЕКЛЮЧЕНИЕМ АККАУНТОВ И КОПИРОВАНИЕМ @USERNAME) -->
+  <div class="drawer-overlay" id="drawerOverlay"></div>
+  <aside class="side-drawer" id="sideDrawer">
+    <div class="drawer-profile-card">
+      <div class="drawer-top-row">
+        <div class="avatar" id="drawerAvatar" style="width:54px;height:54px;font-size:20px;cursor:pointer;"></div>
+        <span class="drawer-id-pill" id="drawerUserIdPill">ID: 1</span>
+      </div>
+      <div>
+        <div class="drawer-name" id="drawerUserName"></div>
+        <div class="drawer-subinfo">
+          <span class="copy-username-chip" id="drawerCopyUsernameBtn" title="Нажмите, чтобы скопировать @username"></span>
+          <span id="drawerUserMeta"></span>
+        </div>
+      </div>
+    </div>
+
+    <div class="drawer-scroll">
+      <!-- Мультиаккаунт: список сохраненных аккаунтов + кнопка Добавить аккаунт -->
+      <div class="drawer-group">
+        <div class="drawer-group-title">Аккаунты</div>
+        <div id="drawerAccountsList"></div>
+        <button type="button" class="drawer-btn" id="drawerAddAccountBtn" style="color:#64d2ff;">
+          <span class="drawer-ico" style="background:rgba(10,132,255,0.2);color:#64d2ff;">＋</span>
+          <span>Добавить аккаунт</span>
+        </button>
+      </div>
+
+      <div class="drawer-group">
+        <div class="drawer-group-title">Навигация и Каналы</div>
+        <button type="button" class="drawer-btn" id="drawerMyProfileBtn">
+          <span class="drawer-ico" style="background:#0a84ff;">👤</span>
+          <span>Мой профиль и Настройки</span>
+        </button>
+        <button type="button" class="drawer-btn" id="drawerCreateChannelBtn">
+          <span class="drawer-ico" style="background:#5e5ce6;">📢</span>
+          <span>Создать канал</span>
+        </button>
+        <button type="button" class="drawer-btn" id="drawerSavedMsgsBtn">
+          <span class="drawer-ico" style="background:#64d2ff;color:#000;">🔖</span>
+          <span>Избранное</span>
+        </button>
+      </div>
+
+      <div class="drawer-group">
+        <div class="drawer-group-title">Верификация и Статус</div>
+        <button type="button" class="drawer-btn" id="drawerOpenVerifyBotBtn">
+          <span class="drawer-ico" style="background:#30d158;">🤖</span>
+          <span>Бот Верификации (@verify_bot)</span>
+        </button>
+        <button type="button" class="drawer-btn" id="drawerPremiumBtn">
+          <span class="drawer-ico" style="background:linear-gradient(135deg,#5e5ce6,#ff9f0a);">⭐</span>
+          <span>Vibegram Premium и Эмодзи</span>
+        </button>
+      </div>
+
+      <div class="drawer-group">
+        <div class="drawer-group-title">Управление</div>
+        <button type="button" class="drawer-btn" id="drawerWipeServerBtn" style="color:#ff9f0a;">
+          <span class="drawer-ico" style="background:rgba(255,159,10,0.2);">🧹</span>
+          <span>Очистить все чаты</span>
+        </button>
+        <button type="button" class="drawer-btn" id="drawerLogoutBtn" style="color:var(--danger);">
+          <span class="drawer-ico" style="background:rgba(255,69,58,0.2);">🚪</span>
+          <span>Выйти из текущего аккаунта</span>
+        </button>
+      </div>
+    </div>
+  </aside>
+
+  <!-- Модальное окно объяснения галочки верификации -->
+  <div class="modal-overlay" id="badgeInfoModal">
+    <div class="ios-sheet-modal" style="max-width:355px;padding:24px 20px;text-align:center;align-items:center;gap:11px;">
+      <div id="badgeInfoIcon" style="width:64px;height:64px;border-radius:50%;background:rgba(10,132,255,0.14);display:flex;align-items:center;justify-content:center;"></div>
+      <div style="font-size:18px;font-weight:800;color:#fff;" id="badgeInfoTitle"></div>
+      <div style="font-size:12.5px;font-weight:700;color:#64d2ff;background:rgba(100,210,255,0.12);padding:4px 12px;border-radius:10px;" id="badgeInfoCategory"></div>
+      <div style="font-size:13.5px;color:#dfe6e9;line-height:1.45;" id="badgeInfoReason"></div>
+      <button type="button" class="btn-primary" id="closeBadgeInfoBtn" style="margin-top:6px;">Понятно</button>
+    </div>
+  </div>
+
+  <div class="lightbox-overlay" id="lightboxOverlay"><img id="lightboxImg" src="" alt=""></div>
+
+  <!-- Контекстное меню сообщений -->
+  <div class="context-wrap" id="msgContextWrap">
+    <div class="reaction-picker-bar">
+      <button class="react-emoji-btn" data-emoji="❤️">❤️</button>
+      <button class="react-emoji-btn" data-emoji="🔥">🔥</button>
+      <button class="react-emoji-btn" data-emoji="👍">👍</button>
+      <button class="react-emoji-btn" data-emoji="😂">😂</button>
+      <button class="react-emoji-btn" data-emoji="🎉">🎉</button>
+      <button class="react-emoji-btn" data-emoji="⚡">⚡</button>
+      <button class="react-emoji-btn" data-emoji="💎">💎</button>
+    </div>
+    <div class="context-menu">
+      <button class="context-item" id="ctxReplyBtn">↩️ <span>Ответить</span></button>
+      <button class="context-item" id="ctxForwardBtn">➡️ <span>Переслать</span></button>
+      <button class="context-item" id="ctxPinBtn">📌 <span id="ctxPinLabel">Закрепить</span></button>
+      <button class="context-item" id="ctxCopyBtn">📋 <span>Копировать текст</span></button>
+      <button class="context-item danger" id="ctxDeleteBtn">🗑 <span>Удалить</span></button>
+    </div>
+  </div>
+
+  <!-- Пересылка сообщения -->
+  <div class="modal-overlay" id="forwardModal">
+    <div class="tg-settings-modal" style="max-width:380px;">
+      <div class="tg-profile-banner" style="padding:14px 18px;">
+        <div class="tg-banner-top" style="margin:0;">
+          <span style="font-weight:700;">Переслать сообщение...</span>
+          <button class="icon-btn" id="closeForwardModalBtn" style="color:#fff;">&times;</button>
+        </div>
+      </div>
+      <div style="padding:12px;">
+        <input type="text" id="forwardSearchInput" class="auth-input" placeholder="Поиск @username...">
+        <div id="forwardChatList" style="max-height:280px;overflow-y:auto;margin-top:8px;"></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Комментарии к посту канала -->
+  <div class="modal-overlay" id="commentsModal">
+    <div class="tg-settings-modal">
+      <div class="tg-profile-banner" style="padding:14px 18px;">
+        <div class="tg-banner-top" style="margin:0;">
+          <span style="font-weight:700;" id="commentsModalTitle">Комментарии</span>
+          <button class="icon-btn" id="closeCommentsModalBtn" style="color:#fff;">&times;</button>
+        </div>
+      </div>
+      <div class="comments-list-box" id="commentsListBox"></div>
+      <form class="chat-input-bar" id="commentForm">
+        <div class="send-as-popup" id="commentSendAsPopup"></div>
+        <button type="button" class="send-as-btn" id="commentSendAsBtn" title="Выбрать от чьего имени комментировать"></button>
+        <input type="text" id="commentInput" class="msg-input" placeholder="Комментировать..." autocomplete="off">
+        <button type="submit" class="send-btn">↑</button>
+      </form>
+    </div>
+  </div>
+
+  <!-- Создание и управление Каналом -->
+  <div class="modal-overlay" id="channelEditorModal">
+    <div class="tg-settings-modal">
+      <div class="tg-profile-banner" id="chBannerBg">
+        <div class="tg-banner-top">
+          <span style="font-weight:700;" id="chModalHeaderTitle">Создать канал</span>
+          <button class="icon-btn" id="closeChannelModalBtn" style="color:#fff;">&times;</button>
+        </div>
+        <div class="tg-avatar-container" id="chAvatarWrap">
+          <div class="tg-avatar-main" id="chAvatarPreview">📢</div>
+          <div class="tg-cam-fab">📷</div>
+          <input type="file" id="chAvatarFileInput" accept="image/*" style="display:none;">
+        </div>
+        <div class="color-picker-row" id="chColorPickerRow"></div>
+      </div>
+
+      <div class="tg-settings-scroll">
+        <div class="tg-section-box">
+          <div class="tg-section-header">Основные данные канала</div>
+          <div class="tg-row-item">
+            <div class="tg-row-icon" style="background:#0a84ff;">📢</div>
+            <div class="tg-row-body">
+              <input type="text" id="chNameInput" class="tg-inline-input" placeholder="Название канала">
+              <div class="tg-row-hint">Обязательное поле</div>
+            </div>
+          </div>
+          <div class="tg-row-item">
+            <div class="tg-row-icon" style="background:#5e5ce6;">@</div>
+            <div class="tg-row-body">
+              <input type="text" id="chUsernameInput" class="tg-inline-input" placeholder="@my_channel">
+              <div class="tg-row-hint">Уникальный юзернейм (заполняется автоматически)</div>
+            </div>
+          </div>
+          <div class="tg-row-item">
+            <div class="tg-row-icon" style="background:#30d158;">ℹ️</div>
+            <div class="tg-row-body">
+              <input type="text" id="chBioInput" class="tg-inline-input" placeholder="Описание канала">
+              <div class="tg-row-hint">О чем ваш канал</div>
+            </div>
+          </div>
+        </div>
+
+        <div class="tg-section-box">
+          <div class="tg-section-header">Публикации и Обсуждения</div>
+          <div class="tg-row-item" style="justify-content:space-between;">
+            <div>
+              <div style="font-size:14px;font-weight:600;">Комментарии к постам</div>
+              <div class="tg-row-hint">Разрешить чат обсуждения под постами</div>
+            </div>
+            <label class="ios-switch"><input type="checkbox" id="chCommentsToggle" checked><span class="ios-slider"></span></label>
+          </div>
+          <div class="tg-row-item" style="justify-content:space-between;">
+            <div>
+              <div style="font-size:14px;font-weight:600;">Подпись автора в постах</div>
+              <div class="tg-row-hint">Показывать имя опубликовавшего админа</div>
+            </div>
+            <label class="ios-switch"><input type="checkbox" id="chSignToggle" checked><span class="ios-slider"></span></label>
+          </div>
+        </div>
+
+        <div class="tg-section-box">
+          <div class="tg-section-header">Администраторы и Права</div>
+          <div style="padding:6px 16px;display:flex;gap:8px;">
+            <input type="text" id="newAdminUsernameInput" class="auth-input" placeholder="@username админа" style="flex:1;padding:8px 12px;">
+            <button type="button" class="btn-primary" id="addChannelAdminBtn" style="width:auto;padding:0 14px;">+ Админ</button>
+          </div>
+          <div id="channelAdminsListContainer"></div>
+        </div>
+      </div>
+
+      <div class="tg-save-footer">
+        <button type="button" class="btn-primary" id="saveChannelBtn">Сохранить канал</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Медиа-редактор Фото и Видео -->
+  <div class="editor-overlay" id="mediaEditorOverlay">
+    <div class="editor-top-bar">
+      <button type="button" class="icon-btn" id="closeEditorBtn" style="color:#fff;">&times;</button>
+      <div style="font-weight:700;font-size:15px;" id="editorTitle">Редактор медиа</div>
+      <div style="width:32px;"></div>
+    </div>
+    <div class="editor-stage">
+      <canvas id="photoEditorCanvas"></canvas>
+      <video id="videoEditorPreview" controls playsinline></video>
+    </div>
+    <div class="editor-controls">
+      <div class="editor-tool-row" id="photoToolsRow">
+        <button type="button" class="tool-chip active" id="toolBrushBtn">🖌 Кисть</button>
+        <input type="color" id="brushColorPicker" value="#ff3b30" style="width:26px;height:26px;border:none;background:none;">
+        <button type="button" class="tool-chip" id="toolTextBtn">🔤 Текст</button>
+        <button type="button" class="tool-chip" id="toolRotateBtn">🔄 90°</button>
+        <button type="button" class="tool-chip" id="toolCropBtn">✂️ 1:1</button>
+        <button type="button" class="tool-chip" id="toolFilterBtn">✨ Фильтр</button>
+        <button type="button" class="tool-chip" id="toolQualityPhotoBtn">HD 1080p</button>
+        <button type="button" class="tool-chip" id="toolResetPhotoBtn">Сброс</button>
+      </div>
+      <div id="videoToolsBox" style="display:none;flex-direction:column;gap:6px;">
+        <div class="editor-tool-row">
+          <button type="button" class="tool-chip active" data-vqual="720p">🎬 720p HD</button>
+          <button type="button" class="tool-chip" id="videoMuteToggleBtn">🔊 Звук: Вкл</button>
+          <span id="videoTrimInfo" style="font-size:12px;color:#64d2ff;margin-left:auto;"></span>
+        </div>
+        <div class="trim-row">
+          <span>Старт:</span><input type="range" id="videoTrimStart" min="0" max="100" value="0" step="0.1">
+          <span>Конец:</span><input type="range" id="videoTrimEnd" min="0" max="100" value="100" step="0.1">
+        </div>
+      </div>
+      <div style="display:flex;gap:8px;align-items:center;">
+        <input type="text" id="mediaCaptionInput" class="msg-input" placeholder="Добавить подпись...">
+        <button type="button" class="send-btn" id="sendMediaConfirmBtn">↑</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Основной интерфейс -->
+  <div class="app" id="app">
+    <aside class="sidebar">
+      <div class="sidebar-header">
+        <button class="icon-btn" id="openDrawerBtn" title="Меню и Аккаунты">
+          <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2">
+            <line x1="3" y1="12" x2="21" y2="12"></line><line x1="3" y1="6" x2="21" y2="6"></line><line x1="3" y1="18" x2="21" y2="18"></line>
+          </svg>
+        </button>
+        <div class="brand-title">Vibegram</div>
+        <div class="search-wrapper">
+          <input type="text" id="searchInput" class="search-input" placeholder="Поиск @юзеров и каналов...">
+          <button class="clear-search" id="clearSearchBtn">&times;</button>
+        </div>
+      </div>
+      <div class="chat-list" id="chatList"></div>
+    </aside>
+
+    <main class="chat-area">
+      <div class="no-chat-selected" id="noChatSelected">
+        Выберите чат слева, откройте <b>@verify_bot</b> или нажмите <b>☰</b> для управления аккаунтами
+      </div>
+
+      <div class="chat-view" id="chatView">
+        <header class="chat-header">
+          <button class="icon-btn back-btn" id="backToChatsBtn">‹</button>
+          <div class="avatar" id="activeChatAvatar" style="width:38px;height:38px;font-size:15px;cursor:pointer;"></div>
+          <div class="chat-header-info" id="openPeerProfileBtn">
+            <div class="chat-header-title" id="activeChatName"></div>
+            <div class="chat-header-status" id="activeChatStatus"></div>
+          </div>
+          <button type="button" class="header-sub-pill" id="headerSubBtn" style="display:none;">Подписаться</button>
+        </header>
+
+        <div class="pinned-banner" id="pinnedBanner">
+          <div class="pinned-content">
+            <div class="pinned-label">📌 Закрепленное сообщение</div>
+            <div class="pinned-text" id="pinnedBannerText"></div>
+          </div>
+          <button type="button" class="icon-btn" id="unpinBannerBtn">&times;</button>
+        </div>
+
+        <div class="bot-top-panel" id="verifyBotPanel">
+          <div id="verifyBotStatusText">🤖 Подайте заявку на галочку или введите в чат пароль-ID создателя (<b>1</b>) для управления заявками.</div>
+          <button type="button" class="header-sub-pill" id="botQuickApplyBtn">Подать заявку ✓</button>
+        </div>
+
+        <div class="messages-container" id="messagesContainer"></div>
+
+        <div class="reply-bar" id="replyBar">
+          <div class="reply-bar-content">
+            <div class="reply-bar-title" id="replyBarTitle">Ответ</div>
+            <div class="reply-bar-text" id="replyBarText"></div>
+          </div>
+          <button type="button" class="icon-btn" id="cancelReplyBtn">&times;</button>
+        </div>
+
+        <form class="chat-input-bar" id="messageForm">
+          <input type="file" id="chatMediaInput" accept="image/*,video/*" style="display:none;">
+          <button type="button" class="attach-btn" id="attachMediaBtn" title="Фото или Видео">📎</button>
+          <input type="text" id="messageInput" class="msg-input" placeholder="Сообщение..." autocomplete="off">
+          <button type="submit" class="send-btn" title="Отправить">↑</button>
+        </form>
+
+        <div class="channel-readonly-bar" id="channelReadonlyBar">
+          <button type="button" class="channel-sub-bottom-btn" id="bottomChannelSubBtn">Подписаться на канал</button>
+        </div>
+      </div>
+    </main>
+  </div>
+
+  <!-- МОЙ ПРОФИЛЬ, КАСТОМНЫЕ PREMIUM SVG-ЭМОДЗИ И ПОДАЧА ЗАЯВКИ НА ВЕРИФИКАЦИЮ -->
+  <div class="modal-overlay" id="myProfileModal">
+    <div class="tg-settings-modal">
+      <div class="tg-profile-banner" id="myProfileBannerBg">
+        <div class="tg-banner-top">
+          <span style="font-weight:700;">Мой профиль</span>
+          <button class="icon-btn" id="closeMyProfileBtn" style="color:#fff;">&times;</button>
+        </div>
+        <div class="tg-avatar-container" id="myProfileAvatarWrap">
+          <div class="tg-avatar-main" id="myProfileAvatarPreview"></div>
+          <div class="tg-cam-fab">📷</div>
+          <input type="file" id="avatarFileInput" accept="image/*" style="display:none;">
+        </div>
+        <div style="font-size:18px;font-weight:800;color:#fff;display:flex;align-items:center;gap:6px;" id="tgHeroLiveName"></div>
+        <div style="font-size:12.5px;color:#64d2ff;margin-top:3px;cursor:pointer;" id="tgHeroPhoneEmail" title="Нажмите, чтобы скопировать @username"></div>
+        <div class="color-picker-row" id="colorPickerRow"></div>
+      </div>
+
+      <div class="tg-settings-scroll">
+        <div class="tg-section-box">
+          <div class="tg-section-header">Личные данные (Уникальный @username)</div>
+          <div class="tg-row-item">
+            <div class="tg-row-icon" style="background:#0a84ff;">👤</div>
+            <div class="tg-row-body">
+              <input type="text" id="myNameInput" class="tg-inline-input" placeholder="Ваше имя">
+              <div class="tg-row-hint">Отображаемое имя</div>
+            </div>
+          </div>
+          <div class="tg-row-item">
+            <div class="tg-row-icon" style="background:#5e5ce6;">@</div>
+            <div class="tg-row-body">
+              <div style="display:flex;align-items:center;gap:6px;">
+                <input type="text" id="myUsernameInput" class="tg-inline-input" placeholder="@username" style="flex:1;">
+                <button type="button" class="tool-chip" id="copyMyUsernameBtn" style="padding:3px 8px;font-size:11px;">📋 Копировать</button>
+              </div>
+              <div class="tg-row-hint">Уникальный юзернейм (@paveldurov всегда имеет ID: 1)</div>
+            </div>
+          </div>
+          <div class="tg-row-item">
+            <div class="tg-row-icon" style="background:#30d158;">📞</div>
+            <div class="tg-row-body">
+              <input type="text" id="myPhoneInput" class="tg-inline-input" placeholder="+375 (29) 000-00-00">
+              <div class="tg-row-hint">Телефон</div>
+            </div>
+          </div>
+          <div class="tg-row-item">
+            <div class="tg-row-icon" style="background:#ff9f0a;">ℹ️</div>
+            <div class="tg-row-body">
+              <input type="text" id="myBioInput" class="tg-inline-input" placeholder="О себе">
+              <div class="tg-row-hint">Описание профиля</div>
+            </div>
+          </div>
+        </div>
+
+        <div class="tg-section-box">
+          <div class="tg-section-header">Telegram Premium SVG Эмодзи-статус</div>
+          <div class="sticker-picker-grid" id="stickerPickerGrid"></div>
+          <div style="padding:4px 16px 8px;">
+            <button type="button" class="btn-primary" id="buyPremiumBtn">Включить / Выключить Premium</button>
+          </div>
+        </div>
+
+        <div class="tg-section-box">
+          <div class="tg-section-header">Заявка на верификацию аккаунта (Через @verify_bot)</div>
+          <div style="padding: 4px 16px 6px; font-size: 12px; color: var(--text-secondary);" id="myProfileVerifyStateInfo"></div>
+          <div class="tg-row-item">
+            <div class="tg-row-icon" style="background:#0a84ff;">✓</div>
+            <div class="tg-row-body">
+              <select id="myVerifyCategorySelect" class="tg-inline-select">
+                <option value="Популярный блогер">🔥 Популярный блогер</option>
+                <option value="Команда разработки Vibegram">⚙️ Команда разработки Vibegram</option>
+                <option value="Официальный проект">🏢 Официальный проект / Бренд</option>
+                <option value="Создатель мессенджера">👑 Создатель мессенджера</option>
+              </select>
+              <div class="tg-row-hint">Желаемая категория галочки (появится только после одобрения заявки)</div>
+            </div>
+          </div>
+          <div class="tg-row-item">
+            <div class="tg-row-icon" style="background:#64d2ff;color:#000;">📜</div>
+            <div class="tg-row-body">
+              <input type="text" id="myVerifyReasonInput" class="tg-inline-input" placeholder="За что выдается галочка...">
+              <div class="tg-row-hint">Описание для модерации (видно при клике на галочку после одобрения)</div>
+            </div>
+          </div>
+          <div style="padding: 6px 16px 10px;">
+            <button type="button" class="btn-primary" id="submitMyProfileVerifyBtn" style="background:linear-gradient(135deg,#0a84ff,#5e5ce6);">
+              Подать заявку на верификацию в @verify_bot ✓
+            </button>
+          </div>
+        </div>
+
+        <div class="tg-section-box">
+          <div class="tg-section-header">Конфиденциальность</div>
+          <div class="tg-row-item">
+            <div class="tg-row-icon" style="background:#ff9f0a;">🔒</div>
+            <div class="tg-row-body">
+              <select id="myPrivacySelect" class="tg-inline-select">
+                <option value="everyone">Все («в сети» и точное время)</option>
+                <option value="nobody">Никто («был(-а) недавно»)</option>
+              </select>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="tg-save-footer">
+        <button type="button" class="btn-primary" id="saveProfileBtn">Сохранить изменения</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- ПРОФИЛЬ СОБЕСЕДНИКА ИЛИ КАНАЛА В СТИЛЕ IPHONE (С КОПИРОВАНИЕМ @USERNAME) -->
+  <div class="modal-overlay" id="peerProfileModal">
+    <div class="ios-sheet-modal">
+      <div class="ios-hero" id="peerHeroBg">
+        <button class="ios-close-pill" id="closePeerProfileBtn">&times;</button>
+        <div class="ios-hero-avatar" id="peerProfileAvatar"></div>
+        <div style="font-size:20px;font-weight:800;color:#fff;display:flex;align-items:center;gap:6px;margin-top:8px;" id="peerProfileName"></div>
+        <div style="font-size:13px;color:var(--text-secondary);margin-top:2px;" id="peerProfileStatus"></div>
+
+        <div class="ios-actions-grid">
+          <button type="button" class="ios-action-btn" id="iosMuteQuickBtn">🔔<span id="iosMuteLabel">звук</span></button>
+          <button type="button" class="ios-action-btn" id="iosCopyPeerUsernameBtn">📋<span>скопировать @</span></button>
+          <button type="button" class="ios-action-btn" id="iosEditChannelQuickBtn" style="display:none;">⚙️<span>управление</span></button>
+          <button type="button" class="ios-action-btn" id="iosSendMediaQuickBtn">🖼<span>медиа</span></button>
+          <button type="button" class="ios-action-btn danger-btn" id="deleteChatBtn">🗑<span id="deleteChatBtnLabel">очистить</span></button>
+        </div>
+      </div>
+
+      <div class="ios-sheet-body">
+        <div class="ios-card-group">
+          <div class="ios-cell" id="peerUsernameCell" style="cursor:pointer;" title="Нажмите, чтобы скопировать @username">
+            <div class="ios-cell-label" id="peerUsernameLabel">имя пользователя и ID (нажмите для копирования)</div>
+            <div class="ios-cell-val" style="color:#64d2ff;font-weight:700;display:flex;align-items:center;justify-content:space-between;">
+              <span id="peerProfileUsername"></span>
+              <span style="font-size:12px;opacity:0.8;">📋</span>
+            </div>
+          </div>
+          <div class="ios-cell" id="peerPhoneRow" style="display:none;">
+            <div class="ios-cell-label">телефон</div>
+            <div class="ios-cell-val" id="peerProfilePhone"></div>
+          </div>
+          <div class="ios-cell">
+            <div class="ios-cell-label" id="peerBioLabel">о себе</div>
+            <div class="ios-cell-val" id="peerProfileBio"></div>
+          </div>
+          <div class="ios-cell" id="peerVerifiedRow" style="display:none;cursor:pointer;">
+            <div class="ios-cell-label" style="color:#64d2ff;">верификация (нажмите, чтобы узнать значение)</div>
+            <div class="ios-cell-val" style="display:flex;align-items:center;gap:6px;font-weight:600;" id="peerVerifiedText"></div>
+          </div>
+        </div>
+
+        <button type="button" class="btn-primary" id="applyVerifyBtn" style="display:none;background:linear-gradient(135deg,#0a84ff,#5e5ce6);">
+          Подать заявку на верификацию в @verify_bot ✓
+        </button>
+
+        <div id="sharedMediaSection" style="display:none;flex-direction:column;gap:6px;">
+          <div style="font-size:11.5px;font-weight:700;text-transform:uppercase;color:var(--text-secondary);" id="sharedMediaCountTitle">Медиафайлы</div>
+          <div class="shared-media-grid" id="sharedMediaGrid"></div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    const AVATAR_COLORS = ['#0a84ff', '#5e5ce6', '#ff453a', '#bf5af2', '#30d158', '#ff9f0a', '#64d2ff'];
+    const PROFILE_STORAGE_KEY = 'vibegram_active_account_v8';
+    const ACCOUNTS_LIST_KEY = 'vibegram_accounts_list_v8';
+    const CHATS_CACHE_PREFIX = 'vibegram_chats_cache_v8_';
+    const MODERATOR_UNLOCKED_KEY = 'vibegram_mod_unlocked_v8';
+
+    // Векторные SVG-эмодзи в стиле Telegram Premium
+    const PREMIUM_SVG_STICKERS = {
+      'star': {
+        title: 'Золотая звезда Premium',
+        svg: `<svg width="18" height="18" viewBox="0 0 24 24"><defs><linearGradient id="gStar" x1="0" y1="0" x2="1" y2="1"><stop offset="0%" stop-color="#ffeaa7"/><stop offset="50%" stop-color="#fdcb6e"/><stop offset="100%" stop-color="#e17055"/></linearGradient></defs><path fill="url(#gStar)" d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/></svg>`
+      },
+      'gem': {
+        title: 'Кристалл Основателя',
+        svg: `<svg width="18" height="18" viewBox="0 0 24 24"><defs><linearGradient id="gGem" x1="0" y1="0" x2="1" y2="1"><stop offset="0%" stop-color="#74b9ff"/><stop offset="50%" stop-color="#0abde3"/><stop offset="100%" stop-color="#6c5ce7"/></linearGradient></defs><polygon fill="url(#gGem)" points="6 3 18 3 22 9 12 21 2 9"/></svg>`
+      },
+      'fire': {
+        title: 'Неоновое пламя',
+        svg: `<svg width="18" height="18" viewBox="0 0 24 24"><defs><linearGradient id="gFire" x1="0" y1="0" x2="1" y2="1"><stop offset="0%" stop-color="#ff9f43"/><stop offset="50%" stop-color="#ee5253"/><stop offset="100%" stop-color="#8e44ad"/></linearGradient></defs><path fill="url(#gFire)" d="M13.5.67s.74 2.65.74 4.8c0 2.06-1.35 3.73-3.41 3.73-2.07 0-3.63-1.67-3.63-3.73l.03-.36C5.21 7.51 4 10.62 4 14c0 4.42 3.58 8 8 8s8-3.58 8-8C20 8.61 17.41 3.8 13.5.67z"/></svg>`
+      },
+      'crown': {
+        title: 'Корона VIP',
+        svg: `<svg width="18" height="18" viewBox="0 0 24 24"><defs><linearGradient id="gCrown" x1="0" y1="0" x2="1" y2="1"><stop offset="0%" stop-color="#fff200"/><stop offset="100%" stop-color="#f39c12"/></linearGradient></defs><path fill="url(#gCrown)" d="M2 19h20v3H2v-3zm0-13l5 5 5-7 5 7 5-5v11H2V6z"/></svg>`
+      },
+      'bolt': {
+        title: 'Энергия Vibegram',
+        svg: `<svg width="18" height="18" viewBox="0 0 24 24"><defs><linearGradient id="gBolt" x1="0" y1="0" x2="1" y2="1"><stop offset="0%" stop-color="#a29bfe"/><stop offset="100%" stop-color="#00cec9"/></linearGradient></defs><polygon fill="url(#gBolt)" points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"/></svg>`
+      },
+      'rocket': {
+        title: 'Ракета Буста',
+        svg: `<svg width="18" height="18" viewBox="0 0 24 24"><defs><linearGradient id="gRock" x1="0" y1="0" x2="1" y2="1"><stop offset="0%" stop-color="#ff6b81"/><stop offset="100%" stop-color="#5352ed"/></linearGradient></defs><path fill="url(#gRock)" d="M12 2.5s7 3.5 7 11.5c0 2.5-1 4.5-2 5.5l-5-2-5 2c-1-1-2-3-2-5.5 0-8 7-11.5 7-11.5z"/></svg>`
+      },
+      'dev': {
+        title: 'Щит Разработчика',
+        svg: `<svg width="18" height="18" viewBox="0 0 24 24"><defs><linearGradient id="gDev" x1="0" y1="0" x2="1" y2="1"><stop offset="0%" stop-color="#00d2d3"/><stop offset="100%" stop-color="#2e86de"/></linearGradient></defs><path fill="url(#gDev)" d="M12 1L3 5v6c0 5.55 3.84 10.74 9 12 5.16-1.26 9-6.45 9-12V5l-9-4z"/></svg>`
+      },
+      'heart': {
+        title: 'Алмазное сердце',
+        svg: `<svg width="18" height="18" viewBox="0 0 24 24"><defs><linearGradient id="gHeart" x1="0" y1="0" x2="1" y2="1"><stop offset="0%" stop-color="#fd79a8"/><stop offset="100%" stop-color="#e84393"/></linearGradient></defs><path fill="url(#gHeart)" d="M12 21.35l-1.45-1.32C5.4 15.36 2 12.28 2 8.5 2 5.42 4.42 3 7.5 3c1.74 0 3.41.81 4.5 2.09C13.09 3.81 14.76 3 16.5 3 19.58 3 22 5.42 22 8.5c0 3.78-3.4 6.86-8.55 11.54L12 21.35z"/></svg>`
+      }
+    };
+
+    // Изящные векторные галочки прочтения iPhone (Telegram iOS)
+    const SVG_SINGLE_CHECK = `
+      <span class="ios-ticks sent" title="Отправлено">
+        <svg width="14" height="13" viewBox="0 0 16 14" fill="none">
+          <path d="M14 2.5L6.2 11L2 6.8" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"/>
+        </svg>
+      </span>`;
+
+    const SVG_DOUBLE_CHECK = `
+      <span class="ios-ticks read" title="Прочитано">
+        <svg width="18" height="13" viewBox="0 0 20 14" fill="none">
+          <path d="M12.8 2.5L5.2 11L1.3 7.1" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"/>
+          <path d="M18.6 2.5L11 11L8.5 8.5" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"/>
+        </svg>
+      </span>`;
+
+    function getVerifiedSvg() {
+      return `<svg width="17" height="17" viewBox="0 0 24 24" fill="none"><circle cx="12" cy="12" r="10" fill="#0a84ff"/><path d="M8 12.3L10.7 15L16.2 9.5" stroke="#fff" stroke-width="2.3" stroke-linecap="round" stroke-linejoin="round"/></svg>`;
+    }
+
+    function getStickerSvg(key) {
+      return (PREMIUM_SVG_STICKERS[key] || PREMIUM_SVG_STICKERS['star']).svg;
+    }
+
+    // Копирование любого @username в буфер обмена в 1 клик
+    function copyUsernameToClipboard(rawUsername) {
+      const clean = '@' + String(rawUsername || '').trim().replace(/^@+/, '');
+      if (navigator.clipboard) {
+        navigator.clipboard.writeText(clean).catch(() => {});
+      }
+      showCustomIosBanner('Скопировано в буфер обмена', clean);
+    }
+
+    function packBioWithMeta(cleanBio, metaObj) {
+      return (cleanBio || 'В Vibegram') + '\u2063' + JSON.stringify(metaObj || {});
+    }
+
+    function unpackBioAndMeta(rawBio) {
+      const str = String(rawBio || '');
+      const idx = str.indexOf('\u2063');
+      if (idx === -1) return { cleanBio: str, meta: {} };
+      try {
+        return { cleanBio: str.slice(0, idx), meta: JSON.parse(str.slice(idx + 1)) || {} };
+      } catch (e) {
+        return { cleanBio: str.slice(0, idx), meta: {} };
+      }
+    }
+
+    function getUserIdNumber(username, metaUid) {
+      const u = (username || '').toLowerCase().replace(/^@+/, '');
+      if (u === 'paveldurov') return 1;
+      if (u === 'verify_bot') return 0;
+      if (metaUid && Number(metaUid) > 1) return Number(metaUid);
+      const nonChannelUsers = Object.keys(usersMap).filter(k => k !== 'verify_bot' && k !== 'paveldurov' && !usersMap[k]?.is_channel).sort();
+      const idx = nonChannelUsers.indexOf(u);
+      return idx >= 0 ? idx + 2 : Math.floor(100 + Math.random() * 899);
+    }
+
+    function enrichEntity(obj) {
+      if (!obj) return obj;
+      const { cleanBio, meta } = unpackBioAndMeta(obj.bio);
+      const u = (obj.username || '').toLowerCase();
+      const uid = u === 'paveldurov' ? 1 : getUserIdNumber(u, meta.uid || obj.uid);
+      return {
+        ...obj,
+        uid: uid,
+        cleanBio: cleanBio,
+        phone: meta.phone || obj.phone || '',
+        email: meta.email || obj.email || '',
+        sticker: meta.sticker || obj.sticker || 'star',
+        is_verified: Boolean(obj.is_verified),
+        verify_category: meta.verify_category || obj.verify_category || (obj.is_channel ? 'Официальный канал' : 'Верифицированный профиль'),
+        verify_reason: meta.verify_reason || obj.verify_reason || 'Подлинность подтверждена через @verify_bot в Vibegram.',
+        admins: meta.admins || obj.admins || {}
+      };
+    }
+
+    /* =========================================================================
+       МУЛЬТИАККАУНТ И ЛОКАЛЬНОЕ СОХРАНЕНИЕ ПЕРЕПИСОК
+       ========================================================================= */
+    let accountsList = JSON.parse(localStorage.getItem(ACCOUNTS_LIST_KEY)) || [];
+    let myProfile = JSON.parse(localStorage.getItem(PROFILE_STORAGE_KEY)) || (accountsList[0] || null);
+    let isModeratorUnlocked = localStorage.getItem(MODERATOR_UNLOCKED_KEY) === '1';
+    let isAddingSecondAccount = false;
+
+    let usersMap = {};
+    let messagesList = [];
+    let modQueueMessages = [];
+    let pinsMap = {};
+    let openedPeers = ['verify_bot'];
+    let activePeer = null;
+    let activeCommentPostId = null;
+    let serverTime = Date.now();
+    let knownMsgIds = new Set();
+    let isFirstSync = true;
+    let soundMuted = false;
+
+    let currentCommentSendAsUsername = '';
+    let currentReplyMsg = null;
+    let selectedContextMsg = null;
+
+    function upsertAccountInList(profileObj) {
+      if (!profileObj || !profileObj.username) return;
+      const u = profileObj.username.toLowerCase();
+      const idx = accountsList.findIndex(a => a.username.toLowerCase() === u);
+      if (idx >= 0) {
+        accountsList[idx] = { ...accountsList[idx], ...profileObj };
+      } else {
+        accountsList.push(profileObj);
+      }
+      localStorage.setItem(ACCOUNTS_LIST_KEY, JSON.stringify(accountsList));
+      localStorage.setItem(PROFILE_STORAGE_KEY, JSON.stringify(profileObj));
+    }
+
+    function saveChatsCacheForCurrentAccount() {
+      if (!myProfile || !myProfile.username) return;
+      const u = myProfile.username.toLowerCase();
+      const payload = {
+        openedPeers: openedPeers,
+        activePeer: activePeer,
+        messagesList: messagesList,
+        usersMap: usersMap,
+        pinsMap: pinsMap
+      };
+      try {
+        localStorage.setItem(CHATS_CACHE_PREFIX + u, JSON.stringify(payload));
+      } catch (e) {}
+    }
+
+    function loadChatsCacheForCurrentAccount() {
+      if (!myProfile || !myProfile.username) return;
+      const u = myProfile.username.toLowerCase();
+      try {
+        const raw = localStorage.getItem(CHATS_CACHE_PREFIX + u);
+        if (!raw) {
+          openedPeers = ['verify_bot'];
+          messagesList = [];
+          return;
+        }
+        const parsed = JSON.parse(raw);
+        if (Array.isArray(parsed.openedPeers)) {
+          openedPeers = parsed.openedPeers.includes('verify_bot') ? parsed.openedPeers : ['verify_bot', ...parsed.openedPeers];
+        }
+        if (Array.isArray(parsed.messagesList) && messagesList.length === 0) {
+          messagesList = parsed.messagesList;
+        }
+        if (parsed.usersMap && Object.keys(usersMap).length === 0) {
+          usersMap = parsed.usersMap;
+        }
+        if (parsed.pinsMap && Object.keys(pinsMap).length === 0) {
+          pinsMap = parsed.pinsMap;
+        }
+        if (parsed.activePeer && !activePeer) {
+          activePeer = parsed.activePeer;
+        }
+      } catch (e) {}
+    }
+
+    async function switchToAccount(username) {
+      saveChatsCacheForCurrentAccount();
+      const targetAcc = accountsList.find(a => a.username.toLowerCase() === username.toLowerCase());
+      if (!targetAcc) return;
+
+      myProfile = targetAcc;
+      localStorage.setItem(PROFILE_STORAGE_KEY, JSON.stringify(myProfile));
+      currentCommentSendAsUsername = myProfile.username;
+      isFirstSync = true;
+      knownMsgIds.clear();
+      activePeer = null;
+      messagesList = [];
+
+      loadChatsCacheForCurrentAccount();
+      closeDrawer();
+      await syncMyProfileToServer();
+      await pollServer();
+      updateDrawerInfo();
+      showCustomIosBanner('Аккаунт переключен', `Вы вошли как ${myProfile.name} (@${myProfile.username})`);
+    }
+
+    const appEl = document.getElementById('app');
+    const chatListEl = document.getElementById('chatList');
+    const searchInput = document.getElementById('searchInput');
+    const clearSearchBtn = document.getElementById('clearSearchBtn');
+    const noChatSelectedEl = document.getElementById('noChatSelected');
+    const chatViewEl = document.getElementById('chatView');
+    const activeChatAvatar = document.getElementById('activeChatAvatar');
+    const activeChatName = document.getElementById('activeChatName');
+    const activeChatStatus = document.getElementById('activeChatStatus');
+    const headerSubBtn = document.getElementById('headerSubBtn');
+    const pinnedBanner = document.getElementById('pinnedBanner');
+    const pinnedBannerText = document.getElementById('pinnedBannerText');
+    const verifyBotPanel = document.getElementById('verifyBotPanel');
+    const verifyBotStatusText = document.getElementById('verifyBotStatusText');
+    const messagesContainer = document.getElementById('messagesContainer');
+    const messageForm = document.getElementById('messageForm');
+    const messageInput = document.getElementById('messageInput');
+    const channelReadonlyBar = document.getElementById('channelReadonlyBar');
+    const bottomChannelSubBtn = document.getElementById('bottomChannelSubBtn');
+    const toastStack = document.getElementById('toastStack');
+    const msgContextWrap = document.getElementById('msgContextWrap');
+    const replyBar = document.getElementById('replyBar');
+    const replyBarTitle = document.getElementById('replyBarTitle');
+    const replyBarText = document.getElementById('replyBarText');
+    const lightboxOverlay = document.getElementById('lightboxOverlay');
+    const lightboxImg = document.getElementById('lightboxImg');
+
+    function renderBadgesHtml(rawObj) {
+      if (!rawObj) return '';
+      const obj = enrichEntity(rawObj);
+      const isVer = Boolean(obj.is_verified);
+      const verHtml = isVer
+        ? `<span class="verified-badge" data-ver-user="${escapeHtml(obj.username)}" title="Нажмите, чтобы узнать за что выдана галочка">${getVerifiedSvg()}</span>`
+        : '';
+      const premHtml = obj.is_premium
+        ? `<span class="prem-svg-badge" data-ver-user="${escapeHtml(obj.username)}" title="Vibegram Premium">${getStickerSvg(obj.sticker)}</span>`
+        : '';
+      return `${verHtml}${premHtml}`;
+    }
+
+    function openBadgeExplanationModal(username) {
+      const target = enrichEntity(getPeerObject(username));
+      const modal = document.getElementById('badgeInfoModal');
+      const iconBox = document.getElementById('badgeInfoIcon');
+      const titleEl = document.getElementById('badgeInfoTitle');
+      const catEl = document.getElementById('badgeInfoCategory');
+      const reasonEl = document.getElementById('badgeInfoReason');
+
+      if (target.is_verified) {
+        iconBox.innerHTML = `<svg width="36" height="36" viewBox="0 0 24 24" fill="none"><circle cx="12" cy="12" r="10" fill="#0a84ff"/><path d="M8 12.3L10.7 15L16.2 9.5" stroke="#fff" stroke-width="2.3" stroke-linecap="round" stroke-linejoin="round"/></svg>`;
+        titleEl.textContent = `${target.name} (@${target.username})`;
+        catEl.textContent = target.verify_category || (target.is_channel ? 'Официальный канал' : 'Верифицированный аккаунт');
+        reasonEl.textContent = `Основание выдачи галочки: ${target.verify_reason || 'Официально подтверждено через @verify_bot.'}`;
+      } else if (target.is_premium) {
+        const stInfo = PREMIUM_SVG_STICKERS[target.sticker] || PREMIUM_SVG_STICKERS['star'];
+        iconBox.innerHTML = stInfo.svg.replace('width="18" height="18"', 'width="36" height="36"');
+        titleEl.textContent = stInfo.title;
+        catEl.textContent = `Подписка Vibegram Premium`;
+        reasonEl.textContent = `Эксклюзивный анимированный SVG эмодзи-статус пользователя ${target.name} (@${target.username}).`;
+      } else {
+        return;
+      }
+      modal.classList.add('open');
+    }
+
+    document.getElementById('closeBadgeInfoBtn').addEventListener('click', () => {
+      document.getElementById('badgeInfoModal').classList.remove('open');
+    });
+
+    document.addEventListener('click', (ev) => {
+      const badgeEl = ev.target.closest('[data-ver-user]');
+      if (badgeEl) {
+        ev.stopPropagation();
+        openBadgeExplanationModal(badgeEl.getAttribute('data-ver-user'));
+        return;
+      }
+      msgContextWrap.classList.remove('open');
+      document.getElementById('commentSendAsPopup').classList.remove('open');
+    });
+
+    lightboxOverlay.addEventListener('click', () => lightboxOverlay.classList.remove('open'));
+
+    /* =========================================================================
+       РЕГИСТРАЦИЯ И ДОБАВЛЕНИЕ АККАУНТОВ
+       ========================================================================= */
+    let generatedEmailCode = '';
+    let pendingRegData = null;
+
+    function checkAuthAndShowScreen() {
+      const authScreen = document.getElementById('authScreen');
+      const closeBtn = document.getElementById('cancelAddAccountBtn');
+      if (!myProfile || !myProfile.username || !myProfile.email) {
+        isAddingSecondAccount = false;
+        closeBtn.style.display = 'none';
+        document.getElementById('authHeaderTitle').textContent = 'Вход в Vibegram';
+        authScreen.classList.add('active');
+        return false;
+      }
+      if (myProfile.username.toLowerCase() === 'paveldurov') {
+        myProfile.uid = 1;
+        isModeratorUnlocked = true;
+        localStorage.setItem(MODERATOR_UNLOCKED_KEY, '1');
+      }
+      upsertAccountInList(myProfile);
+      authScreen.classList.remove('active');
+      return true;
+    }
+
+    document.getElementById('cancelAddAccountBtn').addEventListener('click', () => {
+      isAddingSecondAccount = false;
+      document.getElementById('authScreen').classList.remove('active');
+    });
+
+    document.getElementById('sendEmailCodeBtn').addEventListener('click', async () => {
+      const name = document.getElementById('regNameInput').value.trim();
+      const username = document.getElementById('regUsernameInput').value.trim().replace(/^@+/, '').toLowerCase().replace(/[^a-z0-9_]/g, '');
+      const phone = document.getElementById('regPhoneInput').value.trim() || '+375 (29) 000-00-00';
+      const email = document.getElementById('regEmailInput').value.trim().toLowerCase();
+
+      if (!name || !username || !email || !email.includes('@')) {
+        alert('Заполните Имя, латинский @username и корректный Email.');
+        return;
+      }
+
+      try {
+        const res = await fetch(`/api/sync?me=${encodeURIComponent(username)}`);
+        if (res.ok) {
+          const data = await res.json();
+          usersMap = data.users || {};
+          if (usersMap[username]) {
+            const existing = enrichEntity(usersMap[username]);
+            if (existing.is_channel) {
+              alert(`Ник @${username} уже занят каналом! Выберите другой @username.`);
+              return;
+            }
+            if (existing.email && existing.email.toLowerCase() !== email) {
+              alert(`Ник @${username} уже занят другим пользователем! Каждый @username уникален.`);
+              return;
+            }
+          }
+        }
+      } catch (e) {}
+
+      generatedEmailCode = String(Math.floor(100000 + Math.random() * 900000));
+      const assignedUid = username === 'paveldurov' ? 1 : (Object.keys(usersMap).length + 1);
+
+      pendingRegData = {
+        uid: assignedUid,
+        name,
+        username,
+        phone,
+        email,
+        bio: 'В Vibegram ⚡',
+        color: AVATAR_COLORS[Math.floor(Math.random() * AVATAR_COLORS.length)],
+        avatar: '',
+        privacy: 'everyone',
+        is_premium: false,
+        sticker: 'star',
+        is_verified: false,
+        verify_category: 'Популярный блогер',
+        verify_reason: ''
+      };
+
+      document.getElementById('authStep1').style.display = 'none';
+      document.getElementById('authStep2').style.display = 'flex';
+      document.getElementById('authEmailSentDesc').innerHTML = `Код отправлен на <b>${escapeHtml(email)}</b>`;
+      document.getElementById('authCodeHintBox').innerHTML = `📬 Код из письма Vibegram: <b>${generatedEmailCode}</b><br><span style="font-size:11px;opacity:0.85;">Ваш ID: ${assignedUid}</span>`;
+
+      showCustomIosBanner('Почта Vibegram', `Код подтверждения для @${username}: ${generatedEmailCode}`);
+      document.getElementById('regCodeInput').value = '';
+      document.getElementById('regCodeInput').focus();
+    });
+
+    document.getElementById('backToStep1Btn').addEventListener('click', () => {
+      document.getElementById('authStep2').style.display = 'none';
+      document.getElementById('authStep1').style.display = 'flex';
+    });
+
+    document.getElementById('verifyEmailCodeBtn').addEventListener('click', async () => {
+      if (document.getElementById('regCodeInput').value.trim() !== generatedEmailCode) {
+        alert('Неверный 6-значный код!');
+        return;
+      }
+      saveChatsCacheForCurrentAccount();
+      myProfile = pendingRegData;
+      if (myProfile.username === 'paveldurov') {
+        isModeratorUnlocked = true;
+        localStorage.setItem(MODERATOR_UNLOCKED_KEY, '1');
+      }
+      upsertAccountInList(myProfile);
+      currentCommentSendAsUsername = myProfile.username;
+      isAddingSecondAccount = false;
+
+      document.getElementById('authScreen').classList.remove('active');
+      loadChatsCacheForCurrentAccount();
+      await syncMyProfileToServer();
+      await pollServer();
+      updateDrawerInfo();
+    });
+
+    /* =========================================================================
+       БОКОВОЕ МЕНЮ (DRAWER НА 3 ПОЛОСКИ + СПИСОК АККАУНТОВ)
+       ========================================================================= */
+    const sideDrawer = document.getElementById('sideDrawer');
+    const drawerOverlay = document.getElementById('drawerOverlay');
+
+    function openDrawer() {
+      updateDrawerInfo();
+      drawerOverlay.classList.add('open');
+      sideDrawer.classList.add('open');
+    }
+
+    function closeDrawer() {
+      drawerOverlay.classList.remove('open');
+      sideDrawer.classList.remove('open');
+    }
+
+    function updateDrawerInfo() {
+      if (!myProfile) return;
+      const serverSelf = usersMap[myProfile.username.toLowerCase()];
+      const enriched = enrichEntity({
+        ...myProfile,
+        is_verified: Boolean(serverSelf?.is_verified)
+      });
+      const av = document.getElementById('drawerAvatar');
+      if (enriched.avatar) {
+        av.style.backgroundImage = `url('${enriched.avatar}')`;
+        av.textContent = '';
+      } else {
+        av.style.backgroundImage = 'none';
+        av.style.backgroundColor = enriched.color || '#0a84ff';
+        av.textContent = getInitials(enriched.name);
+      }
+      document.getElementById('drawerUserIdPill').textContent = `ID: ${enriched.uid}`;
+      document.getElementById('drawerUserName').innerHTML = `<span>${escapeHtml(enriched.name)}</span> ${renderBadgesHtml(enriched)}`;
+      document.getElementById('drawerCopyUsernameBtn').innerHTML = `@${escapeHtml(enriched.username)} <span style="font-size:11px;opacity:0.8;">📋</span>`;
+      document.getElementById('drawerUserMeta').textContent = `${enriched.phone} • ${enriched.email}`;
+
+      // Отрисовка всех добавленных аккаунтов
+      const accContainer = document.getElementById('drawerAccountsList');
+      accContainer.innerHTML = '';
+      accountsList.forEach(acc => {
+        const srvAcc = usersMap[acc.username.toLowerCase()] || acc;
+        const enAcc = enrichEntity({ ...acc, is_verified: Boolean(srvAcc.is_verified) });
+        const isCurrent = enAcc.username.toLowerCase() === myProfile.username.toLowerCase();
+        const row = document.createElement('div');
+        row.className = 'account-switch-row' + (isCurrent ? ' active-acc' : '');
+        const avBg = enAcc.avatar ? `background-image:url('${enAcc.avatar}')` : `background-color:${enAcc.color || '#0a84ff'}`;
+        row.innerHTML = `
+          <div class="avatar" style="width:36px;height:36px;font-size:13px;${avBg}">${enAcc.avatar ? '' : getInitials(enAcc.name)}</div>
+          <div style="flex:1;min-width:0;">
+            <div style="font-size:13.5px;font-weight:700;color:#fff;display:flex;align-items:center;gap:4px;">
+              <span>${escapeHtml(enAcc.name)}</span>${renderBadgesHtml(enAcc)}
+            </div>
+            <div style="font-size:11.5px;color:var(--text-secondary);">@${escapeHtml(enAcc.username)} • ID: ${enAcc.uid}</div>
+          </div>
+          ${isCurrent ? '<span class="acc-active-dot">●</span>' : ''}
+        `;
+        row.addEventListener('click', () => {
+          if (!isCurrent) switchToAccount(enAcc.username);
+        });
+        accContainer.appendChild(row);
+      });
+    }
+
+    document.getElementById('drawerCopyUsernameBtn').addEventListener('click', () => {
+      if (myProfile) copyUsernameToClipboard(myProfile.username);
+    });
+
+    document.getElementById('drawerAddAccountBtn').addEventListener('click', () => {
+      closeDrawer();
+      isAddingSecondAccount = true;
+      document.getElementById('cancelAddAccountBtn').style.display = 'flex';
+      document.getElementById('authHeaderTitle').textContent = 'Добавить аккаунт';
+      document.getElementById('regNameInput').value = '';
+      document.getElementById('regUsernameInput').value = '';
+      document.getElementById('regEmailInput').value = '';
+      document.getElementById('authStep2').style.display = 'none';
+      document.getElementById('authStep1').style.display = 'flex';
+      document.getElementById('authScreen').classList.add('active');
+    });
+
+    document.getElementById('openDrawerBtn').addEventListener('click', openDrawer);
+    drawerOverlay.addEventListener('click', closeDrawer);
+    document.getElementById('drawerAvatar').addEventListener('click', () => { closeDrawer(); openMyProfileModal(); });
+    document.getElementById('drawerMyProfileBtn').addEventListener('click', () => { closeDrawer(); openMyProfileModal(); });
+    document.getElementById('drawerCreateChannelBtn').addEventListener('click', () => { closeDrawer(); openChannelModal(null); });
+    document.getElementById('drawerSavedMsgsBtn').addEventListener('click', () => { closeDrawer(); if (myProfile) openChatWith(myProfile.username); });
+    document.getElementById('drawerOpenVerifyBotBtn').addEventListener('click', () => { closeDrawer(); openChatWith('verify_bot'); });
+    document.getElementById('drawerPremiumBtn').addEventListener('click', () => { closeDrawer(); openMyProfileModal(); });
+
+    document.getElementById('drawerWipeServerBtn').addEventListener('click', async () => {
+      if (!confirm('Очистить все чаты и каналы? Ваши аккаунты останутся.')) return;
+      closeDrawer();
+      const allKeys = Object.keys(usersMap);
+      for (const k of allKeys) {
+        await fetch('/api/delete_chat', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ me: usersMap[k]?.owner || myProfile.username, peer: k })
+        }).catch(() => {});
+      }
+      openedPeers = ['verify_bot'];
+      activePeer = null;
+      messagesList = [];
+      saveChatsCacheForCurrentAccount();
+      await syncMyProfileToServer();
+      await pollServer();
+      showCustomIosBanner('Vibegram', 'Чаты и каналы очищены!');
+    });
+
+    document.getElementById('drawerLogoutBtn').addEventListener('click', () => {
+      if (!myProfile) return;
+      if (!confirm(`Выйти из аккаунта @${myProfile.username}?`)) return;
+      closeDrawer();
+      const curU = myProfile.username.toLowerCase();
+      accountsList = accountsList.filter(a => a.username.toLowerCase() !== curU);
+      localStorage.setItem(ACCOUNTS_LIST_KEY, JSON.stringify(accountsList));
+
+      if (accountsList.length > 0) {
+        switchToAccount(accountsList[0].username);
+      } else {
+        localStorage.removeItem(PROFILE_STORAGE_KEY);
+        myProfile = null;
+        document.getElementById('authStep2').style.display = 'none';
+        document.getElementById('authStep1').style.display = 'flex';
+        checkAuthAndShowScreen();
+      }
+    });
+
+    /* =========================================================================
+       ПРАВА АДМИНОВ КАНАЛА И ВЫБОР ПРОФИЛЯ В КОММЕНТАРИЯХ
+       ========================================================================= */
+    function getChannelAdminPerms(channelObj, username) {
+      if (!channelObj || !channelObj.is_channel || !username) return null;
+      const u = username.toLowerCase();
+      if (channelObj.owner === u) {
+        return { isOwner: true, can_post: true, can_edit: true, can_delete: true, can_promote: true };
+      }
+      const enriched = enrichEntity(channelObj);
+      const adm = (enriched.admins || {})[u];
+      if (!adm) return null;
+      return {
+        isOwner: false,
+        can_post: Boolean(adm.can_post),
+        can_edit: Boolean(adm.can_edit),
+        can_delete: Boolean(adm.can_delete),
+        can_promote: Boolean(adm.can_promote)
+      };
+    }
+
+    function getMyCommentIdentities() {
+      if (!myProfile) return [];
+      const me = myProfile.username.toLowerCase();
+      const selfFromServer = usersMap[me] || myProfile;
+      const list = [enrichEntity({ ...myProfile, is_verified: Boolean(selfFromServer.is_verified), is_channel: false })];
+      Object.values(usersMap).forEach(rawU => {
+        if (rawU.is_channel) {
+          const perms = getChannelAdminPerms(rawU, me);
+          if (perms && perms.can_post) list.push(enrichEntity(rawU));
+        }
+      });
+      return list;
+    }
+
+    function updateCommentSendAsButtonUI() {
+      if (!myProfile) return;
+      const identities = getMyCommentIdentities();
+      if (!currentCommentSendAsUsername || !identities.some(i => i.username === currentCommentSendAsUsername)) {
+        currentCommentSendAsUsername = myProfile.username.toLowerCase();
+      }
+      const btn = document.getElementById('commentSendAsBtn');
+      const ident = identities.find(x => x.username === currentCommentSendAsUsername) || identities[0];
+      if (!btn || !ident) return;
+      if (ident.avatar) {
+        btn.style.backgroundImage = `url('${ident.avatar}')`;
+        btn.textContent = '';
+      } else {
+        btn.style.backgroundImage = 'none';
+        btn.style.backgroundColor = ident.color || '#0a84ff';
+        btn.textContent = ident.is_channel ? '📢' : getInitials(ident.name);
+      }
+    }
+
+    document.getElementById('commentSendAsBtn').addEventListener('click', (ev) => {
+      ev.stopPropagation();
+      const popup = document.getElementById('commentSendAsPopup');
+      const identities = getMyCommentIdentities();
+      popup.innerHTML = `<div style="font-size:11px;font-weight:700;color:#64d2ff;padding:4px 8px;">Комментировать от имени:</div>`;
+      identities.forEach(ident => {
+        const row = document.createElement('div');
+        row.className = 'send-as-option' + (ident.username === currentCommentSendAsUsername ? ' selected' : '');
+        const avBg = ident.avatar ? `background-image:url('${ident.avatar}')` : `background-color:${ident.color || '#0a84ff'}`;
+        row.innerHTML = `
+          <div class="avatar" style="width:30px;height:30px;font-size:12px;${avBg}">${ident.avatar ? '' : (ident.is_channel ? '📢' : getInitials(ident.name))}</div>
+          <div style="flex:1;min-width:0;">
+            <div style="font-size:13px;font-weight:700;color:#fff;display:flex;align-items:center;gap:4px;"><span>${escapeHtml(ident.name)}</span>${renderBadgesHtml(ident)}</div>
+            <div style="font-size:11px;color:var(--text-secondary);">${ident.is_channel ? 'Канал' : 'Личный аккаунт'} • @${escapeHtml(ident.username)}</div>
+          </div>
+        `;
+        row.addEventListener('click', (e) => {
+          e.stopPropagation();
+          currentCommentSendAsUsername = ident.username;
+          popup.classList.remove('open');
+          updateCommentSendAsButtonUI();
+        });
+        popup.appendChild(row);
+      });
+      popup.classList.toggle('open');
+    });
+
+    /* =========================================================================
+       СИНХРОНИЗАЦИЯ, КЭШИРОВАНИЕ ПЕРЕПИСОК И УВЕДОМЛЕНИЯ iOS
+       ========================================================================= */
+    function playPleasantSound() {
+      if (soundMuted) return;
+      try {
+        const ctx = new (window.AudioContext || window.webkitAudioContext)();
+        [587.33, 880, 1174.66].forEach((freq, idx) => {
+          const osc = ctx.createOscillator();
+          const gain = ctx.createGain();
+          const start = ctx.currentTime + idx * 0.065;
+          osc.frequency.setValueAtTime(freq, start);
+          gain.gain.setValueAtTime(0.08, start);
+          gain.gain.exponentialRampToValueAtTime(0.001, start + 0.35);
+          osc.connect(gain); gain.connect(ctx.destination);
+          osc.start(start); osc.stop(start + 0.36);
+        });
+      } catch (e) {}
+    }
+
+    function updateToastStackDepths() {
+      Array.from(toastStack.children).reverse().forEach((el, idx) => el.setAttribute('data-depth', String(Math.min(idx, 3))));
+    }
+
+    function showCustomIosBanner(title, text) {
+      playPleasantSound();
+      const toast = document.createElement('div');
+      toast.className = 'ios-toast';
+      toast.innerHTML = `
+        <div class="avatar" style="width:38px;height:38px;font-size:16px;background:linear-gradient(135deg,#0a84ff,#5e5ce6);">⚡</div>
+        <div style="flex:1;min-width:0;">
+          <div style="font-size:13.5px;font-weight:700;color:#fff;">${escapeHtml(title)}</div>
+          <div style="font-size:13px;color:#dfe6e9;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">${escapeHtml(text)}</div>
+        </div>
+      `;
+      toast.addEventListener('click', () => { toast.remove(); updateToastStackDepths(); });
+      toastStack.appendChild(toast);
+      updateToastStackDepths();
+      setTimeout(() => { if (toast.parentNode) { toast.remove(); updateToastStackDepths(); } }, 4500);
+    }
+
+    function getInitials(name) {
+      if (!name) return '?';
+      const parts = name.trim().split(' ');
+      return parts.length > 1 ? (parts[0][0] + parts[1][0]).toUpperCase() : name.slice(0, 2).toUpperCase();
+    }
+
+    function pickColor(username) {
+      let hash = 0;
+      for (let i = 0; i < username.length; i++) hash = username.charCodeAt(i) + ((hash << 5) - hash);
+      return AVATAR_COLORS[Math.abs(hash) % AVATAR_COLORS.length];
+    }
+
+    function formatTime(ts) {
+      return new Date(ts).toLocaleTimeString('ru-RU', { hour: '2-digit', minute: '2-digit' });
+    }
+
+    function getPeerObject(username) {
+      const u = (username || '').toLowerCase();
+      const me = myProfile ? myProfile.username.toLowerCase() : '';
+      if (u === 'verify_bot') {
+        return enrichEntity({
+          uid: 0,
+          username: 'verify_bot',
+          name: 'Бот Верификации',
+          bio: 'Общедоступный бот верификации каналов и аккаунтов. Пароль создателя: ID 1 (@paveldurov)',
+          color: '#30d158',
+          avatar: '',
+          is_bot: true,
+          is_verified: true,
+          verify_category: 'Официальный бот Vibegram',
+          verify_reason: 'Автоматизированная система выдачи галочек верификации.',
+          last_seen: serverTime
+        });
+      }
+      if (u === me && myProfile) {
+        const srvMe = usersMap[me] || {};
+        return enrichEntity({
+          ...myProfile,
+          is_verified: Boolean(srvMe.is_verified),
+          name: 'Избранное',
+          bio: 'Личное облачное хранилище сообщений и медиа',
+          color: '#0a84ff',
+          last_seen: serverTime
+        });
+      }
+      if (usersMap[u]) return enrichEntity(usersMap[u]);
+      return enrichEntity({
+        username: u,
+        name: u.charAt(0).toUpperCase() + u.slice(1),
+        bio: 'Пользователь Vibegram',
+        color: pickColor(u),
+        is_verified: false,
+        last_seen: 0
+      });
+    }
+
+    async function syncMyProfileToServer(oldUsername = '') {
+      if (!myProfile) return;
+      if (myProfile.username.toLowerCase() === 'paveldurov') myProfile.uid = 1;
+      upsertAccountInList(myProfile);
+
+      const packedBio = packBioWithMeta(myProfile.bio, {
+        uid: myProfile.uid,
+        phone: myProfile.phone,
+        email: myProfile.email,
+        sticker: myProfile.sticker || 'star',
+        verify_category: myProfile.verify_category || 'Популярный блогер',
+        verify_reason: myProfile.verify_reason || ''
+      });
+
+      try {
+        await fetch('/api/profile', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            oldUsername: oldUsername,
+            username: myProfile.username,
+            name: myProfile.name,
+            bio: packedBio,
+            color: myProfile.color,
+            avatar: myProfile.avatar,
+            privacy: myProfile.privacy,
+            is_premium: myProfile.is_premium
+          })
+        });
+      } catch (e) {}
+    }
+
+    async function pollServer() {
+      if (!myProfile) return;
+      const me = myProfile.username.toLowerCase();
+      try {
+        const res = await fetch(`/api/sync?me=${encodeURIComponent(me)}`);
+        if (!res.ok) return;
+        const data = await res.json();
+
+        usersMap = data.users || {};
+        pinsMap = data.pins || {};
+        serverTime = data.serverTime || Date.now();
+        messagesList = (data.messages || []).filter(m => !(m.media && (m.media.type === 'voice' || m.media.type === 'video_note')));
+
+        if (isModeratorUnlocked || me === 'paveldurov') {
+          const modRes = await fetch(`/api/sync?me=vibegram`);
+          if (modRes.ok) {
+            const modData = await modRes.json();
+            modQueueMessages = (modData.messages || []).filter(m => m.verification_request);
+          }
+        }
+
+        if (usersMap[me] && !usersMap[me].is_channel) {
+          const enrichedMe = enrichEntity(usersMap[me]);
+          myProfile.uid = me === 'paveldurov' ? 1 : enrichedMe.uid;
+          myProfile.is_verified = Boolean(usersMap[me].is_verified);
+          upsertAccountInList(myProfile);
+        }
+
+        messagesList.forEach(msg => {
+          if (!knownMsgIds.has(msg.id)) {
+            knownMsgIds.add(msg.id);
+            if (!isFirstSync && msg.to === me && msg.sender !== me && activePeer !== msg.sender) {
+              showCustomIosBanner(getPeerObject(msg.sender).name, msg.text || 'Медиафайл');
+            }
+          }
+        });
+        isFirstSync = false;
+
+        if (activePeer) {
+          await fetch('/api/read', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ reader: me, peer: activePeer })
+          }).catch(() => {});
+        }
+
+        // Сохраняем переписки локально при каждой синхронизации
+        saveChatsCacheForCurrentAccount();
+        updateCommentSendAsButtonUI();
+        renderSidebar();
+        renderActiveChat();
+        if (activeCommentPostId) renderCommentsList();
+      } catch (e) {}
+    }
+
+    function buildConversationsList() {
+      if (!myProfile) return [];
+      const me = myProfile.username.toLowerCase();
+      const convMap = new Map();
+
+      convMap.set('verify_bot', { peer: getPeerObject('verify_bot'), lastMsg: null, unreadCount: 0 });
+
+      openedPeers.forEach(u => {
+        if (!convMap.has(u)) convMap.set(u, { peer: getPeerObject(u), lastMsg: null, unreadCount: 0 });
+      });
+
+      Object.values(usersMap).forEach(rawU => {
+        const u = enrichEntity(rawU);
+        if (u.is_channel) {
+          const isSubOrAdmin = (u.subscribers || []).includes(me) || u.owner === me || Boolean((u.admins || {})[me]);
+          if (isSubOrAdmin && !convMap.has(u.username)) {
+            convMap.set(u.username, { peer: u, lastMsg: null, unreadCount: 0 });
+          }
+        }
+      });
+
+      messagesList.forEach(m => {
+        if (m.is_channel_post) {
+          const chName = m.to;
+          if (!usersMap[chName]) return;
+          const chObj = enrichEntity(usersMap[chName]);
+          if (!convMap.has(chName)) convMap.set(chName, { peer: chObj, lastMsg: null, unreadCount: 0 });
+          const item = convMap.get(chName);
+          if (!item.lastMsg || m.time >= item.lastMsg.time) item.lastMsg = m;
+          return;
+        }
+        const other = (m.sender === me) ? m.to : m.sender;
+        if (m.sender !== me && m.to !== me) return;
+        if (!convMap.has(other)) convMap.set(other, { peer: getPeerObject(other), lastMsg: null, unreadCount: 0 });
+        const item = convMap.get(other);
+        if (!item.lastMsg || m.time >= item.lastMsg.time) item.lastMsg = m;
+        if (m.sender === other && m.to === me && !m.read && other !== me) item.unreadCount++;
+      });
+
+      return Array.from(convMap.values()).sort((a, b) => {
+        if (a.peer.username === 'verify_bot') return -1;
+        if (b.peer.username === 'verify_bot') return 1;
+        return (b.lastMsg?.time || 0) - (a.lastMsg?.time || 0);
+      });
+    }
+
+    function renderSidebar() {
+      if (!myProfile) return;
+      const rawQuery = searchInput.value.trim();
+      clearSearchBtn.style.display = rawQuery ? 'block' : 'none';
+      const cleanQuery = rawQuery.replace(/^@+/, '').toLowerCase();
+      const me = myProfile.username.toLowerCase();
+
+      const conversations = buildConversationsList().filter(c =>
+        c.peer.username.includes(cleanQuery) || c.peer.name.toLowerCase().includes(cleanQuery)
+      );
+
+      chatListEl.innerHTML = '';
+
+      conversations.forEach(({ peer, lastMsg, unreadCount }) => {
+        const item = document.createElement('div');
+        item.className = 'chat-item' + (activePeer === peer.username ? ' active' : '');
+        const isSelf = peer.username === me;
+        const online = !isSelf && !peer.is_channel && (serverTime - (peer.last_seen || 0)) < 7500;
+        const avatarBg = peer.avatar ? `background-image:url('${peer.avatar}')` : `background-color:${peer.color}`;
+        const defaultIcon = isSelf ? '🔖' : (peer.is_bot ? '🤖' : (peer.is_channel ? '📢' : getInitials(peer.name)));
+
+        let outTicks = '';
+        if (lastMsg && !peer.is_channel && lastMsg.sender === me) {
+          outTicks = lastMsg.read ? SVG_DOUBLE_CHECK : SVG_SINGLE_CHECK;
+        }
+
+        let previewTxt = lastMsg ? (lastMsg.text || 'Медиафайл') : (peer.is_bot ? 'Подача заявок на галочку (Пароль модератора: ID 1)' : '@' + peer.username);
+
+        item.innerHTML = `
+          <div class="avatar-wrap">
+            <div class="avatar" style="${avatarBg}">${peer.avatar ? '' : defaultIcon}</div>
+            ${online ? '<div class="online-dot"></div>' : ''}
+          </div>
+          <div class="chat-info">
+            <div class="chat-top">
+              <div class="chat-name">
+                ${peer.is_channel ? '<span>📢</span>' : ''}
+                <span>${escapeHtml(peer.name)}</span>
+                ${renderBadgesHtml(peer)}
+              </div>
+              <div class="chat-time">${outTicks}<span>${lastMsg ? formatTime(lastMsg.time) : ''}</span></div>
+            </div>
+            <div class="chat-bottom">
+              <div class="chat-preview">${escapeHtml(previewTxt)}</div>
+              ${unreadCount > 0 ? `<div class="unread-badge">${unreadCount}</div>` : ''}
+            </div>
+          </div>
+        `;
+        item.addEventListener('click', () => openChatWith(peer.username));
+        chatListEl.appendChild(item);
+      });
+
+      if (cleanQuery.length >= 2) {
+        const globalMatches = Object.values(usersMap).map(enrichEntity).filter(u =>
+          !conversations.some(c => c.peer.username === u.username) &&
+          (u.username.includes(cleanQuery) || u.name.toLowerCase().includes(cleanQuery))
+        );
+
+        if (!conversations.some(c => c.peer.username === cleanQuery) && !globalMatches.some(u => u.username === cleanQuery)) {
+          globalMatches.push(getPeerObject(cleanQuery));
+        }
+
+        if (globalMatches.length > 0) {
+          const title = document.createElement('div');
+          title.className = 'section-title';
+          title.textContent = 'Глобальный поиск';
+          chatListEl.appendChild(title);
+
+          globalMatches.forEach(u => {
+            const gItem = document.createElement('div');
+            gItem.className = 'chat-item';
+            const avatarBg = u.avatar ? `background-image:url('${u.avatar}')` : `background-color:${u.color}`;
+            gItem.innerHTML = `
+              <div class="avatar" style="${avatarBg}">${u.avatar ? '' : (u.is_channel ? '📢' : getInitials(u.name))}</div>
+              <div class="chat-info">
+                <div class="chat-name">${u.is_channel ? '📢 ' : ''}${escapeHtml(u.name)} ${renderBadgesHtml(u)}</div>
+                <div class="chat-preview">@${escapeHtml(u.username)} • ID: ${u.uid}</div>
+              </div>
+            `;
+            gItem.addEventListener('click', () => { searchInput.value = ''; openChatWith(u.username); });
+            chatListEl.appendChild(gItem);
+          });
+        }
+      }
+    }
+
+    function openChatWith(peerUsername) {
+      const u = peerUsername.toLowerCase();
+      if (!openedPeers.includes(u)) openedPeers.push(u);
+      activePeer = u;
+      saveChatsCacheForCurrentAccount();
+      cancelReply();
+      appEl.classList.add('mobile-chat-open');
+      renderSidebar();
+      renderActiveChat(true);
+    }
+
+    let lastRenderedSignature = '';
+
+    function renderActiveChat(forceScroll = false) {
+      if (!activePeer || !myProfile) {
+        noChatSelectedEl.style.display = 'block';
+        chatViewEl.classList.remove('active');
+        return;
+      }
+
+      noChatSelectedEl.style.display = 'none';
+      chatViewEl.classList.add('active');
+
+      const me = myProfile.username.toLowerCase();
+      const peer = getPeerObject(activePeer);
+      const isBotChat = activePeer === 'verify_bot';
+
+      const avatarBg = peer.avatar ? `background-image:url('${peer.avatar}')` : `background-color:${peer.color}`;
+      activeChatAvatar.style.cssText = `width:38px;height:38px;font-size:15px;cursor:pointer;${avatarBg}`;
+      activeChatAvatar.textContent = peer.avatar ? '' : (isBotChat ? '🤖' : (peer.is_channel ? '📢' : getInitials(peer.name)));
+
+      activeChatName.innerHTML = `${peer.is_channel ? '<span>📢</span>' : ''}<span>${escapeHtml(peer.name)}</span> ${renderBadgesHtml(peer)}`;
+      activeChatStatus.textContent = peer.is_channel
+        ? `@${peer.username} • подписчиков: ${(peer.subscribers || []).length}`
+        : (isBotChat ? 'общедоступный бот верификации • пароль: ID 1' : `@${peer.username} • ID: ${peer.uid}`);
+
+      if (isBotChat) {
+        verifyBotPanel.classList.add('active');
+        if (isModeratorUnlocked || me === 'paveldurov') {
+          verifyBotStatusText.innerHTML = `✅ <b>Режим Создателя (ID: 1) привязан к @${escapeHtml(me)}!</b> Вы можете выдавать или отклонять галочки ниже.`;
+        } else {
+          verifyBotStatusText.innerHTML = `🤖 Отправьте в чат цифру <b>1</b> (ID создателя @paveldurov), чтобы привязать панель модерации заявок к вашему аккаунту.`;
+        }
+      } else {
+        verifyBotPanel.classList.remove('active');
+      }
+
+      if (peer.is_channel) {
+        const myPerms = getChannelAdminPerms(peer, me);
+        const canPost = Boolean(myPerms && myPerms.can_post);
+        const isSub = (peer.subscribers || []).includes(me) || peer.owner === me;
+        if (canPost) {
+          headerSubBtn.style.display = 'none';
+          messageForm.style.display = 'flex';
+          channelReadonlyBar.style.display = 'none';
+          messageInput.placeholder = `Опубликовать пост в канале «${peer.name}»...`;
+        } else {
+          headerSubBtn.style.display = 'block';
+          headerSubBtn.textContent = isSub ? 'Вы подписаны ✓' : 'Подписаться';
+          headerSubBtn.className = 'header-sub-pill' + (isSub ? ' joined' : '');
+          messageForm.style.display = 'none';
+          channelReadonlyBar.style.display = 'flex';
+          bottomChannelSubBtn.textContent = isSub ? 'Вы подписаны на канал (Отписаться)' : 'Подписаться на канал';
+        }
+      } else {
+        headerSubBtn.style.display = 'none';
+        messageForm.style.display = 'flex';
+        channelReadonlyBar.style.display = 'none';
+        messageInput.placeholder = isBotChat ? 'Введите 1 (ID создателя) или нажмите Подать заявку...' : 'Сообщение...';
+      }
+
+      let chatMessages = [];
+      if (peer.is_channel) {
+        chatMessages = messagesList.filter(m => m.is_channel_post && m.to === activePeer);
+      } else if (isBotChat) {
+        const myBotMsgs = messagesList.filter(m => (m.sender === me && m.to === 'verify_bot') || (m.sender === 'verify_bot' && m.to === me));
+        const combined = new Map();
+        myBotMsgs.forEach(m => combined.set(m.id, m));
+        if (isModeratorUnlocked || me === 'paveldurov') {
+          modQueueMessages.forEach(m => combined.set(m.id, m));
+        }
+        chatMessages = Array.from(combined.values()).sort((a, b) => a.time - b.time);
+      } else {
+        chatMessages = messagesList.filter(m => !m.is_channel_post && ((m.sender === me && m.to === activePeer) || (m.sender === activePeer && m.to === me)));
+      }
+
+      const signature = activePeer + ':' + isModeratorUnlocked + ':' + Boolean(peer.is_verified) + ':' + chatMessages.map(m =>
+        `${m.id}_${m.read}_${(m.views || []).length}_${(m.comments || []).length}_${m.verification_request?.status || ''}_${JSON.stringify(m.reactions || {})}`
+      ).join('|');
+      if (!forceScroll && signature === lastRenderedSignature) return;
+      lastRenderedSignature = signature;
+
+      messagesContainer.innerHTML = '';
+      if (chatMessages.length === 0) {
+        messagesContainer.innerHTML = `
+          <div class="msg-empty">
+            ${isBotChat
+              ? `Это общедоступный <b>@verify_bot</b>.<br><br>Галочки каналам и профилям выдаются <b>только через заявки</b>!<br>Нажмите <b>«Подать заявку ✓»</b> сверху или введите пароль <b>1</b> (ID создателя) для рассмотрения заявок.`
+              : `Сообщений пока нет.`}
+          </div>
+        `;
+        return;
+      }
+
+      chatMessages.forEach(msg => {
+        const isChannelPost = Boolean(msg.is_channel_post);
+        const isOut = !isChannelPost && msg.sender === me;
+        const el = document.createElement('div');
+        el.className = 'message ' + (isChannelPost ? 'channel-post' : (isOut ? 'out' : 'in'));
+        el.id = 'dom_' + msg.id;
+
+        let channelHeaderHtml = isChannelPost
+          ? `<div class="channel-post-header"><span>${escapeHtml(peer.name)}</span>${renderBadgesHtml(peer)}</div>`
+          : '';
+
+        let replyQuoteHtml = '';
+        if (msg.reply_to && msg.reply_to.text) {
+          replyQuoteHtml = `<div class="msg-reply-quote"><div class="msg-reply-author">${escapeHtml(msg.reply_to.name || '@' + msg.reply_to.sender)}</div><div>${escapeHtml(msg.reply_to.text)}</div></div>`;
+        }
+
+        let mediaHtml = '';
+        if (msg.media && msg.media.url) {
+          mediaHtml = msg.media.type === 'image'
+            ? `<div class="msg-media-box" data-fullimg="${escapeHtml(msg.media.url)}"><img src="${escapeHtml(msg.media.url)}"><span class="media-badge">${escapeHtml(msg.media.quality || 'HD')}</span></div>`
+            : `<div class="msg-media-box"><video src="${escapeHtml(msg.media.url)}" controls playsinline></video></div>`;
+        }
+
+        let botVerifyHtml = '';
+        if (msg.verification_request) {
+          const req = msg.verification_request;
+          if (req.status === 'pending' && (isModeratorUnlocked || me === 'paveldurov')) {
+            botVerifyHtml = `
+              <div class="bot-verify-actions">
+                <button type="button" class="bot-verify-btn approve" data-decide="approve">✅ Выдать галочку</button>
+                <button type="button" class="bot-verify-btn reject" data-decide="reject">❌ Отказать</button>
+              </div>
+            `;
+          } else {
+            const st = req.status === 'approved' ? '✅ Галочка официально выдана (@' + req.target + ')' : (req.status === 'rejected' ? '❌ Заявка отклонена' : '⏳ Ожидает одобрения модератором (ID: 1)');
+            botVerifyHtml = `<div class="bot-status-stamp">${escapeHtml(st)}</div>`;
+          }
+        }
+
+        let reactionsHtml = '';
+        const rEntries = Object.entries(msg.reactions || {}).filter(([_, arr]) => arr && arr.length > 0);
+        if (rEntries.length > 0) {
+          reactionsHtml = `<div class="reactions-list">` + rEntries.map(([emoji, arr]) =>
+            `<div class="reaction-pill ${arr.includes(me) ? 'mine' : ''}" data-react-emoji="${escapeHtml(emoji)}"><span>${escapeHtml(emoji)}</span><span>${arr.length}</span></div>`
+          ).join('') + `</div>`;
+        }
+
+        const metaHtml = isChannelPost
+          ? `<span>👁 ${Math.max(1, (msg.views || []).length)}</span> ${msg.author_signature ? `<span>✍️ ${escapeHtml(msg.author_signature)} •</span>` : ''} <span>${formatTime(msg.time)}</span>`
+          : `<span>${formatTime(msg.time)}</span> ${isOut ? (msg.read ? SVG_DOUBLE_CHECK : SVG_SINGLE_CHECK) : ''}`;
+
+        const commentsBarHtml = (isChannelPost && peer.comments_enabled !== false)
+          ? `<div class="channel-comments-bar" data-open-comments="${escapeHtml(msg.id)}"><span>💬 Комментарии (${(msg.comments || []).length})</span><span>›</span></div>`
+          : '';
+
+        el.innerHTML = `
+          ${channelHeaderHtml}
+          ${replyQuoteHtml}
+          ${mediaHtml}
+          ${msg.text ? `<div style="white-space:pre-wrap;">${escapeHtml(msg.text)}</div>` : ''}
+          ${botVerifyHtml}
+          ${reactionsHtml}
+          <div class="msg-meta">${metaHtml}</div>
+          ${commentsBarHtml}
+        `;
+
+        el.querySelectorAll('[data-decide]').forEach(btn => {
+          btn.addEventListener('click', async (ev) => {
+            ev.stopPropagation();
+            const decision = btn.getAttribute('data-decide');
+            await fetch('/api/verification/decide', {
+              method: 'POST',
+              headers: { 'Content-Type': 'application/json' },
+              body: JSON.stringify({
+                msg_id: msg.id,
+                decision: decision,
+                target: msg.verification_request.target
+              })
+            });
+            await pollServer();
+          });
+        });
+
+        const commBtn = el.querySelector('[data-open-comments]');
+        if (commBtn) commBtn.addEventListener('click', (ev) => { ev.stopPropagation(); openCommentsSheet(msg.id); });
+
+        const imgBox = el.querySelector('[data-fullimg]');
+        if (imgBox) imgBox.addEventListener('click', (ev) => { ev.stopPropagation(); lightboxImg.src = imgBox.getAttribute('data-fullimg'); lightboxOverlay.classList.add('open'); });
+
+        el.querySelectorAll('.reaction-pill').forEach(pill => {
+          pill.addEventListener('click', (ev) => {
+            ev.stopPropagation();
+            sendReaction(msg.id, pill.getAttribute('data-react-emoji'));
+          });
+        });
+
+        el.addEventListener('contextmenu', (ev) => { ev.preventDefault(); ev.stopPropagation(); openMsgContextMenu(ev.clientX, ev.clientY, msg); });
+        el.addEventListener('click', (ev) => { ev.stopPropagation(); openMsgContextMenu(ev.clientX || 120, ev.clientY || 120, msg); });
+
+        if (isChannelPost) {
+          const rowWrap = document.createElement('div');
+          rowWrap.className = 'channel-post-row';
+          const chAv = document.createElement('div');
+          chAv.className = 'avatar';
+          chAv.style.cssText = `width:36px;height:36px;font-size:14px;cursor:pointer;${avatarBg}`;
+          chAv.textContent = peer.avatar ? '' : '📢';
+          chAv.addEventListener('click', openPeerProfile);
+          rowWrap.appendChild(chAv);
+          rowWrap.appendChild(el);
+          messagesContainer.appendChild(rowWrap);
+        } else {
+          messagesContainer.appendChild(el);
+        }
+      });
+      messagesContainer.scrollTop = messagesContainer.scrollHeight;
+    }
+
+    document.getElementById('botQuickApplyBtn').addEventListener('click', async () => {
+      if (!myProfile) return;
+      const targetHandle = prompt('Введите @username вашего канала или аккаунта для подачи заявки на галочку:', '@' + myProfile.username);
+      if (!targetHandle) return;
+      const cleanTarget = targetHandle.trim().replace(/^@+/, '').toLowerCase();
+      const reason = prompt('Укажите категорию и за что выдается галочка (например: Популярный блогер / Официальный канал):', 'Официальный авторский канал');
+      if (!reason) return;
+
+      await syncMyProfileToServer();
+      await fetch('/api/verification/request', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ applicant: myProfile.username, target: cleanTarget, reason: reason })
+      });
+      showCustomIosBanner('Бот Верификации', `Заявка для @${cleanTarget} отправлена на рассмотрение!`);
+      await pollServer();
+    });
+
+    /* =========================================================================
+       КОММЕНТАРИИ К ПОСТАМ КАНАЛА
+       ========================================================================= */
+    const commentsModal = document.getElementById('commentsModal');
+    const commentsListBox = document.getElementById('commentsListBox');
+    const commentForm = document.getElementById('commentForm');
+    const commentInput = document.getElementById('commentInput');
+
+    function openCommentsSheet(postId) {
+      activeCommentPostId = postId;
+      updateCommentSendAsButtonUI();
+      renderCommentsList();
+      commentsModal.classList.add('open');
+    }
+
+    function renderCommentsList() {
+      const post = messagesList.find(m => m.id === activeCommentPostId);
+      if (!post) return;
+      const chObj = getPeerObject(post.to);
+      const comments = post.comments || [];
+      document.getElementById('commentsModalTitle').textContent = `Комментарии (${comments.length})`;
+
+      commentsListBox.innerHTML = '';
+      const chAvBg = chObj.avatar ? `background-image:url('${chObj.avatar}')` : `background-color:${chObj.color}`;
+      const originCard = document.createElement('div');
+      originCard.style.cssText = 'display:flex;gap:10px;align-items:center;padding:9px 12px;background:rgba(10,132,255,0.1);border-left:3px solid #0a84ff;border-radius:12px;margin-bottom:6px;';
+      originCard.innerHTML = `
+        <div class="avatar" style="width:34px;height:34px;font-size:13px;${chAvBg}">${chObj.avatar ? '' : '📢'}</div>
+        <div style="flex:1;min-width:0;">
+          <div style="font-size:12.5px;font-weight:700;color:#64d2ff;display:flex;align-items:center;gap:4px;"><span>📢 ${escapeHtml(chObj.name)}</span>${renderBadgesHtml(chObj)}</div>
+          <div style="font-size:12px;color:#dfe6e9;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">${escapeHtml(post.text || 'Медиа-пост канала')}</div>
+        </div>
+      `;
+      commentsListBox.appendChild(originCard);
+
+      comments.forEach(c => {
+        const senderObj = getPeerObject(c.sender);
+        const avBg = senderObj.avatar ? `background-image:url('${senderObj.avatar}')` : `background-color:${senderObj.color}`;
+        const row = document.createElement('div');
+        row.className = 'comment-bubble';
+        row.innerHTML = `
+          <div class="avatar" style="width:34px;height:34px;font-size:12px;${avBg}">${senderObj.avatar ? '' : (senderObj.is_channel ? '📢' : getInitials(senderObj.name))}</div>
+          <div class="comment-card">
+            <div class="comment-author">
+              ${senderObj.is_channel ? '<span>📢</span>' : ''}
+              <span>${escapeHtml(senderObj.name)}</span>
+              ${renderBadgesHtml(senderObj)}
+              <span style="margin-left:auto;font-size:10.5px;color:var(--text-secondary);">${formatTime(c.time)}</span>
+            </div>
+            <div style="color:#fff;">${escapeHtml(c.text)}</div>
+          </div>
+        `;
+        commentsListBox.appendChild(row);
+      });
+      commentsListBox.scrollTop = commentsListBox.scrollHeight;
+    }
+
+    commentForm.addEventListener('submit', async (e) => {
+      e.preventDefault();
+      const text = commentInput.value.trim();
+      if (!text || !activeCommentPostId || !myProfile) return;
+      commentInput.value = '';
+      await fetch('/api/channel/comment', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          post_id: activeCommentPostId,
+          user: currentCommentSendAsUsername || myProfile.username,
+          text: text
+        })
+      });
+      await pollServer();
+    });
+
+    document.getElementById('closeCommentsModalBtn').addEventListener('click', () => {
+      activeCommentPostId = null;
+      commentsModal.classList.remove('open');
+    });
+
+    /* =========================================================================
+       СОЗДАНИЕ И НАСТРОЙКА КАНАЛА
+       ========================================================================= */
+    const channelEditorModal = document.getElementById('channelEditorModal');
+    const chAvatarPreview = document.getElementById('chAvatarPreview');
+    const chAvatarFileInput = document.getElementById('chAvatarFileInput');
+    const chColorPickerRow = document.getElementById('chColorPickerRow');
+    const chNameInput = document.getElementById('chNameInput');
+    const chUsernameInput = document.getElementById('chUsernameInput');
+    const chBioInput = document.getElementById('chBioInput');
+    const chCommentsToggle = document.getElementById('chCommentsToggle');
+    const chSignToggle = document.getElementById('chSignToggle');
+    const channelAdminsListContainer = document.getElementById('channelAdminsListContainer');
+
+    let editingChannelOldUsername = '';
+    let editingChannelOwner = '';
+    let selectedChColor = '#0a84ff';
+    let selectedChAvatar = '';
+    let editingChannelAdmins = {};
+
+    function slugifyChannelHandle(str) {
+      const map = { а:'a',б:'b',в:'v',г:'g',д:'d',е:'e',ё:'e',ж:'zh',з:'z',и:'i',й:'y',к:'k',л:'l',м:'m',н:'n',о:'o',п:'p',р:'r',с:'s',т:'t',у:'u',ф:'f',х:'h',ц:'ts',ч:'ch',ш:'sh',щ:'sch',ъ:'',ы:'y',ь:'',э:'e',ю:'yu',я:'ya' };
+      return String(str || '').toLowerCase().split('').map(c => map[c] !== undefined ? map[c] : c).join('').replace(/[^a-z0-9_]/g, '_').replace(/_+/g, '_').replace(/^_|_$/g, '');
+    }
+
+    function renderChannelColorPicker() {
+      chColorPickerRow.innerHTML = '';
+      AVATAR_COLORS.forEach(c => {
+        const dot = document.createElement('div');
+        dot.className = 'color-dot' + (c === selectedChColor ? ' selected' : '');
+        dot.style.backgroundColor = c;
+        dot.addEventListener('click', () => {
+          selectedChColor = c;
+          selectedChAvatar = '';
+          updateChannelAvatarPreview();
+          renderChannelColorPicker();
+        });
+        chColorPickerRow.appendChild(dot);
+      });
+    }
+
+    function updateChannelAvatarPreview() {
+      if (selectedChAvatar) {
+        chAvatarPreview.style.backgroundImage = `url('${selectedChAvatar}')`;
+        chAvatarPreview.textContent = '';
+      } else {
+        chAvatarPreview.style.backgroundImage = 'none';
+        chAvatarPreview.style.backgroundColor = selectedChColor;
+        const nm = chNameInput.value.trim();
+        chAvatarPreview.textContent = nm ? getInitials(nm) : '📢';
+      }
+    }
+
+    chNameInput.addEventListener('input', () => {
+      updateChannelAvatarPreview();
+      if (!editingChannelOldUsername) {
+        const autoHandle = slugifyChannelHandle(chNameInput.value);
+        if (autoHandle) chUsernameInput.value = '@' + autoHandle;
+      }
+    });
+
+    function renderChannelAdminsEditor() {
+      channelAdminsListContainer.innerHTML = '';
+      const entries = Object.entries(editingChannelAdmins);
+      if (entries.length === 0) {
+        channelAdminsListContainer.innerHTML = `<div style="padding:4px 16px 8px;font-size:11.5px;color:var(--text-secondary);">Администраторов пока нет.</div>`;
+        return;
+      }
+      entries.forEach(([admUser, perms]) => {
+        const card = document.createElement('div');
+        card.className = 'admin-card-item';
+        card.innerHTML = `
+          <div style="display:flex;justify-content:space-between;align-items:center;">
+            <span style="font-weight:700;font-size:13.5px;color:#64d2ff;">@${escapeHtml(admUser)}</span>
+            <button type="button" class="icon-btn" data-remove-adm="${escapeHtml(admUser)}" style="color:var(--danger);padding:2px;">✕</button>
+          </div>
+          <div class="admin-perms-grid">
+            <label><input type="checkbox" data-perm="can_post" ${perms.can_post ? 'checked' : ''}> Публикация постов</label>
+            <label><input type="checkbox" data-perm="can_edit" ${perms.can_edit ? 'checked' : ''}> Изменение инфо</label>
+            <label><input type="checkbox" data-perm="can_delete" ${perms.can_delete ? 'checked' : ''}> Удаление/Закреп</label>
+            <label><input type="checkbox" data-perm="can_promote" ${perms.can_promote ? 'checked' : ''}> Добавление админов</label>
+          </div>
+        `;
+        card.querySelector('[data-remove-adm]').addEventListener('click', () => {
+          delete editingChannelAdmins[admUser];
+          renderChannelAdminsEditor();
+        });
+        card.querySelectorAll('input[type="checkbox"]').forEach(cb => {
+          cb.addEventListener('change', () => {
+            editingChannelAdmins[admUser][cb.getAttribute('data-perm')] = cb.checked;
+          });
+        });
+        channelAdminsListContainer.appendChild(card);
+      });
+    }
+
+    document.getElementById('addChannelAdminBtn').addEventListener('click', () => {
+      const inp = document.getElementById('newAdminUsernameInput');
+      const u = inp.value.trim().replace(/^@+/, '').toLowerCase();
+      if (!u) return;
+      editingChannelAdmins[u] = { can_post: true, can_edit: true, can_delete: true, can_promote: false };
+      inp.value = '';
+      renderChannelAdminsEditor();
+    });
+
+    function openChannelModal(rawChannelObj = null) {
+      if (!myProfile) return;
+      if (rawChannelObj) {
+        const ch = enrichEntity(rawChannelObj);
+        editingChannelOldUsername = ch.username;
+        editingChannelOwner = ch.owner || myProfile.username;
+        document.getElementById('chModalHeaderTitle').textContent = 'Настройки канала';
+        chNameInput.value = ch.name;
+        chUsernameInput.value = '@' + ch.username;
+        chBioInput.value = ch.cleanBio || '';
+        selectedChColor = ch.color || '#0a84ff';
+        selectedChAvatar = ch.avatar || '';
+        chCommentsToggle.checked = ch.comments_enabled !== false;
+        chSignToggle.checked = ch.sign_messages !== false;
+        editingChannelAdmins = JSON.parse(JSON.stringify(ch.admins || {}));
+      } else {
+        editingChannelOldUsername = '';
+        editingChannelOwner = myProfile.username;
+        document.getElementById('chModalHeaderTitle').textContent = 'Создать канал';
+        chNameInput.value = '';
+        chUsernameInput.value = '';
+        chBioInput.value = '';
+        selectedChColor = '#0a84ff';
+        selectedChAvatar = '';
+        chCommentsToggle.checked = true;
+        chSignToggle.checked = true;
+        editingChannelAdmins = {};
+      }
+      updateChannelAvatarPreview();
+      renderChannelColorPicker();
+      renderChannelAdminsEditor();
+      channelEditorModal.classList.add('open');
+    }
+
+    document.getElementById('chAvatarWrap').addEventListener('click', () => chAvatarFileInput.click());
+    chAvatarFileInput.addEventListener('change', (e) => {
+      const file = e.target.files[0];
+      if (!file) return;
+      const reader = new FileReader();
+      reader.onload = (ev) => {
+        const img = new Image();
+        img.onload = () => {
+          const canvas = document.createElement('canvas');
+          canvas.width = 160; canvas.height = 160;
+          const ctx = canvas.getContext('2d');
+          const m = Math.min(img.width, img.height);
+          ctx.drawImage(img, (img.width - m)/2, (img.height - m)/2, m, m, 0, 0, 160, 160);
+          selectedChAvatar = canvas.toDataURL('image/jpeg', 0.85);
+          updateChannelAvatarPreview();
+        };
+        img.src = ev.target.result;
+      };
+      reader.readAsDataURL(file);
+    });
+
+    document.getElementById('closeChannelModalBtn').addEventListener('click', () => channelEditorModal.classList.remove('open'));
+
+    document.getElementById('saveChannelBtn').addEventListener('click', async () => {
+      if (!myProfile || !myProfile.username) return;
+      const name = chNameInput.value.trim();
+      let handle = chUsernameInput.value.trim().replace(/^@+/, '').toLowerCase();
+      if (!handle && name) handle = slugifyChannelHandle(name);
+      handle = handle.replace(/[^a-z0-9_]/g, '');
+      if (!handle) handle = 'channel_' + Math.floor(100 + Math.random() * 899);
+
+      if (!name) {
+        alert('Пожалуйста, введите название канала.');
+        chNameInput.focus();
+        return;
+      }
+
+      if (!editingChannelOldUsername && usersMap[handle]) {
+        alert(`Юзернейм @${handle} уже занят! Измените поле @username.`);
+        return;
+      }
+
+      await syncMyProfileToServer();
+      const existingCh = editingChannelOldUsername ? enrichEntity(usersMap[editingChannelOldUsername]) : {};
+      const cleanBio = chBioInput.value.trim() || 'Канал в Vibegram';
+      const packedBio = packBioWithMeta(cleanBio, {
+        admins: editingChannelAdmins,
+        verify_category: existingCh.verify_category || 'Официальный канал',
+        verify_reason: existingCh.verify_reason || ''
+      });
+
+      try {
+        const res = await fetch('/api/channel/save', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            owner: (editingChannelOwner || myProfile.username).toLowerCase(),
+            oldUsername: editingChannelOldUsername,
+            username: handle,
+            name: name,
+            bio: packedBio,
+            color: selectedChColor,
+            avatar: selectedChAvatar,
+            comments_enabled: chCommentsToggle.checked,
+            sign_messages: chSignToggle.checked
+          })
+        });
+        const data = await res.json();
+        if (!res.ok || data.error) {
+          alert(data.error || 'Не удалось сохранить канал');
+          return;
+        }
+        channelEditorModal.classList.remove('open');
+        await pollServer();
+        openChatWith(handle);
+      } catch (e) {}
+    });
+
+    /* =========================================================================
+       ОТПРАВКА СООБЩЕНИЙ, ПАРОЛЬ БОТА (ID 1) И РЕДАКТОР МЕДИА
+       ========================================================================= */
+    async function dispatchOutgoingMessage(text, mediaPayload, replyPayload) {
+      if (!activePeer || !myProfile) return;
+      const me = myProfile.username.toLowerCase();
+
+      if (activePeer === 'verify_bot' && (text.trim() === '1' || text.trim().toLowerCase() === '/admin 1' || text.trim().toLowerCase() === 'id 1')) {
+        isModeratorUnlocked = true;
+        localStorage.setItem(MODERATOR_UNLOCKED_KEY, '1');
+        showCustomIosBanner('Бот Верификации (@verify_bot)', `Пароль создателя (ID: 1) принят! Панель заявок привязана к @${me}.`);
+        await pollServer();
+        renderActiveChat(true);
+        return;
+      }
+
+      const peerObj = getPeerObject(activePeer);
+      const senderField = peerObj.is_channel ? (peerObj.owner || me) : me;
+
+      await fetch('/api/send', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          from: senderField,
+          to: activePeer,
+          text: text,
+          reply_to: replyPayload,
+          media: mediaPayload
+        })
+      });
+      await pollServer();
+    }
+
+    messageForm.addEventListener('submit', async (e) => {
+      e.preventDefault();
+      const text = messageInput.value.trim();
+      if (!text || !activePeer) return;
+      const replyPayload = currentReplyMsg;
+      messageInput.value = '';
+      cancelReply();
+      await dispatchOutgoingMessage(text, null, replyPayload);
+    });
+
+    headerSubBtn.addEventListener('click', async () => {
+      if (!activePeer || !myProfile) return;
+      await fetch('/api/channel/subscribe', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ user: myProfile.username, channel: activePeer })
+      });
+      await pollServer();
+    });
+
+    bottomChannelSubBtn.addEventListener('click', () => headerSubBtn.click());
+
+    function openMsgContextMenu(x, y, msg) {
+      selectedContextMsg = msg;
+      msgContextWrap.classList.add('open');
+      msgContextWrap.style.left = Math.max(12, Math.min(x, window.innerWidth - 230)) + 'px';
+      msgContextWrap.style.top = Math.max(12, Math.min(y, window.innerHeight - 240)) + 'px';
+    }
+
+    async function sendReaction(msgId, emoji) {
+      if (!myProfile) return;
+      msgContextWrap.classList.remove('open');
+      await fetch('/api/react', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ id: msgId, user: myProfile.username, emoji: emoji })
+      });
+      await pollServer();
+    }
+
+    document.querySelectorAll('.react-emoji-btn').forEach(btn => {
+      btn.addEventListener('click', (ev) => {
+        ev.stopPropagation();
+        if (selectedContextMsg) sendReaction(selectedContextMsg.id, btn.getAttribute('data-emoji'));
+      });
+    });
+
+    document.getElementById('ctxReplyBtn').addEventListener('click', () => {
+      if (!selectedContextMsg) return;
+      const sObj = getPeerObject(selectedContextMsg.sender);
+      currentReplyMsg = { id: selectedContextMsg.id, sender: selectedContextMsg.sender, name: sObj.name, text: selectedContextMsg.text || 'Медиафайл' };
+      replyBarTitle.textContent = 'В ответ ' + sObj.name;
+      replyBarText.textContent = currentReplyMsg.text;
+      replyBar.classList.add('active');
+      msgContextWrap.classList.remove('open');
+      messageInput.focus();
+    });
+
+    function cancelReply() { currentReplyMsg = null; replyBar.classList.remove('active'); }
+    document.getElementById('cancelReplyBtn').addEventListener('click', cancelReply);
+
+    document.getElementById('ctxPinBtn').addEventListener('click', async () => {
+      if (!selectedContextMsg || !activePeer || !myProfile) return;
+      msgContextWrap.classList.remove('open');
+      await fetch('/api/pin', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          me: myProfile.username,
+          peer: activePeer,
+          message: { id: selectedContextMsg.id, sender: selectedContextMsg.sender, text: selectedContextMsg.text || 'Медиафайл' }
+        })
+      });
+      await pollServer();
+    });
+
+    document.getElementById('unpinBannerBtn').addEventListener('click', async (ev) => {
+      ev.stopPropagation();
+      if (!activePeer || !myProfile) return;
+      await fetch('/api/pin', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ me: myProfile.username, peer: activePeer, message: null })
+      });
+      await pollServer();
+    });
+
+    document.getElementById('ctxCopyBtn').addEventListener('click', () => {
+      if (selectedContextMsg?.text && navigator.clipboard) {
+        navigator.clipboard.writeText(selectedContextMsg.text);
+        showCustomIosBanner('Скопировано', 'Текст сообщения скопирован');
+      }
+      msgContextWrap.classList.remove('open');
+    });
+
+    document.getElementById('ctxDeleteBtn').addEventListener('click', async () => {
+      if (!selectedContextMsg) return;
+      msgContextWrap.classList.remove('open');
+      await fetch('/api/delete_msg', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ id: selectedContextMsg.id })
+      });
+      await pollServer();
+    });
+
+    const forwardModal = document.getElementById('forwardModal');
+    const forwardChatList = document.getElementById('forwardChatList');
+    let msgToForward = null;
+
+    document.getElementById('ctxForwardBtn').addEventListener('click', () => {
+      if (!selectedContextMsg) return;
+      msgToForward = selectedContextMsg;
+      msgContextWrap.classList.remove('open');
+      renderForwardList();
+      forwardModal.classList.add('open');
+    });
+
+    document.getElementById('closeForwardModalBtn').addEventListener('click', () => forwardModal.classList.remove('open'));
+    document.getElementById('forwardSearchInput').addEventListener('input', renderForwardList);
+
+    function renderForwardList() {
+      const q = document.getElementById('forwardSearchInput').value.trim().replace(/^@+/, '').toLowerCase();
+      forwardChatList.innerHTML = '';
+      buildConversationsList().filter(c => !q || c.peer.username.includes(q) || c.peer.name.toLowerCase().includes(q)).forEach(({ peer }) => {
+        const row = document.createElement('div');
+        row.className = 'chat-item';
+        row.innerHTML = `<div class="avatar" style="width:36px;height:36px;font-size:13px;background:${peer.color}">${getInitials(peer.name)}</div><div class="chat-info"><div class="chat-name">${escapeHtml(peer.name)}</div><div class="chat-preview">@${escapeHtml(peer.username)}</div></div>`;
+        row.addEventListener('click', async () => {
+          forwardModal.classList.remove('open');
+          await fetch('/api/send', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({
+              from: peer.is_channel ? peer.owner : myProfile.username,
+              to: peer.username,
+              text: msgToForward.text || '',
+              media: msgToForward.media || null,
+              forwarded_from: { username: msgToForward.sender, name: getPeerObject(msgToForward.sender).name }
+            })
+          });
+          openChatWith(peer.username);
+          await pollServer();
+        });
+        forwardChatList.appendChild(row);
+      });
+    }
+
+    // Редактор фото и видео
+    const chatMediaInput = document.getElementById('chatMediaInput');
+    const mediaEditorOverlay = document.getElementById('mediaEditorOverlay');
+    const photoCanvas = document.getElementById('photoEditorCanvas');
+    const photoCtx = photoCanvas.getContext('2d');
+    const videoPreview = document.getElementById('videoEditorPreview');
+    let editorMode = 'image', originalImage = null, photoRotation = 0, photoCropped = false, photoFilterIndex = 0, photoHighQuality = true, brushStrokes = [], textOverlays = [], isDrawing = false, rawVideoDataUrl = '';
+
+    document.getElementById('attachMediaBtn').addEventListener('click', () => { if (activePeer) { chatMediaInput.value = ''; chatMediaInput.click(); } });
+    chatMediaInput.addEventListener('change', (e) => {
+      const file = e.target.files[0];
+      if (!file) return;
+      document.getElementById('mediaCaptionInput').value = '';
+      if (file.type.startsWith('image/')) {
+        editorMode = 'image';
+        photoCanvas.style.display = 'block'; videoPreview.style.display = 'none';
+        document.getElementById('photoToolsRow').style.display = 'flex'; document.getElementById('videoToolsBox').style.display = 'none';
+        const reader = new FileReader();
+        reader.onload = (ev) => {
+          const img = new Image();
+          img.onload = () => { originalImage = img; photoRotation = 0; photoCropped = false; photoFilterIndex = 0; brushStrokes = []; textOverlays = []; redrawPhotoCanvas(); mediaEditorOverlay.classList.add('open'); };
+          img.src = ev.target.result;
+        };
+        reader.readAsDataURL(file);
+      } else if (file.type.startsWith('video/')) {
+        editorMode = 'video';
+        photoCanvas.style.display = 'none'; videoPreview.style.display = 'block';
+        document.getElementById('photoToolsRow').style.display = 'none'; document.getElementById('videoToolsBox').style.display = 'flex';
+        const reader = new FileReader();
+        reader.onload = (ev) => { rawVideoDataUrl = ev.target.result; videoPreview.src = rawVideoDataUrl; mediaEditorOverlay.classList.add('open'); };
+        reader.readAsDataURL(file);
+      }
+    });
+
+    function redrawPhotoCanvas() {
+      if (!originalImage) return;
+      const maxDim = photoHighQuality ? 1280 : 720;
+      let srcW = originalImage.width, srcH = originalImage.height, sx = 0, sy = 0;
+      if (photoCropped) { const m = Math.min(srcW, srcH); sx = (srcW - m)/2; sy = (srcH - m)/2; srcW = m; srcH = m; }
+      const scale = Math.min(1, maxDim / Math.max(srcW, srcH));
+      const dW = Math.round(srcW * scale), dH = Math.round(srcH * scale);
+      photoCanvas.width = photoRotation % 180 !== 0 ? dH : dW;
+      photoCanvas.height = photoRotation % 180 !== 0 ? dW : dH;
+      photoCtx.save();
+      photoCtx.filter = ['none', 'grayscale(100%)', 'sepia(55%) saturate(140%)', 'contrast(135%)'][photoFilterIndex] || 'none';
+      photoCtx.translate(photoCanvas.width/2, photoCanvas.height/2);
+      photoCtx.rotate((photoRotation * Math.PI)/180);
+      photoCtx.drawImage(originalImage, sx, sy, srcW, srcH, -dW/2, -dH/2, dW, dH);
+      photoCtx.restore();
+      brushStrokes.forEach(s => {
+        if (s.points.length < 2) return;
+        photoCtx.beginPath(); photoCtx.strokeStyle = s.color; photoCtx.lineWidth = 5; photoCtx.lineCap = 'round';
+        photoCtx.moveTo(s.points[0].x, s.points[0].y);
+        s.points.forEach(p => photoCtx.lineTo(p.x, p.y));
+        photoCtx.stroke();
+      });
+      textOverlays.forEach(t => {
+        photoCtx.font = '800 28px sans-serif'; photoCtx.textAlign = 'center'; photoCtx.fillStyle = t.color;
+        photoCtx.fillText(t.text, t.x, t.y);
+      });
+    }
+
+    photoCanvas.addEventListener('pointerdown', (ev) => {
+      if (editorMode !== 'image') return;
+      isDrawing = true;
+      const r = photoCanvas.getBoundingClientRect();
+      brushStrokes.push({ color: document.getElementById('brushColorPicker').value, points: [{ x: ((ev.clientX - r.left)/r.width)*photoCanvas.width, y: ((ev.clientY - r.top)/r.height)*photoCanvas.height }] });
+    });
+    photoCanvas.addEventListener('pointermove', (ev) => {
+      if (!isDrawing) return;
+      const r = photoCanvas.getBoundingClientRect();
+      brushStrokes[brushStrokes.length - 1].points.push({ x: ((ev.clientX - r.left)/r.width)*photoCanvas.width, y: ((ev.clientY - r.top)/r.height)*photoCanvas.height });
+      redrawPhotoCanvas();
+    });
+    window.addEventListener('pointerup', () => { isDrawing = false; });
+
+    document.getElementById('toolTextBtn').addEventListener('click', () => {
+      const t = prompt('Текст на фото:');
+      if (t) { textOverlays.push({ text: t, x: photoCanvas.width/2, y: photoCanvas.height/2, color: document.getElementById('brushColorPicker').value }); redrawPhotoCanvas(); }
+    });
+    document.getElementById('toolRotateBtn').addEventListener('click', () => { photoRotation = (photoRotation + 90) % 360; redrawPhotoCanvas(); });
+    document.getElementById('toolCropBtn').addEventListener('click', () => { photoCropped = !photoCropped; redrawPhotoCanvas(); });
+    document.getElementById('toolFilterBtn').addEventListener('click', () => { photoFilterIndex = (photoFilterIndex + 1) % 4; redrawPhotoCanvas(); });
+    document.getElementById('toolQualityPhotoBtn').addEventListener('click', (e) => { photoHighQuality = !photoHighQuality; e.currentTarget.textContent = photoHighQuality ? 'HD 1080p' : 'SD 720p'; redrawPhotoCanvas(); });
+    document.getElementById('toolResetPhotoBtn').addEventListener('click', () => { photoRotation = 0; photoCropped = false; photoFilterIndex = 0; brushStrokes = []; textOverlays = []; redrawPhotoCanvas(); });
+    document.getElementById('closeEditorBtn').addEventListener('click', () => { videoPreview.pause(); mediaEditorOverlay.classList.remove('open'); });
+
+    document.getElementById('sendMediaConfirmBtn').addEventListener('click', async () => {
+      const cap = document.getElementById('mediaCaptionInput').value.trim();
+      const dataUrl = editorMode === 'image' ? photoCanvas.toDataURL('image/jpeg', photoHighQuality ? 0.88 : 0.65) : rawVideoDataUrl;
+      const upRes = await fetch('/api/upload', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ data: dataUrl, ext: editorMode === 'image' ? 'jpg' : 'mp4' })
+      });
+      const upJson = await upRes.json();
+      mediaEditorOverlay.classList.remove('open');
+      await dispatchOutgoingMessage(cap, { type: editorMode, url: upJson.url, quality: photoHighQuality ? 'HD' : 'SD' }, currentReplyMsg);
+    });
+
+    /* =========================================================================
+       НАСТРОЙКИ МОЕГО ПРОФИЛЯ И КОПИРОВАНИЕ @USERNAME
+       ========================================================================= */
+    const myProfileModal = document.getElementById('myProfileModal');
+    const myProfileAvatarPreview = document.getElementById('myProfileAvatarPreview');
+    const tgHeroLiveName = document.getElementById('tgHeroLiveName');
+    const tgHeroPhoneEmail = document.getElementById('tgHeroPhoneEmail');
+    const myNameInput = document.getElementById('myNameInput');
+    const myUsernameInput = document.getElementById('myUsernameInput');
+    const myPhoneInput = document.getElementById('myPhoneInput');
+    const myBioInput = document.getElementById('myBioInput');
+    const myPrivacySelect = document.getElementById('myPrivacySelect');
+    const myVerifyCategorySelect = document.getElementById('myVerifyCategorySelect');
+    const myVerifyReasonInput = document.getElementById('myVerifyReasonInput');
+    const myProfileVerifyStateInfo = document.getElementById('myProfileVerifyStateInfo');
+    const stickerPickerGrid = document.getElementById('stickerPickerGrid');
+
+    let selectedProfileColor = '#0a84ff', selectedBase64Avatar = '', selectedSticker = 'star';
+
+    function renderStickerPicker() {
+      stickerPickerGrid.innerHTML = '';
+      Object.entries(PREMIUM_SVG_STICKERS).forEach(([key, info]) => {
+        const btn = document.createElement('button');
+        btn.type = 'button';
+        btn.className = 'sticker-choice-btn' + (key === selectedSticker ? ' selected' : '');
+        btn.innerHTML = `${info.svg} <span>${escapeHtml(info.title.split(' ')[0])}</span>`;
+        btn.addEventListener('click', () => {
+          selectedSticker = key;
+          if (myProfile) myProfile.is_premium = true;
+          renderStickerPicker();
+          updateAvatarPreview();
+        });
+        stickerPickerGrid.appendChild(btn);
+      });
+    }
+
+    function updateAvatarPreview() {
+      if (!myProfile) return;
+      const srvSelf = usersMap[myProfile.username.toLowerCase()];
+      const actuallyVerified = Boolean(srvSelf?.is_verified);
+      const displayName = myNameInput.value.trim() || myProfile.name;
+
+      const tempObj = {
+        ...myProfile,
+        name: displayName,
+        sticker: selectedSticker,
+        is_verified: actuallyVerified
+      };
+      tgHeroLiveName.innerHTML = `<span>${escapeHtml(displayName)}</span> ${renderBadgesHtml(tempObj)}`;
+      tgHeroPhoneEmail.innerHTML = `@${escapeHtml(myProfile.username)} 📋 • ID: ${myProfile.uid} • ${escapeHtml(myPhoneInput.value.trim())}`;
+
+      if (actuallyVerified) {
+        myProfileVerifyStateInfo.innerHTML = `<span style="color:#30d158;font-weight:700;">✅ Ваш аккаунт официально верифицирован!</span>`;
+      } else if (srvSelf?.verify_pending) {
+        myProfileVerifyStateInfo.innerHTML = `<span style="color:#ff9f0a;font-weight:700;">⏳ Ваша заявка ожидает одобрения в @verify_bot.</span>`;
+      } else {
+        myProfileVerifyStateInfo.innerHTML = `У вас пока нет галочки верификации. Заполните анкету ниже и отправьте заявку в <b>@verify_bot</b>.`;
+      }
+
+      if (selectedBase64Avatar) {
+        myProfileAvatarPreview.style.backgroundImage = `url('${selectedBase64Avatar}')`;
+        myProfileAvatarPreview.textContent = '';
+      } else {
+        myProfileAvatarPreview.style.backgroundImage = 'none';
+        myProfileAvatarPreview.style.backgroundColor = selectedProfileColor;
+        myProfileAvatarPreview.textContent = getInitials(displayName);
+      }
+    }
+
+    document.getElementById('copyMyUsernameBtn').addEventListener('click', () => {
+      copyUsernameToClipboard(myUsernameInput.value || myProfile?.username);
+    });
+    tgHeroPhoneEmail.addEventListener('click', () => {
+      if (myProfile) copyUsernameToClipboard(myProfile.username);
+    });
+
+    function openMyProfileModal() {
+      if (!myProfile) return;
+      selectedProfileColor = myProfile.color || '#0a84ff';
+      selectedBase64Avatar = myProfile.avatar || '';
+      selectedSticker = myProfile.sticker || 'star';
+      myNameInput.value = myProfile.name;
+      myUsernameInput.value = '@' + myProfile.username;
+      myPhoneInput.value = myProfile.phone || '';
+      myBioInput.value = myProfile.bio || '';
+      myPrivacySelect.value = myProfile.privacy || 'everyone';
+      myVerifyCategorySelect.value = myProfile.verify_category || 'Популярный блогер';
+      myVerifyReasonInput.value = myProfile.verify_reason || '';
+
+      const colorRow = document.getElementById('colorPickerRow');
+      colorRow.innerHTML = '';
+      AVATAR_COLORS.forEach(c => {
+        const dot = document.createElement('div');
+        dot.className = 'color-dot' + (c === selectedProfileColor ? ' selected' : '');
+        dot.style.backgroundColor = c;
+        dot.addEventListener('click', () => { selectedProfileColor = c; selectedBase64Avatar = ''; updateAvatarPreview(); });
+        colorRow.appendChild(dot);
+      });
+
+      renderStickerPicker();
+      updateAvatarPreview();
+      myProfileModal.classList.add('open');
+    }
+
+    myNameInput.addEventListener('input', updateAvatarPreview);
+    document.getElementById('myProfileAvatarWrap').addEventListener('click', () => document.getElementById('avatarFileInput').click());
+    document.getElementById('avatarFileInput').addEventListener('change', (e) => {
+      const file = e.target.files[0];
+      if (!file) return;
+      const reader = new FileReader();
+      reader.onload = (ev) => {
+        const img = new Image();
+        img.onload = () => {
+          const canvas = document.createElement('canvas');
+          canvas.width = 160; canvas.height = 160;
+          const ctx = canvas.getContext('2d');
+          const m = Math.min(img.width, img.height);
+          ctx.drawImage(img, (img.width - m)/2, (img.height - m)/2, m, m, 0, 0, 160, 160);
+          selectedBase64Avatar = canvas.toDataURL('image/jpeg', 0.85);
+          updateAvatarPreview();
+        };
+        img.src = ev.target.result;
+      };
+      reader.readAsDataURL(file);
+    });
+
+    document.getElementById('buyPremiumBtn').addEventListener('click', () => {
+      if (!myProfile) return;
+      myProfile.is_premium = !myProfile.is_premium;
+      updateAvatarPreview();
+    });
+
+    document.getElementById('submitMyProfileVerifyBtn').addEventListener('click', async () => {
+      if (!myProfile) return;
+      const cat = myVerifyCategorySelect.value;
+      const reason = myVerifyReasonInput.value.trim() || `Запрос статуса «${cat}»`;
+
+      myProfile.verify_category = cat;
+      myProfile.verify_reason = reason;
+      await syncMyProfileToServer();
+
+      await fetch('/api/verification/request', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          applicant: myProfile.username,
+          target: myProfile.username,
+          reason: `[${cat}] ${reason}`
+        })
+      });
+
+      myProfileModal.classList.remove('open');
+      showCustomIosBanner('Заявка отправлена', 'Откройте @verify_bot (пароль создателя: 1), чтобы рассмотреть заявку!');
+      openChatWith('verify_bot');
+      await pollServer();
+    });
+
+    document.getElementById('closeMyProfileBtn').addEventListener('click', () => myProfileModal.classList.remove('open'));
+
+    document.getElementById('saveProfileBtn').addEventListener('click', async () => {
+      if (!myProfile) return;
+      const oldUsername = myProfile.username;
+      const newUsername = myUsernameInput.value.trim().replace(/^@+/, '').toLowerCase().replace(/[^a-z0-9_]/g, '') || oldUsername;
+
+      if (newUsername !== oldUsername && usersMap[newUsername]) {
+        alert(`Юзернейм @${newUsername} уже занят другим пользователем или каналом!`);
+        return;
+      }
+
+      const srvSelf = usersMap[oldUsername.toLowerCase()];
+      myProfile = {
+        ...myProfile,
+        uid: newUsername === 'paveldurov' ? 1 : myProfile.uid,
+        name: myNameInput.value.trim() || 'User',
+        username: newUsername,
+        phone: myPhoneInput.value.trim(),
+        bio: myBioInput.value.trim() || 'В Vibegram',
+        color: selectedProfileColor,
+        avatar: selectedBase64Avatar,
+        privacy: myPrivacySelect.value,
+        sticker: selectedSticker,
+        verify_category: myVerifyCategorySelect.value,
+        verify_reason: myVerifyReasonInput.value.trim(),
+        is_verified: Boolean(srvSelf?.is_verified)
+      };
+
+      myProfileModal.classList.remove('open');
+      await syncMyProfileToServer(oldUsername);
+      await pollServer();
+      updateDrawerInfo();
+    });
+
+    // Профиль собеседника или канала (с копированием @username)
+    const peerProfileModal = document.getElementById('peerProfileModal');
+
+    function openPeerProfile() {
+      if (!activePeer || !myProfile) return;
+      const me = myProfile.username.toLowerCase();
+      const peer = getPeerObject(activePeer);
+      const myChPerms = peer.is_channel ? getChannelAdminPerms(peer, me) : null;
+      const canManage = Boolean(myChPerms && (myChPerms.isOwner || myChPerms.can_edit || myChPerms.can_promote));
+
+      const avatarEl = document.getElementById('peerProfileAvatar');
+      if (peer.avatar) {
+        avatarEl.style.backgroundImage = `url('${peer.avatar}')`;
+        avatarEl.textContent = '';
+      } else {
+        avatarEl.style.backgroundImage = 'none';
+        avatarEl.style.backgroundColor = peer.color;
+        avatarEl.textContent = peer.is_channel ? '📢' : getInitials(peer.name);
+      }
+
+      document.getElementById('peerProfileName').innerHTML = `<span>${escapeHtml(peer.name)}</span> ${renderBadgesHtml(peer)}`;
+      document.getElementById('peerProfileUsername').textContent = `@${peer.username} • ID: ${peer.uid}`;
+      document.getElementById('peerProfileBio').textContent = peer.cleanBio || peer.bio;
+      document.getElementById('peerProfileStatus').textContent = peer.is_channel ? `канал • подписчиков: ${(peer.subscribers || []).length}` : 'профиль Vibegram';
+
+      const verRow = document.getElementById('peerVerifiedRow');
+      const isVer = Boolean(peer.is_verified);
+      if (isVer) {
+        verRow.style.display = 'block';
+        document.getElementById('peerVerifiedText').innerHTML = `${getVerifiedSvg()} <span>${escapeHtml(peer.verify_category || 'Официально верифицировано')} — нажмите для описания</span>`;
+        verRow.onclick = () => openBadgeExplanationModal(peer.username);
+      } else if (peer.verify_pending) {
+        verRow.style.display = 'block';
+        document.getElementById('peerVerifiedText').innerHTML = `<span style="color:#ff9f0a;">⏳ Заявка на верификацию находится на рассмотрении в @verify_bot</span>`;
+        verRow.onclick = null;
+      } else {
+        verRow.style.display = 'none';
+      }
+
+      document.getElementById('iosEditChannelQuickBtn').style.display = canManage ? 'flex' : 'none';
+      document.getElementById('applyVerifyBtn').style.display = (canManage && !isVer) ? 'block' : 'none';
+      peerProfileModal.classList.add('open');
+    }
+
+    document.getElementById('peerUsernameCell').addEventListener('click', () => {
+      if (activePeer) copyUsernameToClipboard(activePeer);
+    });
+    document.getElementById('iosCopyPeerUsernameBtn').addEventListener('click', () => {
+      if (activePeer) copyUsernameToClipboard(activePeer);
+    });
+
+    document.getElementById('openPeerProfileBtn').addEventListener('click', openPeerProfile);
+    activeChatAvatar.addEventListener('click', openPeerProfile);
+    document.getElementById('closePeerProfileBtn').addEventListener('click', () => peerProfileModal.classList.remove('open'));
+
+    document.getElementById('iosEditChannelQuickBtn').addEventListener('click', () => {
+      peerProfileModal.classList.remove('open');
+      openChannelModal(getPeerObject(activePeer));
+    });
+
+    document.getElementById('applyVerifyBtn').addEventListener('click', async () => {
+      const peer = getPeerObject(activePeer);
+      const cat = prompt(`Категория верификации для «${peer.name}» (@${peer.username}):`, 'Официальный канал');
+      if (!cat) return;
+      const reason = prompt(`За что выдается галочка (будет видно при клике на галочку после одобрения):`, `Подтвержденный авторский канал @${peer.username}`);
+      if (!reason) return;
+
+      const packedBio = packBioWithMeta(peer.cleanBio || 'Канал в Vibegram', {
+        admins: peer.admins || {},
+        verify_category: cat,
+        verify_reason: reason
+      });
+      await fetch('/api/channel/save', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          owner: peer.owner,
+          oldUsername: peer.username,
+          username: peer.username,
+          name: peer.name,
+          bio: packedBio,
+          color: peer.color,
+          avatar: peer.avatar,
+          comments_enabled: peer.comments_enabled !== false,
+          sign_messages: peer.sign_messages !== false
+        })
+      });
+
+      await fetch('/api/verification/request', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ applicant: myProfile.username, target: peer.username, reason: `[${cat}] ${reason}` })
+      });
+      peerProfileModal.classList.remove('open');
+      openChatWith('verify_bot');
+      await pollServer();
+    });
+
+    document.getElementById('deleteChatBtn').addEventListener('click', async () => {
+      if (!activePeer || !myProfile) return;
+      const p = activePeer;
+      openedPeers = openedPeers.filter(u => u !== p);
+      activePeer = null;
+      saveChatsCacheForCurrentAccount();
+      peerProfileModal.classList.remove('open');
+      appEl.classList.remove('mobile-chat-open');
+      await fetch('/api/delete_chat', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ me: myProfile.username, peer: p })
+      });
+      await pollServer();
+    });
+
+    document.getElementById('backToChatsBtn').addEventListener('click', () => appEl.classList.remove('mobile-chat-open'));
+    searchInput.addEventListener('input', renderSidebar);
+    clearSearchBtn.addEventListener('click', () => { searchInput.value = ''; renderSidebar(); });
+
+    function escapeHtml(str) {
+      return String(str || '').replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;');
+    }
+
+    (async function init() {
+      if (checkAuthAndShowScreen()) {
+        currentCommentSendAsUsername = myProfile.username;
+        loadChatsCacheForCurrentAccount();
+        renderSidebar();
+        renderActiveChat();
+        await syncMyProfileToServer();
+        await pollServer();
+        updateDrawerInfo();
+      }
+      setInterval(() => { if (myProfile && !isAddingSecondAccount) pollServer(); }, 900);
+    })();
+  </script>
+</body>
+</html>
