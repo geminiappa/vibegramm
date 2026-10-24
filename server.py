@@ -5,23 +5,33 @@ import time
 import socket
 import os
 import base64
+import threading
 from urllib.parse import urlparse, parse_qs
 
+# Render and other hosting platforms provide the listening port via PORT.
 PORT = int(os.environ.get('PORT', '8000'))
 
-# Пути к базе данных и загруженным файлам
+# Files are kept next to this script. In production, PostgreSQL is used when
+# DATABASE_URL is configured; JSON remains a local-development fallback.
 BASE_DIR = os.path.dirname(os.path.abspath(__file__))
 os.chdir(BASE_DIR)
-
 DB_FILE = os.path.join(BASE_DIR, 'vibegram_db.json')
 UPLOAD_DIR = os.path.join(BASE_DIR, 'uploads')
-
+DATABASE_URL = os.environ.get('DATABASE_URL', '').strip()
+DB_LOCK = threading.RLock()
 os.makedirs(UPLOAD_DIR, exist_ok=True)
 
-USERS = {}
-MESSAGES = []
-PINS = {}
-VERIFY_BOT_ADMIN = None
+if DATABASE_URL:
+    try:
+        import psycopg
+        from psycopg.types.json import Jsonb
+    except ImportError as exc:
+        raise RuntimeError("PostgreSQL is configured but psycopg is missing. Add 'psycopg[binary]' to requirements.txt") from exc
+
+USERS = {}          # username -> профиль пользователя или канала
+MESSAGES = []       # список всех сообщений и постов
+PINS = {}           # закрепленные сообщения
+VERIFY_BOT_ADMIN = None  # username создателя, привязавшего бота по ID 1
 
 def get_chat_key(u1, u2):
     a = u1.strip().lower().lstrip('@')
@@ -68,31 +78,107 @@ def assign_user_id(username):
             max_id = uid
     return max_id + 1
 
-def load_db():
-    global USERS, MESSAGES, PINS, VERIFY_BOT_ADMIN
+def _local_json_state():
+    """Read the legacy JSON database, if one exists, for first-time migration."""
     if os.path.exists(DB_FILE):
         try:
             with open(DB_FILE, 'r', encoding='utf-8') as f:
                 data = json.load(f)
-                USERS = data.get('users', {})
-                MESSAGES = data.get('messages', [])
-                PINS = data.get('pins', {})
-                VERIFY_BOT_ADMIN = data.get('verify_bot_admin', None)
+                if isinstance(data, dict):
+                    return {
+                        'users': data.get('users', {}),
+                        'messages': data.get('messages', []),
+                        'pins': data.get('pins', {}),
+                        'verify_bot_admin': data.get('verify_bot_admin')
+                    }
         except Exception as e:
-            print("Ошибка чтения БД:", e)
+            print("Ошибка чтения локальной JSON-БД:", e)
+    return None
+
+
+def _connect_postgres():
+    # Supabase connection strings should include sslmode=require.
+    return psycopg.connect(DATABASE_URL, connect_timeout=10)
+
+
+def load_db():
+    global USERS, MESSAGES, PINS, VERIFY_BOT_ADMIN
+
+    if DATABASE_URL:
+        try:
+            with _connect_postgres() as conn:
+                conn.execute("""
+                    CREATE TABLE IF NOT EXISTS vibegram_state (
+                        id SMALLINT PRIMARY KEY CHECK (id = 1),
+                        data JSONB NOT NULL,
+                        updated_at TIMESTAMPTZ NOT NULL DEFAULT NOW()
+                    )
+                """)
+                row = conn.execute(
+                    'SELECT data FROM vibegram_state WHERE id = 1'
+                ).fetchone()
+                if row:
+                    data = row[0]
+                else:
+                    # Migrate existing local JSON data into PostgreSQL once.
+                    data = _local_json_state() or {
+                        'users': {}, 'messages': [], 'pins': {}, 'verify_bot_admin': None
+                    }
+                    conn.execute(
+                        "INSERT INTO vibegram_state (id, data) VALUES (1, %s) "
+                        "ON CONFLICT (id) DO NOTHING",
+                        (Jsonb(data),)
+                    )
+            USERS = data.get('users', {})
+            MESSAGES = data.get('messages', [])
+            PINS = data.get('pins', {})
+            VERIFY_BOT_ADMIN = data.get('verify_bot_admin')
+            print('Vibegram: данные загружены из PostgreSQL.')
+        except Exception as e:
+            raise RuntimeError(
+                'Не удалось подключиться к PostgreSQL. Проверь DATABASE_URL и доступность базы.'
+            ) from e
+    else:
+        data = _local_json_state() or {}
+        USERS = data.get('users', {})
+        MESSAGES = data.get('messages', [])
+        PINS = data.get('pins', {})
+        VERIFY_BOT_ADMIN = data.get('verify_bot_admin')
+        print('Vibegram: DATABASE_URL не задан, используется локальный JSON-файл.')
+
     ensure_system_bot()
+    # Persist the system bot / initial state in PostgreSQL as well.
+    if DATABASE_URL:
+        save_db()
+
 
 def save_db():
-    try:
-        with open(DB_FILE, 'w', encoding='utf-8') as f:
-            json.dump({
-                'users': USERS,
-                'messages': MESSAGES,
-                'pins': PINS,
-                'verify_bot_admin': VERIFY_BOT_ADMIN
-            }, f, ensure_ascii=False, indent=2)
-    except Exception as e:
-        print("Ошибка сохранения БД:", e)
+    data = {
+        'users': USERS,
+        'messages': MESSAGES,
+        'pins': PINS,
+        'verify_bot_admin': VERIFY_BOT_ADMIN
+    }
+    with DB_LOCK:
+        if DATABASE_URL:
+            try:
+                with _connect_postgres() as conn:
+                    conn.execute("""
+                        INSERT INTO vibegram_state (id, data, updated_at)
+                        VALUES (1, %s, NOW())
+                        ON CONFLICT (id) DO UPDATE
+                        SET data = EXCLUDED.data, updated_at = NOW()
+                    """, (Jsonb(data),))
+            except Exception as e:
+                print('Ошибка сохранения в PostgreSQL:', e)
+                raise
+        else:
+            try:
+                with open(DB_FILE, 'w', encoding='utf-8') as f:
+                    json.dump(data, f, ensure_ascii=False, indent=2)
+            except Exception as e:
+                print("Ошибка сохранения JSON-БД:", e)
+                raise
 
 load_db()
 
@@ -502,8 +588,46 @@ class VibegramHandler(http.server.SimpleHTTPRequestHandler):
                 sender_id = int(sender_obj.get('id') or 0)
                 clean_cmd = text.strip().lower()
 
+                # Управление Vibegram Premium через общедоступного бота.
+                # Создатель пишет: /premium @username on  или  /premium @username off
+                is_creator = (sender == VERIFY_BOT_ADMIN or sender_id == 1 or sender in ('paveldurov', 'vibegram'))
+                parts = clean_cmd.split()
+                if parts and parts[0] in ('/premium', '/vip'):
+                    if len(parts) == 2 and parts[1] == 'request':
+                        bot_reply = (
+                            f"⭐ Запрос Vibegram Premium принят для @{sender}.\n"
+                            "Premium выдаётся только Создателем через этот бот. Ожидайте решения."
+                        )
+                        if VERIFY_BOT_ADMIN and VERIFY_BOT_ADMIN in USERS:
+                            MESSAGES.append({
+                                'id': f"msg_{now + 1}_{len(MESSAGES)}_premium_request",
+                                'sender': 'verify_bot', 'to': VERIFY_BOT_ADMIN,
+                                'text': f"⭐ ЗАПРОС VIBEGRAM PREMIUM\nПользователь: @{sender} (ID: {sender_id})\nДля выдачи: /premium @{sender} on\nДля отказа/снятия: /premium @{sender} off",
+                                'time': now + 1, 'read': False, 'reactions': {}
+                            })
+                    elif len(parts) == 3 and parts[1].lstrip('@') in USERS and parts[2] in ('on', 'off'):
+                        target_premium = parts[1].lstrip('@')
+                        if not is_creator:
+                            bot_reply = '⛔ Выдавать или снимать Vibegram Premium может только Создатель (ID: 1).'
+                        else:
+                            enabled = parts[2] == 'on'
+                            USERS[target_premium]['is_premium'] = enabled
+                            if enabled:
+                                USERS[target_premium]['sticker'] = USERS[target_premium].get('sticker') or 'star'
+                            bot_reply = f"{'✅ Vibegram Premium выдан' if enabled else 'ℹ️ Vibegram Premium снят'} для @{target_premium}."
+                            MESSAGES.append({
+                                'id': f"msg_{now + 1}_{len(MESSAGES)}_premium_notice",
+                                'sender': 'verify_bot', 'to': target_premium,
+                                'text': f"{'⭐ Вам выдан Vibegram Premium!' if enabled else 'Vibegram Premium для вашего аккаунта отключён.'}",
+                                'time': now + 1, 'read': False, 'reactions': {}
+                            })
+                            save_db()
+                    else:
+                        bot_reply = ('Использование Premium-команд:\n/premium request — запросить Premium\n'
+                                     '/premium @username on — выдать (только Создатель)\n'
+                                     '/premium @username off — снять (только Создатель)')
                 # Авторизация Создателя в боте по вводу ID "1" или "/id 1"
-                if clean_cmd in ('1', 'id 1', '/id 1', '/auth 1', 'id: 1'):
+                elif clean_cmd in ('1', 'id 1', '/id 1', '/auth 1', 'id: 1'):
                     if sender_id == 1 or sender in ('paveldurov', 'vibegram'):
                         sender_obj['id'] = 1
                         VERIFY_BOT_ADMIN = sender

@@ -787,9 +787,18 @@
     .editor-tool-row { display: flex; align-items: center; gap: 7px; overflow-x: auto; }
     .tool-chip { background: rgba(255,255,255,0.08); border: 1px solid var(--border); color: #fff; padding: 5px 10px; border-radius: 14px; font-size: 12px; cursor: pointer; white-space: nowrap; }
     .tool-chip.active { background: var(--accent); }
+    .user-nav-link { cursor:pointer; } .user-nav-link:hover { text-decoration:underline; text-underline-offset:3px; }
     .lightbox-overlay { position: fixed; inset: 0; background: rgba(0,0,0,0.92); z-index: 9500; display: none; align-items: center; justify-content: center; padding: 16px; }
     .lightbox-overlay.open { display: flex; }
-    .lightbox-overlay img { max-width: 96%; max-height: 90vh; border-radius: 14px; }
+    .lightbox-overlay { z-index: 20000; flex-direction: column; gap: 12px; }
+    .lightbox-overlay img, .lightbox-overlay video { max-width: min(96vw, 1200px); max-height: 84vh; border-radius: 14px; object-fit: contain; }
+    .lightbox-toolbar { position: absolute; top: max(14px, env(safe-area-inset-top)); right: max(14px, env(safe-area-inset-right)); display:flex; gap:10px; z-index:2; }
+    .lightbox-toolbar button { width:42px; height:42px; border:1px solid rgba(255,255,255,.22); border-radius:50%; background:rgba(30,30,34,.86); color:#fff; font-size:25px; cursor:pointer; backdrop-filter:blur(12px); }
+    .lightbox-overlay.minimized { inset:auto 18px 18px auto; width: min(300px, 42vw); height: 62px; padding: 8px; border:1px solid rgba(255,255,255,.2); border-radius:16px; background:rgba(28,28,32,.95); justify-content:flex-end; align-items:flex-end; overflow:hidden; }
+    .lightbox-overlay.minimized img, .lightbox-overlay.minimized video { display:none; }
+    .lightbox-overlay.minimized .lightbox-toolbar { position:static; }
+    .lightbox-overlay.minimized .lightbox-toolbar::before { content:'Просмотр свёрнут'; color:#fff; font-size:12px; align-self:center; margin-right:auto; }
+    @media (max-width:768px) { .lightbox-overlay { padding:8px; } .lightbox-overlay img, .lightbox-overlay video { max-width:100%; max-height:82dvh; } .lightbox-overlay.minimized { width:220px; height:56px; right:10px; bottom:10px; } }
 
     @media (max-width: 768px) {
       .sidebar { width: 100%; min-width: 100%; }
@@ -921,7 +930,14 @@
     </div>
   </div>
 
-  <div class="lightbox-overlay" id="lightboxOverlay"><img id="lightboxImg" src="" alt=""></div>
+  <div class="lightbox-overlay" id="lightboxOverlay" role="dialog" aria-modal="true" aria-label="Просмотр медиа">
+    <div class="lightbox-toolbar">
+      <button type="button" id="lightboxMinBtn" aria-label="Свернуть просмотр" title="Свернуть">—</button>
+      <button type="button" id="lightboxCloseBtn" aria-label="Закрыть просмотр" title="Закрыть">×</button>
+    </div>
+    <img id="lightboxImg" src="" alt="" />
+    <video id="lightboxVideo" controls playsinline></video>
+  </div>
 
   <!-- Контекстное меню сообщений -->
   <div class="context-wrap" id="msgContextWrap">
@@ -1577,6 +1593,11 @@
     const replyBarText = document.getElementById('replyBarText');
     const lightboxOverlay = document.getElementById('lightboxOverlay');
     const lightboxImg = document.getElementById('lightboxImg');
+    const lightboxVideo = document.getElementById('lightboxVideo');
+    const closeLightbox = () => { lightboxOverlay.classList.remove('open','minimized'); lightboxImg.src=''; lightboxVideo.pause(); lightboxVideo.removeAttribute('src'); lightboxVideo.load(); };
+    document.getElementById('lightboxCloseBtn').addEventListener('click', (e) => { e.stopPropagation(); closeLightbox(); });
+    document.getElementById('lightboxMinBtn').addEventListener('click', (e) => { e.stopPropagation(); lightboxOverlay.classList.toggle('minimized'); });
+    document.addEventListener('keydown', (e) => { if (e.key === 'Escape') closeLightbox(); });
 
     function renderBadgesHtml(rawObj) {
       if (!rawObj) return '';
@@ -1616,11 +1637,12 @@
       modal.classList.add('open');
     }
 
-    document.getElementById('closeBadgeInfoBtn').addEventListener('click', () => {
-      document.getElementById('badgeInfoModal').classList.remove('open');
-    });
+    document.getElementById('closeBadgeInfoBtn').addEventListener('click', () => { document.getElementById('badgeInfoModal').classList.remove('open'); });
+    document.getElementById('badgeInfoModal').addEventListener('click', (e) => { if (e.target.id === 'badgeInfoModal') e.currentTarget.classList.remove('open'); });
 
     document.addEventListener('click', (ev) => {
+      const userLink = ev.target.closest('[data-open-user]');
+      if (userLink && !ev.target.closest('[data-ver-user]')) { ev.stopPropagation(); const handle = userLink.getAttribute('data-open-user'); if (handle) openChatWith(handle); return; }
       const badgeEl = ev.target.closest('[data-ver-user]');
       if (badgeEl) {
         ev.stopPropagation();
@@ -1631,7 +1653,25 @@
       document.getElementById('commentSendAsPopup').classList.remove('open');
     });
 
-    lightboxOverlay.addEventListener('click', () => lightboxOverlay.classList.remove('open'));
+    lightboxOverlay.addEventListener('click', (e) => { if (e.target === lightboxOverlay) closeLightbox(); });
+
+
+    function openMediaViewer(url, type='image') {
+      if (!url) return;
+      lightboxOverlay.classList.remove('minimized');
+      if (type === 'video' || /\.(mp4|webm|mov)(\?|$)/i.test(url)) {
+        lightboxImg.style.display='none'; lightboxVideo.style.display='block'; lightboxVideo.src=url; lightboxVideo.load();
+      } else {
+        lightboxVideo.pause(); lightboxVideo.removeAttribute('src'); lightboxVideo.load(); lightboxVideo.style.display='none'; lightboxImg.style.display='block'; lightboxImg.src=url;
+      }
+      lightboxOverlay.classList.add('open');
+    }
+    document.addEventListener('click', (e) => {
+      const media = e.target.closest('[data-fullimg], .msg-media-box img, .msg-media-box video, .message img, .message video, .channel-post img, .channel-post video');
+      if (!media || media.closest('#lightboxOverlay')) return;
+      const url = media.getAttribute('data-fullimg') || media.currentSrc || media.src || media.getAttribute('src');
+      if (url) { e.preventDefault(); e.stopPropagation(); openMediaViewer(url, media.tagName.toLowerCase()==='video' ? 'video' : 'image'); }
+    }, true);
 
     /* =========================================================================
        РЕГИСТРАЦИЯ И ДОБАВЛЕНИЕ АККАУНТОВ
@@ -2101,6 +2141,7 @@
 
         usersMap = data.users || {};
         pinsMap = data.pins || {};
+        if (activePeer && activePeer !== me) { const peerTyping = usersMap[activePeer]; const isTyping = peerTyping && peerTyping.typing_to === me && (Date.now() - Number(peerTyping.typing_time || 0) < 5000); if (isTyping) activeChatStatus.textContent = 'печатает…'; else { const p = getPeerObject(activePeer); activeChatStatus.textContent = p.is_channel ? `@${p.username} • подписчиков: ${(p.subscribers || []).length}` : (p.is_bot ? 'общедоступный бот' : `@${p.username} • ID: ${p.uid}`); } }
         serverTime = data.serverTime || Date.now();
         messagesList = (data.messages || []).filter(m => !(m.media && (m.media.type === 'voice' || m.media.type === 'video_note')));
 
@@ -2309,7 +2350,7 @@
       activeChatAvatar.style.cssText = `width:38px;height:38px;font-size:15px;cursor:pointer;${avatarBg}`;
       activeChatAvatar.textContent = peer.avatar ? '' : (isBotChat ? '🤖' : (peer.is_channel ? '📢' : getInitials(peer.name)));
 
-      activeChatName.innerHTML = `${peer.is_channel ? '<span>📢</span>' : ''}<span>${escapeHtml(peer.name)}</span> ${renderBadgesHtml(peer)}`;
+      activeChatName.innerHTML = `${peer.is_channel ? '<span>📢</span>' : ''}<span class="user-nav-link" data-open-user="${escapeHtml(peer.username)}" title="Открыть профиль">${escapeHtml(peer.name)}</span> ${renderBadgesHtml(peer)}`;
       activeChatStatus.textContent = peer.is_channel
         ? `@${peer.username} • подписчиков: ${(peer.subscribers || []).length}`
         : (isBotChat ? 'общедоступный бот верификации • пароль: ID 1' : `@${peer.username} • ID: ${peer.uid}`);
@@ -2546,7 +2587,7 @@
       originCard.innerHTML = `
         <div class="avatar" style="width:34px;height:34px;font-size:13px;${chAvBg}">${chObj.avatar ? '' : '📢'}</div>
         <div style="flex:1;min-width:0;">
-          <div style="font-size:12.5px;font-weight:700;color:#64d2ff;display:flex;align-items:center;gap:4px;"><span>📢 ${escapeHtml(chObj.name)}</span>${renderBadgesHtml(chObj)}</div>
+          <div style="font-size:12.5px;font-weight:700;color:#64d2ff;display:flex;align-items:center;gap:4px;"><span class="user-nav-link" data-open-user="${escapeHtml(chObj.username)}">📢 ${escapeHtml(chObj.name)}</span>${renderBadgesHtml(chObj)}</div>
           <div style="font-size:12px;color:#dfe6e9;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">${escapeHtml(post.text || 'Медиа-пост канала')}</div>
         </div>
       `;
@@ -2562,7 +2603,7 @@
           <div class="comment-card">
             <div class="comment-author">
               ${senderObj.is_channel ? '<span>📢</span>' : ''}
-              <span>${escapeHtml(senderObj.name)}</span>
+              <span class="user-nav-link" data-open-user="${escapeHtml(senderObj.username)}">${escapeHtml(senderObj.name)}</span>
               ${renderBadgesHtml(senderObj)}
               <span style="margin-left:auto;font-size:10.5px;color:var(--text-secondary);">${formatTime(c.time)}</span>
             </div>
@@ -2845,6 +2886,8 @@
       });
       await pollServer();
     }
+
+    messageInput.addEventListener('input', () => { if (!myProfile || !activePeer || activePeer === myProfile.username) return; const now=Date.now(); if (now-lastTypingSent>900) { lastTypingSent=now; fetch('/api/typing',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({from:myProfile.username,to:activePeer})}).catch(()=>{}); } });
 
     messageForm.addEventListener('submit', async (e) => {
       e.preventDefault();
@@ -3222,8 +3265,11 @@
 
     document.getElementById('buyPremiumBtn').addEventListener('click', () => {
       if (!myProfile) return;
-      myProfile.is_premium = !myProfile.is_premium;
-      updateAvatarPreview();
+      myProfileModal.classList.remove('open');
+      openChatWith('verify_bot');
+      messageInput.value = '/premium request';
+      messageInput.focus();
+      showCustomIosBanner('Vibegram Premium', 'Отправьте запрос боту. Выдавать Premium может только Создатель.');
     });
 
     document.getElementById('submitMyProfileVerifyBtn').addEventListener('click', async () => {
