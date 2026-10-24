@@ -1,1 +1,2 @@
 
+# Vibegram — no external Python dependencies
