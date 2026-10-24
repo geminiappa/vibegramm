@@ -2059,6 +2059,22 @@
       return new Date(ts).toLocaleTimeString('ru-RU', { hour: '2-digit', minute: '2-digit' });
     }
 
+    function getPresenceLabel(peer, viewerUsername = (myProfile?.username || '').toLowerCase()) {
+      if (!peer) return 'пользователь не найден';
+      if (peer.is_channel) return `канал • подписчиков: ${(peer.subscribers || []).length}`;
+      if (peer.is_bot) return 'общедоступный бот';
+      if ((peer.username || '').toLowerCase() === viewerUsername) return 'в сети';
+      // Respect the profile's privacy choice for last-seen/online visibility.
+      if (peer.privacy === 'nobody') return 'был(-а) недавно';
+      const lastSeen = Number(peer.last_seen || 0);
+      if (lastSeen && (Date.now() - lastSeen) < 6500) return 'в сети';
+      if (!lastSeen) return 'не в сети';
+      const elapsed = Math.max(0, Date.now() - lastSeen);
+      if (elapsed < 60 * 60 * 1000) return `был(-а) ${Math.max(1, Math.floor(elapsed / 60000))} мин. назад`;
+      if (elapsed < 24 * 60 * 60 * 1000) return `был(-а) ${Math.floor(elapsed / 3600000)} ч. назад`;
+      return `был(-а) ${new Date(lastSeen).toLocaleDateString('ru-RU')}`;
+    }
+
     function getPeerObject(username) {
       const u = (username || '').toLowerCase();
       const me = myProfile ? myProfile.username.toLowerCase() : '';
@@ -2141,7 +2157,6 @@
 
         usersMap = data.users || {};
         pinsMap = data.pins || {};
-        if (activePeer && activePeer !== me) { const peerTyping = usersMap[activePeer]; const isTyping = peerTyping && peerTyping.typing_to === me && (Date.now() - Number(peerTyping.typing_time || 0) < 5000); if (isTyping) activeChatStatus.textContent = 'печатает…'; else { const p = getPeerObject(activePeer); activeChatStatus.textContent = p.is_channel ? `@${p.username} • подписчиков: ${(p.subscribers || []).length}` : (p.is_bot ? 'общедоступный бот' : `@${p.username} • ID: ${p.uid}`); } }
         serverTime = data.serverTime || Date.now();
         messagesList = (data.messages || []).filter(m => !(m.media && (m.media.type === 'voice' || m.media.type === 'video_note')));
 
@@ -2254,7 +2269,7 @@
         const item = document.createElement('div');
         item.className = 'chat-item' + (activePeer === peer.username ? ' active' : '');
         const isSelf = peer.username === me;
-        const online = !isSelf && !peer.is_channel && (serverTime - (peer.last_seen || 0)) < 7500;
+        const online = !isSelf && !peer.is_channel && peer.privacy !== 'nobody' && (Date.now() - Number(peer.last_seen || 0)) < 6500;
         const avatarBg = peer.avatar ? `background-image:url('${peer.avatar}')` : `background-color:${peer.color}`;
         const defaultIcon = isSelf ? '🔖' : (peer.is_bot ? '🤖' : (peer.is_channel ? '📢' : getInitials(peer.name)));
 
@@ -2303,10 +2318,6 @@
           (u.username.includes(cleanQuery) || u.name.toLowerCase().includes(cleanQuery))
         );
 
-        if (!conversations.some(c => c.peer.username === cleanQuery) && !globalMatches.some(u => u.username === cleanQuery)) {
-          globalMatches.push(getPeerObject(cleanQuery));
-        }
-
         if (globalMatches.length > 0) {
           const title = document.createElement('div');
           title.className = 'section-title';
@@ -2327,12 +2338,22 @@
             gItem.addEventListener('click', () => { searchInput.value = ''; openChatWith(u.username); });
             chatListEl.appendChild(gItem);
           });
+        } else if (!conversations.some(c => c.peer.username === cleanQuery)) {
+          const notFound = document.createElement('div');
+          notFound.className = 'section-title';
+          notFound.textContent = `Пользователь или канал @${cleanQuery} не найден`;
+          chatListEl.appendChild(notFound);
         }
       }
     }
 
     function openChatWith(peerUsername) {
-      const u = peerUsername.toLowerCase();
+      const u = String(peerUsername || '').trim().toLowerCase().replace(/^@+/, '');
+      if (!u) return;
+      if (u !== 'verify_bot' && (!usersMap[u] && u !== (myProfile?.username || '').toLowerCase())) {
+        showCustomIosBanner('Не найдено', `Пользователь или канал @${u} не найден`);
+        return;
+      }
       if (!openedPeers.includes(u)) openedPeers.push(u);
       activePeer = u;
       saveChatsCacheForCurrentAccount();
@@ -2366,9 +2387,8 @@
       const peerTypingNow = !peer.is_channel && !isBotChat && peer.typing_to === me && (Date.now() - Number(peer.typing_time || 0) < 5000);
       activeChatStatus.textContent = peerTypingNow
         ? 'печатает…'
-        : (peer.is_channel
-          ? `@${peer.username} • подписчиков: ${(peer.subscribers || []).length}`
-          : (isBotChat ? 'общедоступный бот верификации' : `@${peer.username} • ID: ${peer.uid || peer.id || '—'}`));
+        : (isBotChat ? 'общедоступный бот верификации' : getPresenceLabel(peer, me));
+      activeChatStatus.classList.toggle('online', peerTypingNow || activeChatStatus.textContent === 'в сети');
 
       if (isBotChat) {
         verifyBotPanel.classList.add('active');
@@ -2902,7 +2922,27 @@
       await pollServer();
     }
 
-    messageInput.addEventListener('input', () => { if (!myProfile || !activePeer || activePeer === myProfile.username) return; const now=Date.now(); if (now-lastTypingSent>900) { lastTypingSent=now; fetch('/api/typing',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({from:myProfile.username,to:activePeer})}).catch(()=>{}); } });
+    messageInput.addEventListener('input', () => {
+      if (!myProfile || !activePeer || activePeer === myProfile.username) return;
+      const now = Date.now();
+      if (!messageInput.value.trim()) {
+        fetch('/api/typing', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ from: myProfile.username, to: activePeer, active: false }) }).catch(() => {});
+        return;
+      }
+      if (now - lastTypingSent > 900) {
+        lastTypingSent = now;
+        fetch('/api/typing', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ from: myProfile.username, to: activePeer, active: true }) }).catch(() => {});
+      }
+    });
+    messageInput.addEventListener('blur', () => {
+      if (myProfile && activePeer) fetch('/api/typing', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ from: myProfile.username, to: activePeer, active: false }) }).catch(() => {});
+    });
+    document.addEventListener('visibilitychange', () => {
+      if (document.visibilityState === 'visible' && myProfile && !isAddingSecondAccount) pollServer();
+      if (document.visibilityState === 'hidden' && myProfile && activePeer) {
+        fetch('/api/typing', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ from: myProfile.username, to: activePeer, active: false }) }).catch(() => {});
+      }
+    });
 
     messageForm.addEventListener('submit', async (e) => {
       e.preventDefault();
@@ -3370,7 +3410,7 @@
       document.getElementById('peerProfileName').innerHTML = `<span>${escapeHtml(peer.name)}</span> ${renderBadgesHtml(peer)}`;
       document.getElementById('peerProfileUsername').textContent = `@${peer.username} • ID: ${peer.uid}`;
       document.getElementById('peerProfileBio').textContent = peer.cleanBio || peer.bio;
-      document.getElementById('peerProfileStatus').textContent = peer.is_channel ? `канал • подписчиков: ${(peer.subscribers || []).length}` : 'профиль Vibegram';
+      document.getElementById('peerProfileStatus').textContent = getPresenceLabel(peer, me);
 
       const verRow = document.getElementById('peerVerifiedRow');
       const isVer = Boolean(peer.is_verified);
@@ -3463,6 +3503,17 @@
 
     document.getElementById('backToChatsBtn').addEventListener('click', () => appEl.classList.remove('mobile-chat-open'));
     searchInput.addEventListener('input', renderSidebar);
+    searchInput.addEventListener('keydown', (e) => {
+      if (e.key !== 'Enter') return;
+      const handle = searchInput.value.trim().replace(/^@+/, '').toLowerCase();
+      if (!handle) return;
+      if (usersMap[handle] || handle === 'verify_bot' || handle === (myProfile?.username || '').toLowerCase()) {
+        searchInput.value = '';
+        openChatWith(handle);
+      } else {
+        showCustomIosBanner('Пользователь не найден', `Аккаунта или канала @${handle} нет в Vibegram`);
+      }
+    });
     clearSearchBtn.addEventListener('click', () => { searchInput.value = ''; renderSidebar(); });
 
     function escapeHtml(str) {
@@ -3479,7 +3530,7 @@
         await pollServer();
         updateDrawerInfo();
       }
-      setInterval(() => { if (myProfile && !isAddingSecondAccount) pollServer(); }, 900);
+      setInterval(() => { if (myProfile && !isAddingSecondAccount && document.visibilityState === 'visible') pollServer(); }, 1500);
     })();
   </script>
 </body>

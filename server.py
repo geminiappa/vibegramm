@@ -208,7 +208,17 @@ class VibegramHandler(http.server.SimpleHTTPRequestHandler):
             USERS['verify_bot']['last_seen'] = now
 
             if me and me in USERS and not USERS[me].get('is_channel'):
+                # /api/sync is the heartbeat: if a client stops polling, its
+                # last_seen naturally expires and other clients show it offline.
                 USERS[me]['last_seen'] = now
+                USERS[me]['online'] = True
+
+            # Expire typing indicators and mark stale accounts offline in memory.
+            for username, user_obj in USERS.items():
+                last_seen = int(user_obj.get('last_seen') or 0)
+                user_obj['online'] = bool(not user_obj.get('is_channel') and now - last_seen < 6500)
+                if now - int(user_obj.get('typing_time') or 0) >= 5000:
+                    user_obj['typing_to'] = ''
 
             channels_set = {u for u, obj in USERS.items() if obj.get('is_channel')}
             my_messages = [
@@ -530,10 +540,16 @@ class VibegramHandler(http.server.SimpleHTTPRequestHandler):
         if parsed.path == '/api/typing':
             sender = str(body.get('from') or '').strip().lower().lstrip('@')
             to = str(body.get('to') or '').strip().lower().lstrip('@')
-            if sender in USERS:
-                USERS[sender]['typing_to'] = to
-                USERS[sender]['typing_time'] = now
-                # Typing is transient; profile/channel state is persisted by its own endpoints.
+            active = bool(body.get('active', True))
+            if sender in USERS and not USERS[sender].get('is_channel'):
+                # Only announce typing to a known recipient; a blank/false
+                # activity signal clears the transient state immediately.
+                if active and to and to in USERS:
+                    USERS[sender]['typing_to'] = to
+                    USERS[sender]['typing_time'] = now
+                else:
+                    USERS[sender]['typing_to'] = ''
+                    USERS[sender]['typing_time'] = 0
             return self.send_json({'ok': True})
 
         # Загрузка медиа
