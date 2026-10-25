@@ -34,6 +34,7 @@ USERS = {}          # username -> профиль пользователя или
 MESSAGES = []       # список всех сообщений и постов
 PINS = {}           # закрепленные сообщения
 VERIFY_BOT_ADMIN = None  # username создателя, привязавшего бота по ID 1
+PUSH_SUBSCRIPTIONS = {}  # username -> [{subscription: Web Push subscription, created_at: ms}]
 def get_chat_key(u1, u2):
     a = u1.strip().lower().lstrip('@')
     b = u2.strip().lower().lstrip('@')
@@ -89,7 +90,8 @@ def _local_json_state():
                         'users': data.get('users', {}),
                         'messages': data.get('messages', []),
                         'pins': data.get('pins', {}),
-                        'verify_bot_admin': data.get('verify_bot_admin')
+                        'verify_bot_admin': data.get('verify_bot_admin'),
+                        'push_subscriptions': data.get('push_subscriptions', {})
                     }
         except Exception as e:
             print("Ошибка чтения локальной JSON-БД:", e)
@@ -101,8 +103,134 @@ def _connect_postgres():
     return psycopg.connect(DATABASE_URL, connect_timeout=10)
 
 
+
+def _push_configured():
+    return bool(os.environ.get('VAPID_PUBLIC_KEY', '').strip() and
+                os.environ.get('VAPID_PRIVATE_KEY', '').strip())
+
+
+def _absolute_public_url(path_or_url, base_url):
+    value = str(path_or_url or '').strip()
+    if value.startswith('https://') or value.startswith('http://'):
+        return value
+    # Data-URL avatars are intentionally not included in push payloads: they can
+    # exceed push-service payload limits. Profile save uploads them as files.
+    if value.startswith('/uploads/'):
+        return base_url.rstrip('/') + value
+    return base_url.rstrip('/') + '/facuicon.jpeg'
+
+
+def _webpush_send_worker(username, records, payload):
+    private_key = os.environ.get('VAPID_PRIVATE_KEY', '').strip()
+    if not private_key or not os.environ.get('VAPID_PUBLIC_KEY', '').strip():
+        return
+    try:
+        from pywebpush import webpush, WebPushException
+    except Exception as exc:
+        print(f'[Vibegram WebPush] pywebpush недоступен: {exc}', flush=True)
+        return
+
+    expired_endpoints = set()
+    subject = os.environ.get('VAPID_SUBJECT', 'mailto:admin@vibegramm.onrender.com').strip()
+    for record in records:
+        subscription = record.get('subscription') if isinstance(record, dict) else None
+        if not isinstance(subscription, dict):
+            continue
+        endpoint = str(subscription.get('endpoint') or '')
+        try:
+            webpush(
+                subscription_info=subscription,
+                data=json.dumps(payload, ensure_ascii=False, separators=(',', ':')),
+                vapid_private_key=private_key,
+                vapid_claims={'sub': subject},
+                ttl=60,
+                timeout=8
+            )
+        except Exception as exc:
+            response = getattr(exc, 'response', None)
+            status_code = getattr(response, 'status_code', None)
+            if status_code in (404, 410) and endpoint:
+                expired_endpoints.add(endpoint)
+            else:
+                print(f'[Vibegram WebPush] delivery failed for @{username}: {str(exc)[:240]}', flush=True)
+
+    if expired_endpoints:
+        with DB_LOCK:
+            current = PUSH_SUBSCRIPTIONS.get(username, [])
+            PUSH_SUBSCRIPTIONS[username] = [
+                row for row in current
+                if (row.get('subscription') or {}).get('endpoint') not in expired_endpoints
+            ]
+            if not PUSH_SUBSCRIPTIONS[username]:
+                PUSH_SUBSCRIPTIONS.pop(username, None)
+            save_db()
+
+
+def send_web_push(username, payload):
+    user = str(username or '').strip().lower().lstrip('@')
+    if not user or not _push_configured():
+        return
+    with DB_LOCK:
+        records = list(PUSH_SUBSCRIPTIONS.get(user, []))
+    if not records:
+        return
+    thread = threading.Thread(target=_webpush_send_worker, args=(user, records, payload), daemon=True)
+    thread.start()
+
+
+def dispatch_push_for_messages(messages, base_url):
+    """Queue push delivery for server-created messages without exposing subscriptions."""
+    for msg in messages:
+        if not isinstance(msg, dict):
+            continue
+        text = str(msg.get('text') or '').strip()
+        media = msg.get('media') if isinstance(msg.get('media'), dict) else None
+        if not text:
+            media_type = str((media or {}).get('type') or '').lower()
+            text = {'image': '📷 Фото', 'video': '🎬 Видео', 'voice': '🎙 Голосовое сообщение',
+                    'video_note': '⭕ Видеосообщение', 'sticker': 'Стикер', 'file': '📎 Файл'}.get(media_type, 'Новое сообщение')
+        text = text[:240]
+
+        if msg.get('is_channel_post'):
+            channel_name = str(msg.get('to') or '').strip().lower().lstrip('@')
+            channel = USERS.get(channel_name, {})
+            author = str(((msg.get('views') or [''])[0]) or '').lower().lstrip('@')
+            icon = _absolute_public_url(channel.get('avatar'), base_url)
+            payload = {
+                'title': str(channel.get('name') or channel_name or 'Новый пост')[:100],
+                'body': text,
+                'icon': icon,
+                'badge': base_url.rstrip('/') + '/pwa-192.png',
+                'username': channel_name,
+                'url': base_url.rstrip('/') + '/?openChat=' + channel_name,
+                'tag': 'vibegram-channel-' + channel_name
+            }
+            subscribers = channel.get('subscribers', [])
+            if isinstance(subscribers, list):
+                for subscriber in set(str(s or '').lower().lstrip('@') for s in subscribers):
+                    if subscriber and subscriber != author:
+                        send_web_push(subscriber, payload)
+            continue
+
+        recipient = str(msg.get('to') or '').strip().lower().lstrip('@')
+        sender = str(msg.get('sender') or '').strip().lower().lstrip('@')
+        if not recipient or recipient == sender or recipient == 'verify_bot':
+            continue
+        sender_profile = USERS.get(sender, {})
+        icon = _absolute_public_url(sender_profile.get('avatar'), base_url)
+        payload = {
+            'title': str(sender_profile.get('name') or sender or 'Новое сообщение')[:100],
+            'body': text,
+            'icon': icon,
+            'badge': base_url.rstrip('/') + '/pwa-192.png',
+            'username': sender,
+            'url': base_url.rstrip('/') + '/?openChat=' + sender,
+            'tag': 'vibegram-chat-' + sender
+        }
+        send_web_push(recipient, payload)
+
 def load_db():
-    global USERS, MESSAGES, PINS, VERIFY_BOT_ADMIN
+    global USERS, MESSAGES, PINS, VERIFY_BOT_ADMIN, PUSH_SUBSCRIPTIONS
 
     if DATABASE_URL:
         try:
@@ -133,6 +261,7 @@ def load_db():
             MESSAGES = data.get('messages', [])
             PINS = data.get('pins', {})
             VERIFY_BOT_ADMIN = data.get('verify_bot_admin')
+            PUSH_SUBSCRIPTIONS = data.get('push_subscriptions', {}) if isinstance(data.get('push_subscriptions', {}), dict) else {}
             print('Vibegram: данные загружены из PostgreSQL.')
         except Exception as e:
             raise RuntimeError(
@@ -144,6 +273,7 @@ def load_db():
         MESSAGES = data.get('messages', [])
         PINS = data.get('pins', {})
         VERIFY_BOT_ADMIN = data.get('verify_bot_admin')
+        PUSH_SUBSCRIPTIONS = data.get('push_subscriptions', {}) if isinstance(data.get('push_subscriptions', {}), dict) else {}
         print('Vibegram: DATABASE_URL не задан, используется локальный JSON-файл.')
 
     ensure_system_bot()
@@ -189,7 +319,8 @@ def save_db():
         'users': USERS,
         'messages': MESSAGES,
         'pins': PINS,
-        'verify_bot_admin': VERIFY_BOT_ADMIN
+        'verify_bot_admin': VERIFY_BOT_ADMIN,
+        'push_subscriptions': PUSH_SUBSCRIPTIONS
     }
     with DB_LOCK:
         if DATABASE_URL:
@@ -215,8 +346,24 @@ def save_db():
 load_db()
 
 class VibegramHandler(http.server.SimpleHTTPRequestHandler):
+    extensions_map = {
+        **http.server.SimpleHTTPRequestHandler.extensions_map,
+        '.webmanifest': 'application/manifest+json',
+        '.js': 'text/javascript; charset=utf-8',
+    }
+
     def log_message(self, format, *args):
         pass
+
+    def _public_base_url(self):
+        configured = os.environ.get('PUBLIC_BASE_URL', '').strip().rstrip('/')
+        if configured:
+            return configured
+        host = str(self.headers.get('X-Forwarded-Host') or self.headers.get('Host') or 'vibegramm.onrender.com').split(',')[0].strip()
+        proto = str(self.headers.get('X-Forwarded-Proto') or 'https').split(',')[0].strip()
+        if proto not in ('http', 'https'):
+            proto = 'https'
+        return f'{proto}://{host}'
 
     def send_json(self, data, status=200):
         raw = json.dumps(data, ensure_ascii=False).encode('utf-8')
@@ -230,6 +377,12 @@ class VibegramHandler(http.server.SimpleHTTPRequestHandler):
 
     def do_GET(self):
         parsed = urlparse(self.path)
+
+        if parsed.path == '/api/push/public-key':
+            public_key = os.environ.get('VAPID_PUBLIC_KEY', '').strip()
+            if not public_key or not os.environ.get('VAPID_PRIVATE_KEY', '').strip():
+                return self.send_json({'ok': False, 'enabled': False, 'error': 'Web Push не настроен на сервере.'}, 503)
+            return self.send_json({'ok': True, 'enabled': True, 'publicKey': public_key})
 
         if parsed.path == '/api/sync':
             qs = parse_qs(parsed.query)
@@ -275,6 +428,59 @@ class VibegramHandler(http.server.SimpleHTTPRequestHandler):
         body = json.loads(self.rfile.read(length).decode('utf-8')) if length > 0 else {}
         now = int(time.time() * 1000)
 
+        if parsed.path == '/api/push/subscribe':
+            username = str(body.get('username') or '').strip().lower().lstrip('@')
+            subscription = body.get('subscription')
+            if not username or username not in USERS or USERS[username].get('is_channel') or USERS[username].get('is_bot'):
+                return self.send_json({'error': 'Аккаунт не найден. Сначала открой Vibegram под своим профилем.'}, 400)
+            if not isinstance(subscription, dict):
+                return self.send_json({'error': 'Некорректная push-подписка.'}, 400)
+            endpoint = str(subscription.get('endpoint') or '').strip()
+            keys = subscription.get('keys') if isinstance(subscription.get('keys'), dict) else {}
+            p256dh = str(keys.get('p256dh') or '').strip()
+            auth = str(keys.get('auth') or '').strip()
+            if not endpoint.startswith('https://') or len(endpoint) > 4096 or not p256dh or not auth:
+                return self.send_json({'error': 'Подписка содержит некорректные endpoint/keys.'}, 400)
+            subscription = {'endpoint': endpoint, 'keys': {'p256dh': p256dh, 'auth': auth}}
+            with DB_LOCK:
+                # An endpoint belongs to one current account on this browser/device.
+                for owner_name, owner_records in list(PUSH_SUBSCRIPTIONS.items()):
+                    if owner_name == username or not isinstance(owner_records, list):
+                        continue
+                    PUSH_SUBSCRIPTIONS[owner_name] = [
+                        row for row in owner_records
+                        if (row.get('subscription') or {}).get('endpoint') != endpoint
+                    ]
+                    if not PUSH_SUBSCRIPTIONS[owner_name]:
+                        PUSH_SUBSCRIPTIONS.pop(owner_name, None)
+                records = PUSH_SUBSCRIPTIONS.setdefault(username, [])
+                records = [row for row in records if (row.get('subscription') or {}).get('endpoint') != endpoint]
+                if len(records) >= 10:
+                    return self.send_json({'error': 'Для этого аккаунта уже сохранено 10 устройств. Удали старую подписку.'}, 429)
+                records.append({'subscription': subscription, 'created_at': now})
+                PUSH_SUBSCRIPTIONS[username] = records
+                save_db()
+            return self.send_json({'ok': True, 'subscribed': True, 'devices': len(PUSH_SUBSCRIPTIONS.get(username, []))})
+
+        if parsed.path == '/api/push/unsubscribe':
+            username = str(body.get('username') or '').strip().lower().lstrip('@')
+            endpoint = str(body.get('endpoint') or '').strip()
+            if not endpoint:
+                return self.send_json({'error': 'Не указан endpoint подписки.'}, 400)
+            removed = 0
+            with DB_LOCK:
+                target_users = [username] if username else list(PUSH_SUBSCRIPTIONS.keys())
+                for owner_name in target_users:
+                    current = PUSH_SUBSCRIPTIONS.get(owner_name, [])
+                    filtered = [row for row in current if (row.get('subscription') or {}).get('endpoint') != endpoint]
+                    removed += len(current) - len(filtered)
+                    if filtered:
+                        PUSH_SUBSCRIPTIONS[owner_name] = filtered
+                    else:
+                        PUSH_SUBSCRIPTIONS.pop(owner_name, None)
+                save_db()
+            return self.send_json({'ok': True, 'removed': removed})
+
         # Регистрация / сохранение личного профиля с проверкой уникальности @username и выдачей ID
         if parsed.path == '/api/profile':
             old_u = str(body.get('oldUsername') or '').strip().lower().lstrip('@')
@@ -300,6 +506,12 @@ class VibegramHandler(http.server.SimpleHTTPRequestHandler):
 
             if old_u and old_u != u and old_u in USERS and not USERS[old_u].get('is_channel'):
                 USERS[u] = USERS.pop(old_u)
+                if old_u in PUSH_SUBSCRIPTIONS:
+                    moved_records = list(PUSH_SUBSCRIPTIONS.pop(old_u, []))
+                    existing_records = PUSH_SUBSCRIPTIONS.get(u, [])
+                    seen_endpoints = {((row.get('subscription') or {}).get('endpoint')) for row in existing_records}
+                    existing_records.extend(row for row in moved_records if ((row.get('subscription') or {}).get('endpoint')) not in seen_endpoints)
+                    PUSH_SUBSCRIPTIONS[u] = existing_records
                 if VERIFY_BOT_ADMIN == old_u:
                     VERIFY_BOT_ADMIN = u
                 for m in MESSAGES:
@@ -426,6 +638,20 @@ class VibegramHandler(http.server.SimpleHTTPRequestHandler):
             existing = USERS.get(handle, {})
             avatar = avatar_input or existing.get('avatar', '')
             owner_final = existing.get('owner') or actor
+            if isinstance(avatar, str) and avatar.startswith('data:image/') and ',' in avatar:
+                try:
+                    data_header, encoded_avatar = avatar.split(',', 1)
+                    mime = data_header[5:].split(';', 1)[0].lower()
+                    avatar_ext = {'image/jpeg': 'jpg', 'image/jpg': 'jpg', 'image/png': 'png', 'image/webp': 'webp'}.get(mime, 'jpg')
+                    avatar_binary = base64.b64decode(encoded_avatar, validate=True)
+                    if len(avatar_binary) <= 2 * 1024 * 1024:
+                        safe_handle = re.sub(r'[^a-z0-9_]', '', handle)
+                        avatar_filename = f"avatar_channel_{now}_{safe_handle}.{avatar_ext}"
+                        with open(os.path.join(UPLOAD_DIR, avatar_filename), 'wb') as avatar_file:
+                            avatar_file.write(avatar_binary)
+                        avatar = f"/uploads/{avatar_filename}"
+                except Exception as exc:
+                    print(f'[Vibegram Avatar] channel avatar upload skipped: {exc}', flush=True)
             subs = existing.get('subscribers', [owner_final])
             if owner_final not in subs:
                 subs.append(owner_final)
@@ -587,6 +813,7 @@ class VibegramHandler(http.server.SimpleHTTPRequestHandler):
 
         # Решение Создателя в боте @verify_bot: Выдать галочку или Отказать
         if parsed.path == '/api/verification/decide':
+            message_start_index = len(MESSAGES)
             msg_id = str(body.get('msg_id') or '')
             decision = str(body.get('decision') or '')  # 'approve' | 'reject'
             target = str(body.get('target') or '').strip().lower().lstrip('@')
@@ -643,6 +870,7 @@ class VibegramHandler(http.server.SimpleHTTPRequestHandler):
                 })
 
             save_db()
+            dispatch_push_for_messages(MESSAGES[message_start_index:], self._public_base_url())
             return self.send_json({'ok': True})
 
         # Статус "печатает..."
@@ -682,6 +910,7 @@ class VibegramHandler(http.server.SimpleHTTPRequestHandler):
 
         # Отправка сообщения (ЛС, Бот @verify_bot или Пост в канал)
         if parsed.path == '/api/send':
+            message_start_index = len(MESSAGES)
             sender = str(body.get('from') or '').strip().lower().lstrip('@')
             to = str(body.get('to') or '').strip().lower().lstrip('@')
             text = str(body.get('text') or '').strip()
@@ -871,6 +1100,7 @@ class VibegramHandler(http.server.SimpleHTTPRequestHandler):
                     'reactions': {}
                 })
                 save_db()
+                dispatch_push_for_messages(MESSAGES[message_start_index:], self._public_base_url())
                 return self.send_json({'ok': True, 'message': user_msg})
 
             # 2. Если это публикация поста в канал (проверяем права владельца или администратора)
@@ -906,6 +1136,7 @@ class VibegramHandler(http.server.SimpleHTTPRequestHandler):
             }
             MESSAGES.append(msg)
             save_db()
+            dispatch_push_for_messages(MESSAGES[message_start_index:], self._public_base_url())
             return self.send_json({'ok': True, 'message': msg})
 
         # Закрепление чата в боковом списке пользователя (хранится в PostgreSQL/JSON вместе с PINS)

@@ -3,6 +3,13 @@
 <head>
   <link rel="icon" type="image/jpeg" href="/facuicon.jpeg?v=1">
   <link rel="shortcut icon" type="image/jpeg" href="/facuicon.jpeg?v=1">
+  <link rel="manifest" href="/manifest.webmanifest">
+  <link rel="apple-touch-icon" href="/pwa-192.png">
+  <meta name="theme-color" content="#080a10">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-title" content="Vibegram">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+  <meta name="mobile-web-app-capable" content="yes">
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
   <title>Vibegram</title>
@@ -1453,6 +1460,16 @@
           </div>
         </div>
 
+        <div class="tg-section-box" id="pwaSettingsBox">
+          <div class="tg-section-header">Приложение Vibegram</div>
+          <div style="padding:4px 16px 9px;display:flex;flex-direction:column;gap:8px;">
+            <div style="font-size:12px;line-height:1.5;color:var(--text-secondary);">Установи Vibegram на экран «Домой», чтобы открывать его отдельным приложением. После настройки Web Push новые сообщения смогут приходить даже при закрытом сайте.</div>
+            <div id="pwaInstallStatus" role="status" style="font-size:12px;line-height:1.4;color:#64d2ff;">Проверяем возможность установки…</div>
+            <button type="button" class="btn-primary" id="installPwaBtn">Установить Vibegram</button>
+            <button type="button" class="tool-chip" id="pwaEnablePushBtn" style="width:100%;justify-content:center;padding:10px;">Включить push-уведомления</button>
+          </div>
+        </div>
+
         <div class="tg-section-box">
           <div class="tg-section-header">Конфиденциальность</div>
           <div class="tg-row-item">
@@ -2383,6 +2400,17 @@
       });
 
       try {
+        if (typeof myProfile.avatar === 'string' && myProfile.avatar.startsWith('data:image/')) {
+          const avatarUpload = await fetch('/api/upload', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ data: myProfile.avatar, ext: 'jpg' })
+          });
+          const uploadedAvatar = await avatarUpload.json().catch(() => ({}));
+          if (!avatarUpload.ok || !uploadedAvatar.url) throw new Error(uploadedAvatar.error || 'Не удалось загрузить аватар.');
+          myProfile.avatar = uploadedAvatar.url;
+          selectedBase64Avatar = uploadedAvatar.url;
+        }
         const response = await fetch('/api/profile', {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
@@ -2411,36 +2439,241 @@
       } catch (e) {}
     }
 
+    const PUSH_SUBSCRIPTION_ENABLED_KEY = 'vibegram_webpush_subscription_enabled_v1';
+    const NOTIFICATIONS_MUTED_KEY = 'vibegram_notifications_muted_v1';
+    let deferredPwaInstallPrompt = null;
+    let pwaRegistrationPromise = null;
+    let lastPushBoundUsername = '';
+
+    function isIOSDevice() {
+      return /iPad|iPhone|iPod/.test(navigator.userAgent) ||
+        (navigator.platform === 'MacIntel' && navigator.maxTouchPoints > 1);
+    }
+
+    function isStandalonePwa() {
+      return window.matchMedia('(display-mode: standalone)').matches ||
+        window.navigator.standalone === true;
+    }
+
+    window.addEventListener('beforeinstallprompt', event => {
+      event.preventDefault();
+      deferredPwaInstallPrompt = event;
+      updatePwaInstallUI();
+    });
+    window.addEventListener('appinstalled', () => {
+      deferredPwaInstallPrompt = null;
+      updatePwaInstallUI();
+      showCustomIosBanner('Vibegram установлен', 'Теперь можно запускать мессенджер с домашнего экрана.');
+    });
+
+    function updatePwaInstallUI() {
+      const status = document.getElementById('pwaInstallStatus');
+      const button = document.getElementById('installPwaBtn');
+      if (!status || !button) return;
+      if (isStandalonePwa()) {
+        status.textContent = 'Vibegram уже запущен как отдельное приложение.';
+        button.textContent = 'Приложение установлено';
+        button.disabled = true;
+      } else if (isIOSDevice()) {
+        status.textContent = 'На iPhone: открой сайт в Safari → «Поделиться» → «На экран Домой». Push доступен в установленном веб-приложении на iOS/iPadOS 16.4+.';
+        button.textContent = 'Как установить на iPhone';
+        button.disabled = false;
+      } else if (deferredPwaInstallPrompt) {
+        status.textContent = 'Браузер поддерживает установку приложения.';
+        button.textContent = 'Установить приложение';
+        button.disabled = false;
+      } else {
+        status.textContent = 'Открой меню браузера и выбери «Установить приложение» или «Добавить на главный экран», если пункт доступен.';
+        button.textContent = 'Инструкция по установке';
+        button.disabled = false;
+      }
+    }
+
+    document.getElementById('installPwaBtn')?.addEventListener('click', async () => {
+      if (isStandalonePwa()) return;
+      if (deferredPwaInstallPrompt) {
+        deferredPwaInstallPrompt.prompt();
+        try { await deferredPwaInstallPrompt.userChoice; } catch (_) {}
+        deferredPwaInstallPrompt = null;
+        updatePwaInstallUI();
+        return;
+      }
+      if (isIOSDevice()) {
+        showCustomIosBanner('Установка на iPhone', 'В Safari нажми «Поделиться» → «На экран Домой» → «Добавить».');
+        return;
+      }
+      showCustomIosBanner('Установка Vibegram', 'Открой меню браузера и выбери «Установить приложение» или «Добавить на главный экран».');
+    });
+
     function notificationsEnabled() {
+      if (localStorage.getItem(NOTIFICATIONS_MUTED_KEY) === '1') return false;
       if (window.vibegramDesktop && window.vibegramDesktop.isDesktop) return true;
       return localStorage.getItem(NOTIFICATIONS_ENABLED_KEY) === '1' ||
         (('Notification' in window) && Notification.permission === 'granted');
     }
 
     function updateNotificationsButton() {
-      const button = document.getElementById('enableNotificationsBtn');
-      if (!button) return;
       const enabled = notificationsEnabled();
-      button.classList.toggle('enabled', enabled);
-      button.title = enabled ? 'Уведомления включены' : 'Включить уведомления и звук';
-      button.setAttribute('aria-label', button.title);
+      const button = document.getElementById('enableNotificationsBtn');
+      if (button) {
+        button.classList.toggle('enabled', enabled);
+        button.title = enabled ? 'Уведомления разрешены' : 'Включить уведомления и звук';
+        button.setAttribute('aria-label', button.title);
+      }
+      const pushButton = document.getElementById('pwaEnablePushBtn');
+      if (pushButton) {
+        const pushEnabled = localStorage.getItem(PUSH_SUBSCRIPTION_ENABLED_KEY) === '1';
+        pushButton.textContent = pushEnabled ? 'Отключить push-уведомления' : 'Включить push-уведомления';
+      }
+    }
+
+    function urlBase64ToUint8Array(base64String) {
+      const padding = '='.repeat((4 - base64String.length % 4) % 4);
+      const base64 = (base64String + padding).replace(/-/g, '+').replace(/_/g, '/');
+      const raw = atob(base64);
+      const output = new Uint8Array(raw.length);
+      for (let i = 0; i < raw.length; i++) output[i] = raw.charCodeAt(i);
+      return output;
+    }
+
+    async function getPwaServiceWorker() {
+      if (!('serviceWorker' in navigator)) throw new Error('Этот браузер не поддерживает Service Worker.');
+      if (!pwaRegistrationPromise) {
+        pwaRegistrationPromise = navigator.serviceWorker.register('/service-worker.js', { scope: '/' })
+          .then(async registration => {
+            await navigator.serviceWorker.ready;
+            return registration;
+          }).catch(error => {
+            pwaRegistrationPromise = null;
+            throw error;
+          });
+      }
+      return pwaRegistrationPromise;
+    }
+
+    async function subscribeToServerPush(registration) {
+      if (!myProfile?.username) throw new Error('Сначала открой профиль Vibegram.');
+      if (!('PushManager' in window)) throw new Error('В этом браузере недоступны push-подписки.');
+      const keyResponse = await fetch('/api/push/public-key', { cache: 'no-store' });
+      const keyData = await keyResponse.json().catch(() => ({}));
+      if (!keyResponse.ok || !keyData.publicKey) {
+        throw new Error(keyData.error || 'Push не настроен на сервере. Администратору нужно задать VAPID_PUBLIC_KEY и VAPID_PRIVATE_KEY в Render.');
+      }
+
+      let subscription = await registration.pushManager.getSubscription();
+      if (!subscription) {
+        subscription = await registration.pushManager.subscribe({
+          userVisibleOnly: true,
+          applicationServerKey: urlBase64ToUint8Array(keyData.publicKey)
+        });
+      }
+      const response = await fetch('/api/push/subscribe', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ username: myProfile.username, subscription: subscription.toJSON() })
+      });
+      const result = await response.json().catch(() => ({}));
+      if (!response.ok || !result.ok) throw new Error(result.error || 'Не удалось сохранить push-подписку.');
+      localStorage.setItem(PUSH_SUBSCRIPTION_ENABLED_KEY, '1');
+      return subscription;
+    }
+
+    async function disablePushNotifications() {
+      try {
+        const registration = await getPwaServiceWorker().catch(() => null);
+        const subscription = registration?.pushManager ? await registration.pushManager.getSubscription() : null;
+        if (subscription) {
+          await fetch('/api/push/unsubscribe', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ username: myProfile?.username || '', endpoint: subscription.endpoint })
+          }).catch(() => {});
+          await subscription.unsubscribe().catch(() => {});
+        }
+        localStorage.removeItem(PUSH_SUBSCRIPTION_ENABLED_KEY);
+        localStorage.removeItem(NOTIFICATIONS_ENABLED_KEY);
+        localStorage.setItem(NOTIFICATIONS_MUTED_KEY, '1');
+        lastPushBoundUsername = '';
+        updateNotificationsButton();
+        showCustomIosBanner('Push-уведомления отключены', 'Уведомления Vibegram отключены на этом устройстве.');
+      } catch (error) {
+        showCustomIosBanner('Не удалось отключить Push', String(error?.message || 'Повтори попытку позже.'));
+      }
+    }
+
+    async function keepPushBoundToCurrentAccount() {
+      const username = String(myProfile?.username || '').toLowerCase();
+      if (!username || localStorage.getItem(PUSH_SUBSCRIPTION_ENABLED_KEY) !== '1' || lastPushBoundUsername === username) return;
+      if (!('serviceWorker' in navigator) || !('PushManager' in window)) return;
+      lastPushBoundUsername = username;
+      try {
+        const registration = await getPwaServiceWorker();
+        const subscription = await registration.pushManager.getSubscription();
+        if (!subscription) {
+          localStorage.removeItem(PUSH_SUBSCRIPTION_ENABLED_KEY);
+          lastPushBoundUsername = '';
+          updateNotificationsButton();
+          return;
+        }
+        const response = await fetch('/api/push/subscribe', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ username, subscription: subscription.toJSON() })
+        });
+        if (!response.ok) throw new Error('Не удалось привязать push к текущему аккаунту.');
+      } catch (_) {
+        lastPushBoundUsername = '';
+      }
     }
 
     async function enableNotifications() {
       try {
-        if (!(window.vibegramDesktop && window.vibegramDesktop.isDesktop) && 'Notification' in window) {
-          if (Notification.permission === 'default') await Notification.requestPermission();
-          if (Notification.permission === 'denied') {
-            showCustomIosBanner('Уведомления отключены', 'Разреши уведомления для Vibegram в настройках браузера.');
+        if (localStorage.getItem(PUSH_SUBSCRIPTION_ENABLED_KEY) === '1') {
+          await disablePushNotifications();
+          return;
+        }
+        localStorage.removeItem(NOTIFICATIONS_MUTED_KEY);
+        if (window.vibegramDesktop && window.vibegramDesktop.isDesktop) {
+          localStorage.setItem(NOTIFICATIONS_ENABLED_KEY, '1');
+          updateNotificationsButton();
+          showCustomIosBanner('Уведомления включены', 'Системные уведомления Vibegram включены в приложении Windows.');
+          return;
+        }
+        if (!('Notification' in window)) {
+          showCustomIosBanner('Уведомления недоступны', 'Открой Vibegram в Safari, Chrome или другом поддерживаемом браузере.');
+          return;
+        }
+        if (isIOSDevice() && !isStandalonePwa()) {
+          showCustomIosBanner('Сначала установи Vibegram', 'На iPhone открой эту страницу в Safari → «Поделиться» → «На экран Домой». Затем запусти установленный Vibegram и повтори включение.');
+          updatePwaInstallUI();
+          return;
+        }
+        if (!window.isSecureContext) {
+          showCustomIosBanner('Нужен защищённый сайт', 'Push-уведомления работают через HTTPS.');
+          return;
+        }
+        if (Notification.permission === 'default') {
+          const permission = await Notification.requestPermission();
+          if (permission !== 'granted') {
+            showCustomIosBanner('Уведомления не разрешены', 'Разреши уведомления Vibegram в настройках браузера или iPhone.');
             updateNotificationsButton();
             return;
           }
         }
+        if (Notification.permission === 'denied') {
+          showCustomIosBanner('Уведомления отключены', 'Включи уведомления Vibegram в настройках браузера или системы.');
+          updateNotificationsButton();
+          return;
+        }
+
         localStorage.setItem(NOTIFICATIONS_ENABLED_KEY, '1');
+        const registration = await getPwaServiceWorker();
+        await subscribeToServerPush(registration);
         updateNotificationsButton();
-        showCustomIosBanner('Уведомления включены', 'Новые сообщения будут приходить с уведомлением и звуком.');
+        showCustomIosBanner('Push-уведомления включены', 'Новые сообщения могут приходить, даже когда Vibegram закрыт.');
       } catch (error) {
-        showCustomIosBanner('Не удалось включить уведомления', 'Проверь разрешения уведомлений в системе.');
+        updateNotificationsButton();
+        showCustomIosBanner('Не удалось включить Push', String(error?.message || 'Проверь настройки VAPID на сервере.'));
       }
     }
 
@@ -2449,7 +2682,7 @@
       const safeTitle = String(title || 'Vibegram').slice(0, 100);
       const safeBody = String(body || 'Новое сообщение').slice(0, 240);
       const avatarUrl = typeof senderProfile?.avatar === 'string' ? senderProfile.avatar : '';
-      const notificationIcon = avatarUrl || '/facuicon.jpeg?v=1';
+      const notificationIcon = avatarUrl && !avatarUrl.startsWith('data:') ? avatarUrl : '/facuicon.jpeg?v=1';
       if (window.vibegramDesktop && window.vibegramDesktop.isDesktop && typeof window.vibegramDesktop.notify === 'function') {
         window.vibegramDesktop.notify(safeTitle, safeBody, avatarUrl);
         return;
@@ -2458,7 +2691,7 @@
         const options = {
           body: safeBody,
           icon: notificationIcon,
-          badge: '/facuicon.jpeg?v=1',
+          badge: '/pwa-192.png',
           tag: 'vibegram-' + safeTitle,
           data: { username: senderProfile?.username || '' }
         };
@@ -2475,18 +2708,27 @@
     }
 
     if ('serviceWorker' in navigator && /^https?:$/.test(window.location.protocol)) {
-      navigator.serviceWorker.register('/service-worker.js', { scope: '/' }).catch(() => {});
+      getPwaServiceWorker().catch(() => {});
       navigator.serviceWorker.addEventListener('message', event => {
         const handle = String(event.data?.username || '').toLowerCase();
-        if (event.data?.type === 'VIBEGRAM_OPEN_CHAT' && handle && usersMap[handle]) {
-          window.focus();
-          openChatWith(handle);
+        if ((event.data?.type === 'VIBEGRAM_OPEN_CHAT' || event.data?.type === 'VIBEGRAM_PUSH_RECEIVED') && handle && usersMap[handle]) {
+          if (event.data?.type === 'VIBEGRAM_PUSH_RECEIVED' && !document.hidden) {
+            const profile = usersMap[handle];
+            const p = event.data.payload || {};
+            if (activePeer !== handle) notifyIncomingMessage(p.title || profile.name, p.body || 'Новое сообщение', profile);
+          }
+          if (event.data?.type === 'VIBEGRAM_OPEN_CHAT') {
+            window.focus();
+            openChatWith(handle);
+          }
         }
       });
     }
 
     document.getElementById('enableNotificationsBtn')?.addEventListener('click', enableNotifications);
+    document.getElementById('pwaEnablePushBtn')?.addEventListener('click', enableNotifications);
     updateNotificationsButton();
+    updatePwaInstallUI();
 
     async function pollServer() {
       if (!myProfile) return;
@@ -2498,6 +2740,12 @@
 
         usersMap = data.users || {};
         pinsMap = data.pins || {};
+        const openChatParam = new URLSearchParams(window.location.search).get('openChat');
+        if (openChatParam && usersMap[String(openChatParam).toLowerCase()]) {
+          const openKey = String(openChatParam).toLowerCase();
+          window.history.replaceState({}, document.title, window.location.pathname);
+          if (activePeer !== openKey) openChatWith(openKey);
+        }
         serverTime = data.serverTime || Date.now();
         allSyncMessages = Array.isArray(data.messages) ? data.messages : [];
         messagesList = allSyncMessages.filter(m => !(m.media && (m.media.type === 'voice' || m.media.type === 'video_note')));
@@ -2531,6 +2779,7 @@
           myProfile.profile_channels = Array.isArray(serverSelf.profile_channels) ? serverSelf.profile_channels : (myProfile.profile_channels || []);
           upsertAccountInList(myProfile);
         }
+        keepPushBoundToCurrentAccount().catch(() => {});
 
         messagesList.forEach(msg => {
           if (!knownMsgIds.has(msg.id)) {
