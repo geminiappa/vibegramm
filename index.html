@@ -1,6 +1,8 @@
 <!DOCTYPE html>
 <html lang="ru">
 <head>
+  <link rel="icon" type="image/jpeg" href="/facuicon.jpeg?v=1">
+  <link rel="shortcut icon" type="image/jpeg" href="/facuicon.jpeg?v=1">
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
   <title>Vibegram</title>
@@ -268,7 +270,7 @@
     .ios-toast[data-depth="3"] { opacity: 0; pointer-events: none; }
 
     /* Премиум SVG-эмодзи и Галочка Верификации */
-    .prem-svg-badge, .verified-badge {
+    .prem-svg-badge, .verified-badge, .team-svg-badge {
       display: inline-flex;
       align-items: center;
       justify-content: center;
@@ -280,7 +282,9 @@
       transition: transform 0.2s var(--bounce);
     }
     .prem-svg-badge { animation: floatBadge 2.6s ease-in-out infinite; filter: drop-shadow(0 2px 6px rgba(94, 92, 230, 0.55)); }
-    .prem-svg-badge:hover, .verified-badge:hover { transform: scale(1.25); }
+    .prem-svg-badge:hover, .verified-badge:hover, .team-svg-badge:hover { transform: scale(1.2); }
+    .team-svg-badge { display:inline-flex; align-items:center; justify-content:center; width:18px; height:18px; flex:0 0 auto; filter:drop-shadow(0 1px 5px rgba(168,85,247,.38)); }
+    .team-svg-badge svg { width:18px; height:18px; display:block; }
     @keyframes floatBadge { 0%, 100% { transform: translateY(0); } 50% { transform: translateY(-2px); } }
 
     /* Левая панель списка чатов в стиле iOS */
@@ -861,7 +865,7 @@
     .avatar { background-size:cover; background-position:center; background-repeat:no-repeat; overflow:hidden; }
     .avatar-wrap .avatar, #activeChatAvatar, #drawerAvatar, .tg-avatar-main, .ios-hero-avatar, #peerProfileAvatar { background-size:cover; background-position:center; background-repeat:no-repeat; }
     .chat-name { gap:5px; overflow:hidden; }
-    .chat-name > span:not(.verified-badge):not(.prem-svg-badge) { overflow:hidden; text-overflow:ellipsis; }
+    .chat-name > span:not(.verified-badge):not(.prem-svg-badge):not(.team-svg-badge) { overflow:hidden; text-overflow:ellipsis; }
     .chat-preview { overflow:hidden; text-overflow:ellipsis; white-space:nowrap; }
     .chat-area { background-color:#090c12; }
     .chat-header { padding-left:clamp(10px,1.5vw,20px); padding-right:clamp(10px,1.5vw,20px); }
@@ -879,8 +883,8 @@
     .reaction-picker-bar { gap:5px; }
     .react-emoji-btn { display:inline-flex; align-items:center; justify-content:center; width:36px; height:36px; border-radius:12px; background:rgba(255,255,255,.045); transition:transform 120ms ease,background-color 120ms ease; }
     .react-emoji-btn:hover { background:rgba(10,132,255,.18); transform:translateY(-1px); }
-    .sticker-send-option svg, .prem-svg-badge svg, .verified-badge svg { display:block; flex:0 0 auto; }
-    .verified-badge, .prem-svg-badge { flex:0 0 auto; }
+    .sticker-send-option svg, .prem-svg-badge svg, .verified-badge svg, .team-svg-badge svg { display:block; flex:0 0 auto; }
+    .verified-badge, .prem-svg-badge, .team-svg-badge { flex:0 0 auto; }
     .modal-overlay { padding: max(10px,env(safe-area-inset-top)) 10px max(10px,env(safe-area-inset-bottom)); }
     button, .chat-item, .ios-action-btn, .channel-sub-bottom-btn { touch-action:manipulation; }
     @media (min-width:1200px) {
@@ -1546,6 +1550,11 @@
       return (PREMIUM_SVG_STICKERS[key] || PREMIUM_SVG_STICKERS['star']).svg;
     }
 
+    // Separate, server-issued badge reserved for the official Vibegram team.
+    function getTeamStarSvg() {
+      return `<svg viewBox="0 0 24 24" aria-hidden="true"><defs><linearGradient id="vibeTeamStarGradient" x1="0" y1="0" x2="1" y2="1"><stop offset="0%" stop-color="#e9d5ff"/><stop offset="48%" stop-color="#a855f7"/><stop offset="100%" stop-color="#6366f1"/></linearGradient></defs><path d="M12 1.5 14.7 7.1 20.9 3.9 17.8 10.2 23.5 12 17.8 13.8 20.9 20.1 14.7 16.9 12 22.5 9.3 16.9 3.1 20.1 6.2 13.8 .5 12 6.2 10.2 3.1 3.9 9.3 7.1Z" fill="url(#vibeTeamStarGradient)"/><circle cx="12" cy="12" r="3.4" fill="#fff" fill-opacity=".95"/></svg>`;
+    }
+
     // Копирование любого @username в буфер обмена в 1 клик
     function copyUsernameToClipboard(rawUsername) {
       const clean = '@' + String(rawUsername || '').trim().replace(/^@+/, '');
@@ -1736,30 +1745,50 @@
     function renderBadgesHtml(rawObj) {
       if (!rawObj) return '';
       const obj = enrichEntity(rawObj);
-      const isVer = Boolean(obj.is_verified);
+      const username = String(obj.username || '').toLowerCase().replace(/^@+/, '');
+      const serverObj = usersMap[username];
+      // Badges are rendered only from server-authoritative state. Local profile/cache
+      // flags and a chosen sticker are never sufficient to display Premium or Team.
+      const isVer = Boolean(serverObj && serverObj.is_verified);
+      const isPremium = Boolean(serverObj && serverObj.is_premium && serverObj.premium_grant_version === 1);
+      const isTeam = Boolean(serverObj && serverObj.is_team && serverObj.team_grant_version === 1);
+      const teamHtml = isTeam
+        ? `<span class="team-svg-badge" data-ver-user="${escapeHtml(username)}" data-badge-type="team" title="Официальная команда Vibegram">${getTeamStarSvg()}</span>`
+        : '';
       const verHtml = isVer
-        ? `<span class="verified-badge" data-ver-user="${escapeHtml(obj.username)}" title="Нажмите, чтобы узнать за что выдана галочка">${getVerifiedSvg()}</span>`
+        ? `<span class="verified-badge" data-ver-user="${escapeHtml(username)}" data-badge-type="verified" title="Нажмите, чтобы узнать за что выдана галочка">${getVerifiedSvg()}</span>`
         : '';
-      const premHtml = obj.is_premium
-        ? `<span class="prem-svg-badge" data-ver-user="${escapeHtml(obj.username)}" title="Vibegram Premium">${getStickerSvg(obj.sticker)}</span>`
+      const premHtml = isPremium
+        ? `<span class="prem-svg-badge" data-ver-user="${escapeHtml(username)}" data-badge-type="premium" title="Vibegram Premium">${getStickerSvg(serverObj.sticker || serverObj.sticker_id || obj.sticker)}</span>`
         : '';
-      return `${verHtml}${premHtml}`;
+      return `${teamHtml}${verHtml}${premHtml}`;
     }
 
-    function openBadgeExplanationModal(username) {
+    function openBadgeExplanationModal(username, badgeType = '') {
       const target = enrichEntity(getPeerObject(username));
+      const serverObj = usersMap[String(username || '').toLowerCase().replace(/^@+/, '')];
+      if (!serverObj) return;
+      target.is_verified = Boolean(serverObj.is_verified);
+      target.is_premium = Boolean(serverObj.is_premium && serverObj.premium_grant_version === 1);
+      target.is_team = Boolean(serverObj.is_team && serverObj.team_grant_version === 1);
+      target.sticker = serverObj.sticker || serverObj.sticker_id || target.sticker;
       const modal = document.getElementById('badgeInfoModal');
       const iconBox = document.getElementById('badgeInfoIcon');
       const titleEl = document.getElementById('badgeInfoTitle');
       const catEl = document.getElementById('badgeInfoCategory');
       const reasonEl = document.getElementById('badgeInfoReason');
 
-      if (target.is_verified) {
+      if (badgeType === 'team' && target.is_team) {
+        iconBox.innerHTML = getTeamStarSvg().replace('<svg ', '<svg width="36" height="36" ');
+        titleEl.textContent = `Команда Vibegram — ${target.name}`;
+        catEl.textContent = 'Официальная команда Vibegram';
+        reasonEl.textContent = 'Отдельный командный знак. Его выдаёт только администратор Vibegram через серверную систему управления.';
+      } else if ((badgeType === 'verified' || !badgeType) && target.is_verified) {
         iconBox.innerHTML = `<svg width="36" height="36" viewBox="0 0 24 24" fill="none"><circle cx="12" cy="12" r="10" fill="#0a84ff"/><path d="M8 12.3L10.7 15L16.2 9.5" stroke="#fff" stroke-width="2.3" stroke-linecap="round" stroke-linejoin="round"/></svg>`;
         titleEl.textContent = `${target.name} (@${target.username})`;
         catEl.textContent = target.verify_category || (target.is_channel ? 'Официальный канал' : 'Верифицированный аккаунт');
         reasonEl.textContent = `Основание выдачи галочки: ${target.verify_reason || 'Официально подтверждено через @verify_bot.'}`;
-      } else if (target.is_premium) {
+      } else if ((badgeType === 'premium' || !badgeType) && target.is_premium) {
         const stInfo = PREMIUM_SVG_STICKERS[target.sticker] || PREMIUM_SVG_STICKERS['star'];
         iconBox.innerHTML = stInfo.svg.replace('width="18" height="18"', 'width="36" height="36"');
         titleEl.textContent = stInfo.title;
@@ -1780,7 +1809,7 @@
       const badgeEl = ev.target.closest('[data-ver-user]');
       if (badgeEl) {
         ev.stopPropagation();
-        openBadgeExplanationModal(badgeEl.getAttribute('data-ver-user'));
+        openBadgeExplanationModal(badgeEl.getAttribute('data-ver-user'), badgeEl.getAttribute('data-badge-type') || '');
         return;
       }
       msgContextWrap.classList.remove('open');
@@ -2271,8 +2300,7 @@
             bio: packedBio,
             color: myProfile.color,
             avatar: myProfile.avatar,
-            privacy: myProfile.privacy,
-            is_premium: myProfile.is_premium
+            privacy: myProfile.privacy
           })
         });
         const saved = await response.json().catch(() => ({}));
@@ -2281,6 +2309,8 @@
           myProfile.avatar = saved.profile.avatar || myProfile.avatar || '';
           myProfile.color = saved.profile.color || myProfile.color;
           myProfile.is_verified = Boolean(saved.profile.is_verified);
+          myProfile.is_premium = Boolean(saved.profile.is_premium && saved.profile.premium_grant_version === 1);
+          myProfile.is_team = Boolean(saved.profile.is_team && saved.profile.team_grant_version === 1);
           upsertAccountInList(myProfile);
         }
       } catch (e) {}
@@ -2364,6 +2394,9 @@
           const enrichedMe = enrichEntity(serverSelf);
           myProfile.uid = me === 'paveldurov' ? 1 : enrichedMe.uid;
           myProfile.is_verified = Boolean(serverSelf.is_verified);
+          myProfile.is_premium = Boolean(serverSelf.is_premium && serverSelf.premium_grant_version === 1);
+          myProfile.is_team = Boolean(serverSelf.is_team && serverSelf.team_grant_version === 1);
+          myProfile.sticker = serverSelf.sticker || serverSelf.sticker_id || myProfile.sticker || 'star';
           // Server profile is the cross-device source of truth. Do not replace an
           // existing local image with blank data, but download the saved avatar when
           // this account is opened on a new phone/PC.
@@ -3479,7 +3512,7 @@
         btn.innerHTML = `${info.svg} <span>${escapeHtml(info.title.split(' ')[0])}</span>`;
         btn.addEventListener('click', () => {
           selectedSticker = key;
-          if (myProfile) myProfile.is_premium = true;
+          // Selecting a sticker changes only the preview; Premium itself is granted by the server.
           renderStickerPicker();
           updateAvatarPreview();
         });

@@ -7,6 +7,7 @@ import os
 import base64
 import threading
 import re
+import hmac
 from urllib.parse import urlparse, parse_qs
 
 # Render and other hosting platforms provide the listening port via PORT.
@@ -52,8 +53,9 @@ def ensure_system_bot():
             'color': '#0abde3',
             'avatar': '',
             'privacy': 'everyone',
-            'is_premium': True,
-            'sticker_id': ' tg_Verify ',
+            'is_premium': False,
+            'is_team': False,
+            'sticker_id': 'tg_Verify',
             'is_verified': True,
             'verify_category': 'Официальный бот Vibegram',
             'verify_reason': 'Системный бот для выдачи галочек верификации аккаунтам и каналам.',
@@ -152,13 +154,33 @@ def load_db():
         for m in MESSAGES
         if m.get('verification_request') and (m.get('verification_request') or {}).get('status') == 'approved'
     }
-    verification_state_changed = False
+    state_changed = False
     for username, user_obj in USERS.items():
+        # Legacy Premium flags did not record an auditable server-side grant.
+        # Remove them once on migration; grants issued below carry versioned metadata.
+        if user_obj.get('is_premium') and not (
+            user_obj.get('premium_grant_version') == 1 and
+            user_obj.get('premium_granted_by') == 'admin_token'
+        ):
+            user_obj['is_premium'] = False
+            user_obj.pop('premium_granted_by', None)
+            user_obj.pop('premium_granted_at', None)
+            user_obj.pop('premium_grant_version', None)
+            state_changed = True
+        if user_obj.get('is_team') and not (
+            user_obj.get('team_grant_version') == 1 and
+            user_obj.get('team_granted_by') == 'admin_token'
+        ):
+            user_obj['is_team'] = False
+            user_obj.pop('team_granted_by', None)
+            user_obj.pop('team_granted_at', None)
+            user_obj.pop('team_grant_version', None)
+            state_changed = True
         if user_obj.get('is_verified') and not user_obj.get('is_bot') and username not in approved_targets:
             user_obj['is_verified'] = False
-            verification_state_changed = True
-    # Persist the system bot, migrated verification states and initial state.
-    if DATABASE_URL or verification_state_changed:
+            state_changed = True
+    # Persist the system bot, migrated badge states and initial state.
+    if DATABASE_URL or state_changed:
         save_db()
 
 
@@ -315,6 +337,13 @@ class VibegramHandler(http.server.SimpleHTTPRequestHandler):
                 'avatar': (str(body.get('avatar') or '').strip() or existing.get('avatar', '')),
                 'privacy': body.get('privacy') or existing.get('privacy', 'everyone'),
                 'is_premium': bool(existing.get('is_premium', False)),
+                'premium_grant_version': existing.get('premium_grant_version'),
+                'premium_granted_by': existing.get('premium_granted_by'),
+                'premium_granted_at': existing.get('premium_granted_at'),
+                'is_team': bool(existing.get('is_team', False)),
+                'team_grant_version': existing.get('team_grant_version'),
+                'team_granted_by': existing.get('team_granted_by'),
+                'team_granted_at': existing.get('team_granted_at'),
                 'sticker_id': body.get('sticker_id') or existing.get('sticker_id', 'star'),
                 # Verified state may ONLY change in /api/verification/decide after bot review.
                 # Ignore any is_verified value supplied by a browser client.
@@ -397,6 +426,15 @@ class VibegramHandler(http.server.SimpleHTTPRequestHandler):
                 'subscribers': subs,
                 'comments_enabled': comments_enabled,
                 'sign_messages': sign_messages,
+                'is_premium': bool(existing.get('is_premium', False)),
+                'premium_grant_version': existing.get('premium_grant_version'),
+                'premium_granted_by': existing.get('premium_granted_by'),
+                'premium_granted_at': existing.get('premium_granted_at'),
+                'is_team': bool(existing.get('is_team', False)),
+                'team_grant_version': existing.get('team_grant_version'),
+                'team_granted_by': existing.get('team_granted_by'),
+                'team_granted_at': existing.get('team_granted_at'),
+                'sticker_id': existing.get('sticker_id', 'star'),
                 'is_verified': bool(existing.get('is_verified', False)),
                 'verify_category': existing.get('verify_category', 'Официальный канал'),
                 'verify_reason': existing.get('verify_reason', 'Подлинность канала подтверждена модерацией Vibegram.'),
@@ -648,18 +686,28 @@ class VibegramHandler(http.server.SimpleHTTPRequestHandler):
                     'media': media,
                     'reactions': {}
                 }
+                # The admin secret may be supplied only to a privileged bot command.
+                # Never persist it in message history or return it to the browser.
+                raw_parts = text.strip().split()
+                command_name = raw_parts[0].lower() if raw_parts else ''
+                if (command_name in ('/premium', '/vip', '/team') and len(raw_parts) >= 4
+                        and raw_parts[2].lower() in ('on', 'off')):
+                    user_msg['text'] = f"{raw_parts[0]} {raw_parts[1]} {raw_parts[2]} [ключ скрыт]"
                 MESSAGES.append(user_msg)
 
                 sender_obj = USERS.get(sender, {})
                 sender_id = int(sender_obj.get('id') or 0)
                 clean_cmd = text.strip().lower()
+                parts = raw_parts
+                command = parts[0].lower() if parts else ''
+                configured_admin_token = os.environ.get('VIBEGRAM_ADMIN_TOKEN', '').strip()
+                supplied_admin_token = parts[3] if len(parts) == 4 else ''
+                is_admin_token_valid = bool(configured_admin_token and supplied_admin_token and
+                    hmac.compare_digest(supplied_admin_token, configured_admin_token))
 
-                # Управление Vibegram Premium через общедоступного бота.
-                # Создатель пишет: /premium @username on  или  /premium @username off
-                is_creator = (sender == VERIFY_BOT_ADMIN or sender_id == 1 or sender in ('paveldurov', 'vibegram'))
-                parts = clean_cmd.split()
-                if parts and parts[0] in ('/premium', '/vip'):
-                    if len(parts) == 2 and parts[1] == 'request':
+                # Premium is server-managed: an ID, username or localStorage flag cannot grant it.
+                if command in ('/premium', '/vip'):
+                    if len(parts) == 2 and parts[1].lower() == 'request':
                         bot_reply = (
                             f"⭐ Запрос Vibegram Premium принят для @{sender}.\n"
                             "Premium выдаётся только Создателем через этот бот. Ожидайте решения."
@@ -677,15 +725,26 @@ class VibegramHandler(http.server.SimpleHTTPRequestHandler):
                                 'premium_request': {'applicant': sender, 'status': 'pending'}
                             })
                         save_db()
-                    elif len(parts) == 3 and parts[1].lstrip('@') in USERS and parts[2] in ('on', 'off'):
-                        target_premium = parts[1].lstrip('@')
-                        if not is_creator:
-                            bot_reply = '⛔ Выдавать или снимать Vibegram Premium может только Создатель (ID: 1).'
+                    elif len(parts) in (3, 4) and parts[1].lstrip('@').lower() in USERS and parts[2].lower() in ('on', 'off'):
+                        target_premium = parts[1].lstrip('@').lower()
+                        if len(parts) != 4 or not configured_admin_token:
+                            bot_reply = ('⛔ Выдача Premium заблокирована без серверного ключа. '
+                                         'Настрой VIBEGRAM_ADMIN_TOKEN в Render и укажи этот ключ последним аргументом команды.')
+                        elif not is_admin_token_valid:
+                            bot_reply = '⛔ Неверный ключ администратора. Premium не изменён.'
                         else:
-                            enabled = parts[2] == 'on'
-                            USERS[target_premium]['is_premium'] = enabled
+                            enabled = parts[2].lower() == 'on'
+                            target_obj = USERS[target_premium]
+                            target_obj['is_premium'] = enabled
                             if enabled:
-                                USERS[target_premium]['sticker'] = USERS[target_premium].get('sticker') or 'star'
+                                target_obj['premium_grant_version'] = 1
+                                target_obj['premium_granted_by'] = 'admin_token'
+                                target_obj['premium_granted_at'] = now
+                                target_obj['sticker'] = target_obj.get('sticker') or 'star'
+                            else:
+                                target_obj.pop('premium_grant_version', None)
+                                target_obj.pop('premium_granted_by', None)
+                                target_obj.pop('premium_granted_at', None)
                             bot_reply = f"{'✅ Vibegram Premium выдан' if enabled else 'ℹ️ Vibegram Premium снят'} для @{target_premium}."
                             MESSAGES.append({
                                 'id': f"msg_{now + 1}_{len(MESSAGES)}_premium_notice",
@@ -695,10 +754,60 @@ class VibegramHandler(http.server.SimpleHTTPRequestHandler):
                             })
                             save_db()
                     else:
-                        bot_reply = ('Использование Premium-команд:\n/premium request — запросить Premium\n'
-                                     '/premium @username on — выдать (только Создатель)\n'
-                                     '/premium @username off — снять (только Создатель)')
-                # Авторизация Создателя в боте по вводу ID "1" или "/id 1"
+                        bot_reply = ('Команды Premium:\n/premium request — запросить Premium\n'
+                                     '/premium @username on <ADMIN_TOKEN> — выдать\n'
+                                     '/premium @username off <ADMIN_TOKEN> — снять\n'
+                                     'Без VIBEGRAM_ADMIN_TOKEN на сервере выдача запрещена.')
+                # Отдельная звезда команды Vibegram; доступ только по серверному ключу.
+                elif command == '/team':
+                    if len(parts) == 2 and parts[1].lower() == 'request':
+                        bot_reply = ('⭐ Заявка на звезду команды принята. Выдача возможна только администратором '
+                                     'Vibegram через серверный ключ.')
+                        creator_username = VERIFY_BOT_ADMIN
+                        if not creator_username:
+                            creator_username = next((name for name, obj in USERS.items()
+                                if not obj.get('is_channel') and not obj.get('is_bot') and int(obj.get('id') or obj.get('uid') or 0) == 1), None)
+                        if creator_username and creator_username in USERS:
+                            MESSAGES.append({
+                                'id': f"msg_{now + 1}_{len(MESSAGES)}_team_request",
+                                'sender': 'verify_bot', 'to': creator_username,
+                                'text': f"⭐ ЗАЯВКА НА ЗВЕЗДУ КОМАНДЫ\nПользователь: @{sender} (ID: {sender_id})\nКоманда выдачи: /team @{sender} on <ADMIN_TOKEN>",
+                                'time': now + 1, 'read': False, 'reactions': {},
+                                'team_request': {'applicant': sender, 'status': 'pending'}
+                            })
+                    elif len(parts) in (3, 4) and parts[1].lstrip('@').lower() in USERS and parts[2].lower() in ('on', 'off'):
+                        target_team = parts[1].lstrip('@').lower()
+                        if len(parts) != 4 or not configured_admin_token:
+                            bot_reply = ('⛔ Выдача звезды команды заблокирована без серверного ключа. '
+                                         'Настрой VIBEGRAM_ADMIN_TOKEN в Render и укажи его последним аргументом.')
+                        elif not is_admin_token_valid:
+                            bot_reply = '⛔ Неверный ключ администратора. Статус команды не изменён.'
+                        else:
+                            enabled = parts[2].lower() == 'on'
+                            target_obj = USERS[target_team]
+                            target_obj['is_team'] = enabled
+                            if enabled:
+                                target_obj['team_grant_version'] = 1
+                                target_obj['team_granted_by'] = 'admin_token'
+                                target_obj['team_granted_at'] = now
+                            else:
+                                target_obj.pop('team_grant_version', None)
+                                target_obj.pop('team_granted_by', None)
+                                target_obj.pop('team_granted_at', None)
+                            bot_reply = f"{'✅ Звезда команды Vibegram выдана' if enabled else 'ℹ️ Звезда команды Vibegram снята'} для @{target_team}."
+                            MESSAGES.append({
+                                'id': f"msg_{now + 1}_{len(MESSAGES)}_team_notice",
+                                'sender': 'verify_bot', 'to': target_team,
+                                'text': f"{'⭐ Вам выдана отдельная звезда команды Vibegram!' if enabled else 'Звезда команды Vibegram снята.'}",
+                                'time': now + 1, 'read': False, 'reactions': {}
+                            })
+                            save_db()
+                    else:
+                        bot_reply = ('Команды звезды команды Vibegram:\n/team request — подать заявку\n'
+                                     '/team @username on <ADMIN_TOKEN> — выдать\n'
+                                     '/team @username off <ADMIN_TOKEN> — снять.')
+                # Авторизация Создателя в боте по вводу ID "1" или "/id 1".
+                # It remains separate from badge grants; ID alone can no longer grant Premium/team status.
                 elif clean_cmd in ('1', 'id 1', '/id 1', '/auth 1', 'id: 1'):
                     if sender_id == 1 or sender in ('paveldurov', 'vibegram'):
                         sender_obj['id'] = 1
