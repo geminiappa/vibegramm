@@ -6999,5 +6999,105 @@ button:focus-visible,a:focus-visible,input:focus-visible,textarea:focus-visible,
 @media(prefers-reduced-motion:reduce){.modal-overlay.open>.tg-settings-modal,.modal-overlay.open>.ios-sheet-modal,.vg-modal.open>.vg-modal-card{animation:none!important}}
 </style>
 
+<style id="vibegram-rainbow-and-interface-v2">
+/* Rainbow usernames: only server-approved grants get the effect. Keep badges/icons readable. */
+.vg-rainbow-name,
+.vg-rainbow-name > .vg-badge,
+.vg-rainbow-name .vg-verified-badge,
+.vg-rainbow-name .vg-premium-badge { isolation:isolate; }
+.vg-rainbow-name:not(:has(svg)):not(:has(.vg-badge)) {
+  display:inline-block; max-width:100%; color:transparent!important;
+  background-image:linear-gradient(105deg,#ff4d6d 0%,#ff9f43 16%,#ffe66d 31%,#52e0a1 47%,#42c9f5 63%,#9b7bff 79%,#ff4d6d 100%);
+  background-size:300% 100%; background-position:0% 50%; background-clip:text;
+  -webkit-background-clip:text; -webkit-text-fill-color:transparent;
+  font-weight:800; animation:vgRainbowFlow 4.2s linear infinite;
+}
+/* Ensure badge markup and SVGs never inherit transparent text from the rainbow label. */
+.vg-rainbow-name .vg-badge,.vg-rainbow-name svg,.vg-rainbow-name .badge,
+.vg-rainbow-name [class*="verified"],.vg-rainbow-name [class*="premium"] {
+  -webkit-text-fill-color:initial; color:initial; background-clip:border-box;
+}
+@keyframes vgRainbowFlow { to { background-position:300% 50%; } }
+#drawerUserName,#peerProfileName,.chat-header-identity,.chat-item-name,.chat-item-title,
+.channel-post-header,.vg-group-sender,.vg-forwarded-meta { min-width:0; }
+#drawerUserName,#peerProfileName { overflow-wrap:anywhere; }
+#drawerUserName .vg-rainbow-name,#peerProfileName .vg-rainbow-name,
+[data-open-user].vg-rainbow-name,.vg-forwarded-name.vg-rainbow-name {
+  vertical-align:baseline; text-decoration:none; cursor:pointer;
+}
+/* App-wide alignment polish: consistent box sizing, controls and safe scrolling. */
+#app, #app * { box-sizing:border-box; }
+button,input,textarea,select { font:inherit; }
+button { -webkit-tap-highlight-color:transparent; }
+.modal-overlay,.vg-modal,.ios-sheet-overlay { overscroll-behavior:contain; }
+.modal-overlay > *, .vg-modal > *, .ios-sheet-modal, .tg-settings-modal { min-width:0; }
+.tg-section-box,.tg-row-item,.vg-modal-card,.vg-created-entity-row,.vg-drawer-entity,
+.chat-item,.chat-header-identity,.chat-header-tools { min-width:0; }
+.tg-row-item,.vg-modal-head,.vg-modal-footer,.vg-action-row,.vg-group-footer-actions {
+  flex-wrap:wrap; gap:10px;
+}
+.tg-row-body { min-width:0; overflow-wrap:anywhere; }
+.tg-row-body input,.tg-row-body textarea,.tg-row-body select,
+.tg-section-box input,.tg-section-box textarea,.tg-section-box select { max-width:100%; }
+img,video { max-width:100%; }
+@media(max-width:768px){
+  .vg-rainbow-name:not(:has(svg)):not(:has(.vg-badge)){animation-duration:5.5s}
+  .tg-row-item { align-items:flex-start; }
+  .tg-row-body { flex:1 1 180px; }
+  .modal-overlay,.vg-modal { padding:8px!important; }
+  .modal-overlay > .tg-settings-modal,.modal-overlay > .ios-sheet-modal,
+  .vg-modal > .vg-modal-card { width:100%!important; max-width:100%!important; }
+  .chat-header-identity { overflow:hidden; }
+}
+@media(prefers-reduced-motion:reduce){.vg-rainbow-name{animation:none!important}}
+</style>
+<script id="vibegram-rainbow-interface-v2">
+(()=>{
+  const granted = handle => {
+    const h=String(handle||'').trim().toLowerCase().replace(/^@+/, '');
+    const map=(typeof usersMap!=='undefined'?usersMap:window.usersMap); const u=map && map[h];
+    return !!(u && u.rainbow_nick===true && Number(u.rainbow_grant_version)===1);
+  };
+  const refreshRainbowNames = () => {
+    try {
+      document.querySelectorAll('[data-open-user]').forEach(el=>{
+        const h=el.getAttribute('data-open-user');
+        el.classList.toggle('vg-rainbow-name',granted(h));
+      });
+      const profile=(typeof myProfile!=='undefined'?myProfile:window.myProfile); const me=profile && profile.username;
+      const self=granted(me);
+      const drawer=document.querySelector('#drawerUserName > span');
+      if(drawer) drawer.classList.toggle('vg-rainbow-name',self);
+      const peerName=document.querySelector('#peerProfileName span');
+      if(peerName){
+        const active=(typeof activePeer!=='undefined'?activePeer:window.activePeer);
+        peerName.classList.toggle('vg-rainbow-name',granted(active));
+      }
+      const state=document.getElementById('rainbowNickState');
+      if(state){
+        const map=(typeof usersMap!=='undefined'?usersMap:window.usersMap); const u=map && map[String(me||'').toLowerCase()];
+        state.textContent=granted(me)?'🌈 Радужный ник активен':(u&&u.rainbow_pending?'Заявка рассматривается':'Радужный ник не выдан');
+        state.classList.toggle('is-active',granted(me));
+      }
+    } catch(e) { /* UI enhancement must never interrupt chat rendering. */ }
+  };
+  if(document.readyState==='loading') document.addEventListener('DOMContentLoaded',()=>{
+    refreshRainbowNames();
+    new MutationObserver(refreshRainbowNames).observe(document.body,{childList:true,subtree:true});
+  },{once:true});
+  else {
+    refreshRainbowNames();
+    new MutationObserver(refreshRainbowNames).observe(document.body,{childList:true,subtree:true});
+  }
+  document.addEventListener('click',e=>{
+    const button=e.target.closest('#requestRainbowNickBtn');
+    if(!button)return;
+    // Existing app handler owns the API request; this only refreshes visible status afterward.
+    setTimeout(refreshRainbowNames,350);
+  });
+  window.addEventListener('focus',refreshRainbowNames);
+})();
+</script>
+
 </body>
 </html>
