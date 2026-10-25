@@ -9,6 +9,7 @@ import threading
 import re
 import hmac
 import hashlib
+import secrets
 from urllib.parse import urlparse, parse_qs
 
 # Render and other hosting platforms provide the listening port via PORT.
@@ -36,13 +37,18 @@ MESSAGES = []       # список всех сообщений и постов
 PINS = {}           # закрепленные сообщения
 VERIFY_BOT_ADMIN = None  # username создателя, привязавшего бота по ID 1
 PUSH_SUBSCRIPTIONS = {}  # username -> [{subscription: Web Push subscription, created_at: ms}]
+USER_PREFS = {}          # username -> cross-device preferences (archive, folders, drafts, blocks)
+SCHEDULED_MESSAGES = []  # scheduled sends persisted in shared state
+CALL_SIGNALS = []        # ephemeral WebRTC signalling packets; never persisted
+CALL_SIGNALS_LOCK = threading.RLock()
+REPORTS = []            # user-submitted abuse reports, visible to creator/moderators only via API
 def get_chat_key(u1, u2):
     a = u1.strip().lower().lstrip('@')
     b = u2.strip().lower().lstrip('@')
-    if a in USERS and USERS[a].get('is_channel'):
-        return f"channel:{a}"
-    if b in USERS and USERS[b].get('is_channel'):
-        return f"channel:{b}"
+    if a in USERS and (USERS[a].get('is_channel') or USERS[a].get('is_group')):
+        return f"{'channel' if USERS[a].get('is_channel') else 'group'}:{a}"
+    if b in USERS and (USERS[b].get('is_channel') or USERS[b].get('is_group')):
+        return f"{'channel' if USERS[b].get('is_channel') else 'group'}:{b}"
     return ":".join(sorted([a, b]))
 
 def ensure_system_bot():
@@ -92,7 +98,10 @@ def _local_json_state():
                         'messages': data.get('messages', []),
                         'pins': data.get('pins', {}),
                         'verify_bot_admin': data.get('verify_bot_admin'),
-                        'push_subscriptions': data.get('push_subscriptions', {})
+                        'push_subscriptions': data.get('push_subscriptions', {}),
+                        'user_prefs': data.get('user_prefs', {}),
+                        'scheduled_messages': data.get('scheduled_messages', []),
+                        'reports': data.get('reports', [])
                     }
         except Exception as e:
             print("Ошибка чтения локальной JSON-БД:", e)
@@ -305,19 +314,22 @@ def dispatch_push_for_messages(messages, base_url):
             continue
         sender_profile = USERS.get(sender, {})
         icon = _absolute_public_url(sender_profile.get('avatar'), base_url, sender)
-        payload = {
-            'title': str(sender_profile.get('name') or sender or 'Новое сообщение')[:100],
-            'body': text,
-            'icon': icon,
-            'badge': base_url.rstrip('/') + '/pwa-192.png',
-            'username': sender,
-            'url': base_url.rstrip('/') + '/?openChat=' + sender,
-            'tag': 'vibegram-chat-' + sender
-        }
-        send_web_push(recipient, payload)
+        group_obj = USERS.get(recipient, {}) if USERS.get(recipient, {}).get('is_group') else None
+        recipients = [x for x in (group_obj.get('members') or []) if x != sender] if group_obj else [recipient]
+        for target_user in recipients:
+            payload = {
+                'title': (str(sender_profile.get('name') or sender or 'Новое сообщение') + (f" · {group_obj.get('name')}" if group_obj else ''))[:100],
+                'body': text,
+                'icon': icon,
+                'badge': base_url.rstrip('/') + '/pwa-192.png',
+                'username': recipient if group_obj else sender,
+                'url': base_url.rstrip('/') + '/?openChat=' + recipient,
+                'tag': 'vibegram-chat-' + recipient
+            }
+            send_web_push(target_user, payload)
 
 def load_db():
-    global USERS, MESSAGES, PINS, VERIFY_BOT_ADMIN, PUSH_SUBSCRIPTIONS
+    global USERS, MESSAGES, PINS, VERIFY_BOT_ADMIN, PUSH_SUBSCRIPTIONS, USER_PREFS, SCHEDULED_MESSAGES, REPORTS
 
     if DATABASE_URL:
         try:
@@ -349,6 +361,9 @@ def load_db():
             PINS = data.get('pins', {})
             VERIFY_BOT_ADMIN = data.get('verify_bot_admin')
             PUSH_SUBSCRIPTIONS = data.get('push_subscriptions', {}) if isinstance(data.get('push_subscriptions', {}), dict) else {}
+            USER_PREFS = data.get('user_prefs', {}) if isinstance(data.get('user_prefs', {}), dict) else {}
+            SCHEDULED_MESSAGES = data.get('scheduled_messages', []) if isinstance(data.get('scheduled_messages', []), list) else []
+            REPORTS = data.get('reports', []) if isinstance(data.get('reports', []), list) else []
             print('Vibegram: данные загружены из PostgreSQL.')
         except Exception as e:
             raise RuntimeError(
@@ -361,6 +376,9 @@ def load_db():
         PINS = data.get('pins', {})
         VERIFY_BOT_ADMIN = data.get('verify_bot_admin')
         PUSH_SUBSCRIPTIONS = data.get('push_subscriptions', {}) if isinstance(data.get('push_subscriptions', {}), dict) else {}
+        USER_PREFS = data.get('user_prefs', {}) if isinstance(data.get('user_prefs', {}), dict) else {}
+        SCHEDULED_MESSAGES = data.get('scheduled_messages', []) if isinstance(data.get('scheduled_messages', []), list) else []
+        REPORTS = data.get('reports', []) if isinstance(data.get('reports', []), list) else []
         print('Vibegram: DATABASE_URL не задан, используется локальный JSON-файл.')
 
     ensure_system_bot()
@@ -416,7 +434,10 @@ def save_db():
         'messages': MESSAGES,
         'pins': PINS,
         'verify_bot_admin': VERIFY_BOT_ADMIN,
-        'push_subscriptions': PUSH_SUBSCRIPTIONS
+        'push_subscriptions': PUSH_SUBSCRIPTIONS,
+        'user_prefs': USER_PREFS,
+        'scheduled_messages': SCHEDULED_MESSAGES,
+        'reports': REPORTS
     }
     with DB_LOCK:
         if DATABASE_URL:
@@ -511,6 +532,37 @@ class VibegramHandler(http.server.SimpleHTTPRequestHandler):
                 self.wfile.write(binary)
             return
 
+        if parsed.path == '/api/preferences':
+            qs = parse_qs(parsed.query)
+            username = str(qs.get('username', [''])[0] or '').strip().lower().lstrip('@')
+            if username not in USERS or USERS[username].get('is_channel'):
+                return self.send_json({'error': 'Аккаунт не найден'}, 404)
+            return self.send_json({'ok': True, 'preferences': USER_PREFS.get(username, {})})
+
+        if parsed.path == '/api/scheduled':
+            qs = parse_qs(parsed.query)
+            username = str(qs.get('username', [''])[0] or '').strip().lower().lstrip('@')
+            if username not in USERS:
+                return self.send_json({'error': 'Аккаунт не найден'}, 404)
+            rows = [dict(x) for x in SCHEDULED_MESSAGES if x.get('sender') == username]
+            rows.sort(key=lambda x: int(x.get('send_at') or 0))
+            return self.send_json({'ok': True, 'scheduled': rows})
+
+        if parsed.path == '/api/call/signals':
+            qs = parse_qs(parsed.query)
+            username = str(qs.get('user', [''])[0] or '').strip().lower().lstrip('@')
+            try:
+                since = int(qs.get('since', ['0'])[0] or 0)
+            except ValueError:
+                since = 0
+            if username not in USERS:
+                return self.send_json({'error': 'Аккаунт не найден'}, 404)
+            now_ms = int(time.time() * 1000)
+            with CALL_SIGNALS_LOCK:
+                CALL_SIGNALS[:] = [x for x in CALL_SIGNALS if now_ms - int(x.get('time') or 0) < 180000]
+                rows = [dict(x) for x in CALL_SIGNALS if x.get('to') == username and int(x.get('seq') or 0) > since]
+            return self.send_json({'ok': True, 'signals': rows, 'lastSeq': max([int(x.get('seq') or 0) for x in rows] or [since])})
+
         if parsed.path == '/api/sync':
             qs = parse_qs(parsed.query)
             me = qs.get('me', [''])[0].strip().lower().lstrip('@')
@@ -533,12 +585,16 @@ class VibegramHandler(http.server.SimpleHTTPRequestHandler):
                     user_obj['typing_to'] = ''
 
             channels_set = {u for u, obj in USERS.items() if obj.get('is_channel')}
+            groups_set = {u for u, obj in USERS.items() if obj.get('is_group')}
             my_messages = [
                 m for m in MESSAGES
-                if m['sender'] == me or m['to'] == me or m['to'] in channels_set or m['sender'] in channels_set
+                if (m.get('sender') == me or m.get('to') == me or m.get('to') in channels_set or m.get('sender') in channels_set)
+                or (m.get('to') in groups_set and (me in (USERS.get(m.get('to'), {}).get('members') or []) or USERS.get(m.get('to'), {}).get('owner') == me))
             ]
+            visible_users = {name: _public_user(name, user_obj) for name, user_obj in USERS.items()
+                             if not user_obj.get('is_group') or me in (user_obj.get('members') or []) or user_obj.get('owner') == me}
             self.send_json({
-                'users': {name: _public_user(name, user_obj) for name, user_obj in USERS.items()},
+                'users': visible_users,
                 'messages': my_messages,
                 'pins': PINS,
                 'verifyBotAdmin': VERIFY_BOT_ADMIN,
@@ -720,6 +776,121 @@ class VibegramHandler(http.server.SimpleHTTPRequestHandler):
             }
             save_db()
             return self.send_json({'ok': True, 'profile': _public_user(u, USERS[u])})
+
+        # Создание группового чата. Members and permissions are stored in the existing shared USERS state.
+        if parsed.path == '/api/group/create':
+            owner = str(body.get('owner') or '').strip().lower().lstrip('@')
+            handle = str(body.get('username') or '').strip().lower().lstrip('@')
+            name = str(body.get('name') or '').strip()[:80]
+            description = str(body.get('description') or '').strip()[:600]
+            requested = body.get('members') if isinstance(body.get('members'), list) else []
+            if owner not in USERS or USERS[owner].get('is_channel') or USERS[owner].get('is_group') or USERS[owner].get('is_bot'):
+                return self.send_json({'error': 'Создать группу может только обычный аккаунт.'}, 403)
+            if not re.fullmatch(r'[a-z0-9_]{3,32}', handle) or not name:
+                return self.send_json({'error': 'Название обязательно. Username группы: 3–32 символа, латиница, цифры и _.'}, 400)
+            if handle in USERS:
+                return self.send_json({'error': f'Username @{handle} уже занят.'}, 409)
+            members = [owner]
+            unknown = []
+            for item in requested[:200]:
+                member = str(item or '').strip().lower().lstrip('@')
+                if not member or member == owner or member in members:
+                    continue
+                if member not in USERS or USERS[member].get('is_channel') or USERS[member].get('is_group') or USERS[member].get('is_bot'):
+                    unknown.append(member)
+                else:
+                    members.append(member)
+            if unknown:
+                return self.send_json({'error': 'Не найдены аккаунты: ' + ', '.join('@'+x for x in unknown[:10])}, 400)
+            USERS[handle] = {
+                'id': f'group_{now}_{len(USERS)}', 'username': handle, 'name': name,
+                'bio': description or 'Групповой чат Vibegram', 'color': '#2aabee', 'avatar': '',
+                'is_channel': False, 'is_group': True, 'owner': owner, 'members': members,
+                'admins': {owner: {'manage_members': True, 'manage_settings': True, 'can_post': True}},
+                'slow_mode_seconds': 0, 'last_group_message': {}, 'created_at': now, 'invite_token': secrets.token_urlsafe(18),
+                'last_seen': now, 'privacy': 'members'
+            }
+            save_db()
+            return self.send_json({'ok': True, 'group': _public_user(handle, USERS[handle])})
+
+        if parsed.path == '/api/group/join':
+            username = str(body.get('username') or '').strip().lower().lstrip('@')
+            token = str(body.get('token') or '').strip()
+            if username not in USERS or USERS[username].get('is_channel') or USERS[username].get('is_group') or USERS[username].get('is_bot'):
+                return self.send_json({'error': 'Сначала войдите в обычный аккаунт Vibegram.'}, 403)
+            group_pair = next(((key, val) for key, val in USERS.items() if val.get('is_group') and secrets.compare_digest(str(val.get('invite_token') or ''), token)), None)
+            if not group_pair:
+                return self.send_json({'error': 'Ссылка-приглашение недействительна или отозвана.'}, 404)
+            handle, group = group_pair
+            members = group.setdefault('members', [])
+            if username not in members:
+                if len(members) >= 500:
+                    return self.send_json({'error': 'В группе достигнут лимит в 500 участников.'}, 409)
+                members.append(username)
+                save_db()
+            return self.send_json({'ok': True, 'group': {'username': handle, 'name': group.get('name')}, 'joined': True})
+
+        if parsed.path == '/api/group/member':
+            actor = str(body.get('actor') or '').strip().lower().lstrip('@')
+            handle = str(body.get('group') or '').strip().lower().lstrip('@')
+            member = str(body.get('member') or '').strip().lower().lstrip('@')
+            action = str(body.get('action') or 'add')
+            group = USERS.get(handle, {})
+            if not group.get('is_group'):
+                return self.send_json({'error': 'Группа не найдена.'}, 404)
+            admins = group.setdefault('admins', {})
+            actor_is_admin = actor == group.get('owner') or bool((admins.get(actor) or {}).get('manage_members'))
+            if not actor_is_admin:
+                return self.send_json({'error': 'Нет прав управлять участниками этой группы.'}, 403)
+            if action in ('add', 'remove', 'promote', 'demote') and member not in USERS:
+                return self.send_json({'error': 'Пользователь не найден.'}, 404)
+            members = group.setdefault('members', [])
+            if action == 'add':
+                if USERS[member].get('is_channel') or USERS[member].get('is_group') or USERS[member].get('is_bot'):
+                    return self.send_json({'error': 'Можно добавлять только личные аккаунты.'}, 400)
+                if member not in members:
+                    members.append(member)
+            elif action == 'remove':
+                if member == group.get('owner'):
+                    return self.send_json({'error': 'Владельца нельзя удалить из его группы.'}, 400)
+                if member in members:
+                    members.remove(member)
+                admins.pop(member, None)
+            elif action == 'promote':
+                if actor != group.get('owner'):
+                    return self.send_json({'error': 'Только владелец может назначать администраторов.'}, 403)
+                if member not in members:
+                    return self.send_json({'error': 'Сначала добавьте пользователя в группу.'}, 400)
+                admins[member] = {'manage_members': True, 'manage_settings': True, 'can_post': True}
+            elif action == 'demote':
+                if actor != group.get('owner') or member == group.get('owner'):
+                    return self.send_json({'error': 'Только владелец может снимать других администраторов.'}, 403)
+                admins.pop(member, None)
+            else:
+                return self.send_json({'error': 'Недопустимое действие.'}, 400)
+            save_db()
+            return self.send_json({'ok': True, 'members': members, 'admins': admins})
+
+        if parsed.path == '/api/group/settings':
+            actor = str(body.get('actor') or '').strip().lower().lstrip('@')
+            handle = str(body.get('group') or '').strip().lower().lstrip('@')
+            group = USERS.get(handle, {})
+            if not group.get('is_group'):
+                return self.send_json({'error': 'Группа не найдена.'}, 404)
+            perms = group.get('admins', {}).get(actor, {})
+            if actor != group.get('owner') and not perms.get('manage_settings'):
+                return self.send_json({'error': 'Нет прав изменять настройки группы.'}, 403)
+            if 'name' in body and str(body.get('name') or '').strip():
+                group['name'] = str(body.get('name')).strip()[:80]
+            if 'description' in body:
+                group['bio'] = str(body.get('description') or '').strip()[:600]
+            if 'slow_mode_seconds' in body:
+                try:
+                    group['slow_mode_seconds'] = max(0, min(60, int(body.get('slow_mode_seconds'))))
+                except (TypeError, ValueError):
+                    return self.send_json({'error': 'Медленный режим: число от 0 до 60 секунд.'}, 400)
+            save_db()
+            return self.send_json({'ok': True, 'group': _public_user(handle, group)})
 
         # Создание или редактирование Telegram-канала (исправлена валидация и права админов)
         if parsed.path == '/api/channel/save':
@@ -994,6 +1165,118 @@ class VibegramHandler(http.server.SimpleHTTPRequestHandler):
             return self.send_json({'ok': True})
 
         # Статус "печатает..."
+        if parsed.path == '/api/preferences':
+            username = str(body.get('username') or '').strip().lower().lstrip('@')
+            patch = body.get('preferences') if isinstance(body.get('preferences'), dict) else {}
+            if username not in USERS or USERS[username].get('is_channel') or USERS[username].get('is_bot'):
+                return self.send_json({'error': 'Аккаунт не найден'}, 404)
+            allowed = {'archived_chats', 'folders', 'drafts', 'hidden_messages', 'blocked_users', 'muted_chats', 'custom_folders', 'settings', 'read_message_ids'}
+            current = USER_PREFS.setdefault(username, {})
+            for key in allowed:
+                if key not in patch:
+                    continue
+                value = patch[key]
+                if key in ('archived_chats', 'hidden_messages', 'blocked_users', 'muted_chats', 'read_message_ids'):
+                    if not isinstance(value, list):
+                        continue
+                    value = [str(x)[:180] for x in value[:5000]]
+                elif key in ('folders', 'drafts', 'settings'):
+                    if not isinstance(value, dict):
+                        continue
+                    value = {str(k)[:80]: v for k, v in list(value.items())[:500]}
+                    if key == 'drafts':
+                        value = {k: str(v)[:10000] for k, v in value.items() if str(v).strip()}
+                    elif key == 'folders':
+                        value = {k: str(v)[:40] for k, v in value.items()}
+                    elif key == 'settings':
+                        value = {k: v for k, v in value.items() if isinstance(v, (str, int, float, bool, type(None)))}
+                elif key == 'custom_folders':
+                    if not isinstance(value, list):
+                        continue
+                    value = list(dict.fromkeys(str(x).strip()[:32] for x in value if str(x).strip()))[:20]
+                current[key] = value
+            save_db()
+            return self.send_json({'ok': True, 'preferences': current})
+
+        if parsed.path == '/api/edit_msg':
+            msg_id = str(body.get('id') or '')
+            sender = str(body.get('user') or '').strip().lower().lstrip('@')
+            new_text = str(body.get('text') or '').strip()
+            if not msg_id or not sender or not new_text or len(new_text) > 4000:
+                return self.send_json({'error': 'Сообщение не должно быть пустым и может содержать до 4000 символов.'}, 400)
+            for msg in MESSAGES:
+                if str(msg.get('id')) != msg_id:
+                    continue
+                if str(msg.get('sender') or '').lower() != sender or msg.get('is_channel_post'):
+                    return self.send_json({'error': 'Редактировать можно только свои личные сообщения.'}, 403)
+                msg['text'] = new_text
+                msg['edited'] = True
+                msg['edited_at'] = now
+                save_db()
+                return self.send_json({'ok': True, 'message': msg})
+            return self.send_json({'error': 'Сообщение не найдено.'}, 404)
+
+        if parsed.path == '/api/delete_msgs':
+            sender = str(body.get('user') or '').strip().lower().lstrip('@')
+            ids = body.get('ids') if isinstance(body.get('ids'), list) else []
+            scope = str(body.get('scope') or 'everyone')
+            ids = {str(x) for x in ids[:100]}
+            if sender not in USERS or not ids:
+                return self.send_json({'error': 'Укажите аккаунт и сообщения для удаления.'}, 400)
+            if scope == 'everyone':
+                owned = {str(m.get('id')) for m in MESSAGES if str(m.get('id')) in ids and str(m.get('sender') or '').lower() == sender and not m.get('is_channel_post')}
+                MESSAGES[:] = [m for m in MESSAGES if str(m.get('id')) not in owned]
+                for k in list(PINS.keys()):
+                    if isinstance(PINS.get(k), dict) and str(PINS[k].get('id')) in owned:
+                        PINS.pop(k, None)
+                save_db()
+                return self.send_json({'ok': True, 'deleted': len(owned), 'ignored': len(ids - owned)})
+            return self.send_json({'error': 'Удаление только для себя должно выполняться через настройки клиента.'}, 400)
+
+        if parsed.path == '/api/schedule':
+            action = str(body.get('action') or 'create')
+            sender = str(body.get('sender') or '').strip().lower().lstrip('@')
+            if sender not in USERS or USERS[sender].get('is_channel') or USERS[sender].get('is_bot'):
+                return self.send_json({'error': 'Аккаунт не найден'}, 404)
+            if action == 'cancel':
+                sid = str(body.get('id') or '')
+                before = len(SCHEDULED_MESSAGES)
+                SCHEDULED_MESSAGES[:] = [x for x in SCHEDULED_MESSAGES if not (x.get('id') == sid and x.get('sender') == sender)]
+                if len(SCHEDULED_MESSAGES) != before:
+                    save_db()
+                return self.send_json({'ok': True, 'cancelled': len(SCHEDULED_MESSAGES) != before})
+            target = str(body.get('to') or '').strip().lower().lstrip('@')
+            text = str(body.get('text') or '').strip()
+            try:
+                send_at = int(body.get('send_at') or 0)
+            except (TypeError, ValueError):
+                send_at = 0
+            if target not in USERS or (not text and not body.get('media')) or len(text) > 4000:
+                return self.send_json({'error': 'Некорректное сообщение или получатель.'}, 400)
+            if send_at < now + 30000 or send_at > now + 365 * 24 * 60 * 60 * 1000:
+                return self.send_json({'error': 'Время отправки должно быть минимум через 30 секунд и не дальше года.'}, 400)
+            row = {'id': f'sched_{now}_{len(SCHEDULED_MESSAGES)}', 'sender': sender, 'to': target, 'text': text, 'media': body.get('media'), 'reply_to': body.get('reply_to'), 'send_at': send_at, 'created_at': now}
+            SCHEDULED_MESSAGES.append(row)
+            save_db()
+            return self.send_json({'ok': True, 'scheduled': row})
+
+        if parsed.path == '/api/call/signal':
+            sender = str(body.get('from') or '').strip().lower().lstrip('@')
+            target = str(body.get('to') or '').strip().lower().lstrip('@')
+            kind = str(body.get('kind') or '')
+            payload = body.get('payload')
+            if sender not in USERS or target not in USERS or sender == target:
+                return self.send_json({'error': 'Пользователь не найден.'}, 404)
+            if kind not in ('offer', 'answer', 'ice', 'reject', 'hangup', 'busy'):
+                return self.send_json({'error': 'Недопустимый сигнал звонка.'}, 400)
+            if len(json.dumps(payload, ensure_ascii=False)) > 180000:
+                return self.send_json({'error': 'Сигнал слишком большой.'}, 413)
+            with CALL_SIGNALS_LOCK:
+                seq = int(time.time() * 1000) * 1000 + len(CALL_SIGNALS) % 1000
+                CALL_SIGNALS.append({'seq': seq, 'id': f'call_{seq}', 'from': sender, 'to': target, 'kind': kind, 'payload': payload, 'time': now})
+                CALL_SIGNALS[:] = CALL_SIGNALS[-1000:]
+            return self.send_json({'ok': True, 'seq': seq})
+
         if parsed.path == '/api/typing':
             sender = str(body.get('from') or '').strip().lower().lstrip('@')
             to = str(body.get('to') or '').strip().lower().lstrip('@')
@@ -1041,6 +1324,38 @@ class VibegramHandler(http.server.SimpleHTTPRequestHandler):
 
             if not sender or not to or (not text and not media):
                 return self.send_json({'error': 'Invalid fields'}, 400)
+
+            if sender in USER_PREFS and to in (USER_PREFS.get(sender, {}).get('blocked_users') or []):
+                return self.send_json({'error': 'Вы заблокировали этого пользователя. Разблокируйте его, чтобы написать.'}, 403)
+            if sender in (USER_PREFS.get(to, {}).get('blocked_users') or []):
+                return self.send_json({'error': 'Получатель ограничил сообщения от вашего аккаунта.'}, 403)
+
+            if to in USERS and USERS[to].get('is_group'):
+                group = USERS[to]
+                members = group.get('members') or []
+                if sender not in members and sender != group.get('owner'):
+                    return self.send_json({'error': 'Сначала вступите в группу, чтобы отправлять сообщения.'}, 403)
+                admins = group.get('admins') or {}
+                last_group_message = group.setdefault('last_group_message', {})
+                slow = int(group.get('slow_mode_seconds') or 0)
+                last = int(last_group_message.get(sender) or 0)
+                if slow and now - last < slow * 1000 and sender != group.get('owner') and not (admins.get(sender) or {}).get('can_post'):
+                    wait = max(1, slow - int((now-last)/1000))
+                    return self.send_json({'error': f'Включён медленный режим. Подождите {wait} сек.'}, 429)
+                last_group_message[sender] = now
+                group_message = {
+                    'id': f"msg_{now}_{len(MESSAGES)}_group", 'sender': sender, 'to': to,
+                    'is_group_message': True, 'text': text, 'time': now, 'read': False,
+                    'read_by': [sender], 'reply_to': reply_to, 'media': media,
+                    'forwarded_from': forwarded_from, 'reactions': {}
+                }
+                MESSAGES.append(group_message)
+                save_db()
+                try:
+                    dispatch_push_for_messages([group_message], self._public_base_url())
+                except Exception as exc:
+                    print(f'[Vibegram group push] {exc}', flush=True)
+                return self.send_json({'ok': True, 'message': group_message})
 
             if sender in USERS:
                 USERS[sender]['typing_to'] = ''
@@ -1317,13 +1632,63 @@ class VibegramHandler(http.server.SimpleHTTPRequestHandler):
                     return self.send_json({'ok': True, 'reactions': reactions})
             return self.send_json({'error': 'Message not found'}, 404)
 
+        # Голосование в опросах
+        if parsed.path == '/api/poll/vote':
+            msg_id = str(body.get('id') or '')
+            voter = str(body.get('user') or '').strip().lower().lstrip('@')
+            try:
+                option_index = int(body.get('option'))
+            except (TypeError, ValueError):
+                option_index = -1
+            if voter not in USERS or not msg_id:
+                return self.send_json({'error': 'Укажите аккаунт и опрос.'}, 400)
+            for msg in MESSAGES:
+                media = msg.get('media') if isinstance(msg.get('media'), dict) else {}
+                if str(msg.get('id')) != msg_id or media.get('type') != 'poll':
+                    continue
+                options = media.get('options') if isinstance(media.get('options'), list) else []
+                if option_index < 0 or option_index >= len(options):
+                    return self.send_json({'error': 'Вариант ответа не найден.'}, 400)
+                votes = media.setdefault('votes', {})
+                # One answer per user; clicking the selected option withdraws the vote.
+                for key in list(votes.keys()):
+                    voters = votes.get(key) if isinstance(votes.get(key), list) else []
+                    if voter in voters:
+                        voters.remove(voter)
+                    if not voters:
+                        votes.pop(key, None)
+                current = votes.setdefault(str(option_index), [])
+                current.append(voter)
+                save_db()
+                return self.send_json({'ok': True, 'votes': votes})
+            return self.send_json({'error': 'Опрос не найден.'}, 404)
+
+        # Жалоба на пользователя или сообщение. Сохраняется для последующей модерации.
+        if parsed.path == '/api/report':
+            reporter = str(body.get('reporter') or '').strip().lower().lstrip('@')
+            target = str(body.get('target') or '').strip().lower().lstrip('@')
+            reason = str(body.get('reason') or 'other').strip()[:80]
+            details = str(body.get('details') or '').strip()[:1000]
+            msg_id = str(body.get('message_id') or '')[:180]
+            if reporter not in USERS or target not in USERS or reporter == target:
+                return self.send_json({'error': 'Некорректный отправитель или объект жалобы.'}, 400)
+            REPORTS.append({'id': f'report_{now}_{len(REPORTS)}', 'reporter': reporter, 'target': target, 'reason': reason, 'details': details, 'message_id': msg_id, 'time': now, 'status': 'new'})
+            REPORTS[:] = REPORTS[-10000:]
+            save_db()
+            return self.send_json({'ok': True, 'report_id': REPORTS[-1]['id']})
+
         # Прочтение сообщений + просмотры постов
         if parsed.path == '/api/read':
             reader = str(body.get('reader') or '').strip().lower().lstrip('@')
             peer = str(body.get('peer') or '').strip().lower().lstrip('@')
             changed = False
             for m in MESSAGES:
-                if m.get('is_channel_post') and m['to'] == peer:
+                if m.get('is_group_message') and m.get('to') == peer and reader in (USERS.get(peer, {}).get('members') or []):
+                    read_by = m.setdefault('read_by', [])
+                    if reader != m.get('sender') and reader not in read_by:
+                        read_by.append(reader)
+                        changed = True
+                elif m.get('is_channel_post') and m['to'] == peer:
                     views = m.setdefault('views', [])
                     if reader and reader not in views:
                         views.append(reader)
@@ -1360,7 +1725,15 @@ class VibegramHandler(http.server.SimpleHTTPRequestHandler):
         if parsed.path == '/api/delete_chat':
             me = str(body.get('me') or '').strip().lower().lstrip('@')
             peer = str(body.get('peer') or '').strip().lower().lstrip('@')
-            if peer in USERS and USERS[peer].get('is_channel'):
+            if peer in USERS and USERS[peer].get('is_group'):
+                group = USERS[peer]
+                if group.get('owner') == me:
+                    USERS.pop(peer, None)
+                    MESSAGES[:] = [m for m in MESSAGES if m.get('to') != peer]
+                else:
+                    group['members'] = [x for x in (group.get('members') or []) if x != me]
+                    (group.get('admins') or {}).pop(me, None)
+            elif peer in USERS and USERS[peer].get('is_channel'):
                 if USERS[peer].get('owner') == me:
                     del USERS[peer]
                     MESSAGES[:] = [m for m in MESSAGES if m['to'] != peer and m['sender'] != peer]
@@ -1379,6 +1752,72 @@ class VibegramHandler(http.server.SimpleHTTPRequestHandler):
 
         self.send_json({'error': 'Not found'}, 404)
 
+def scheduled_message_worker():
+    """Deliver due messages independently of whether the sender's browser stays open."""
+    while True:
+        time.sleep(2)
+        now_ms = int(time.time() * 1000)
+        due = [x for x in SCHEDULED_MESSAGES if int(x.get('send_at') or 0) <= now_ms]
+        if not due:
+            continue
+        delivered_ids = set()
+        delivered_messages = []
+        for row in due:
+            sender = str(row.get('sender') or '').lower()
+            target = str(row.get('to') or '').lower()
+            if sender not in USERS or target not in USERS:
+                delivered_ids.add(row.get('id'))
+                continue
+            if USERS[target].get('is_group'):
+                group = USERS[target]
+                if sender not in (group.get('members') or []) and sender != group.get('owner'):
+                    delivered_ids.add(row.get('id'))
+                    continue
+                scheduled_group_message = {'id': f"msg_{now_ms}_{len(MESSAGES)}_group_scheduled", 'sender': sender, 'to': target,
+                    'is_group_message': True, 'text': str(row.get('text') or ''), 'time': now_ms, 'read': False,
+                    'read_by': [sender], 'reply_to': row.get('reply_to'), 'media': row.get('media'), 'forwarded_from': None, 'reactions': {}, 'scheduled': True}
+                MESSAGES.append(scheduled_group_message)
+                delivered_messages.append(scheduled_group_message)
+                delivered_ids.add(row.get('id'))
+                continue
+            if USERS[target].get('is_channel'):
+                channel = USERS[target]
+                perms = (channel.get('admins') or {}).get(sender, {})
+                if sender != channel.get('owner') and not perms.get('can_post'):
+                    delivered_ids.add(row.get('id'))
+                    continue
+                is_post = True
+                msg_sender = target
+                author = (USERS.get(sender) or {}).get('name', sender) if channel.get('sign_messages', True) else ''
+            else:
+                is_post = False
+                msg_sender = sender
+                author = ''
+            msg = {
+                'id': f"msg_{now_ms}_{len(MESSAGES)}_scheduled",
+                'sender': msg_sender, 'to': target, 'text': str(row.get('text') or ''),
+                'time': now_ms, 'read': False, 'reply_to': row.get('reply_to'),
+                'media': row.get('media'), 'forwarded_from': None, 'reactions': {},
+                'scheduled': True, 'is_channel_post': is_post, 'author_signature': author,
+                'views': [sender] if is_post else []
+            }
+            MESSAGES.append(msg)
+            delivered_messages.append(msg)
+            delivered_ids.add(row.get('id'))
+        if delivered_ids:
+            SCHEDULED_MESSAGES[:] = [x for x in SCHEDULED_MESSAGES if x.get('id') not in delivered_ids]
+            try:
+                save_db()
+            except Exception as exc:
+                print(f'[Vibegram scheduler] save failed: {exc}', flush=True)
+            if delivered_messages:
+                try:
+                    public_base_url = os.environ.get('PUBLIC_BASE_URL', 'https://vibegramm.onrender.com').strip().rstrip('/')
+                    dispatch_push_for_messages(delivered_messages, public_base_url)
+                except Exception as exc:
+                    print(f'[Vibegram scheduler push] {exc}', flush=True)
+
+
 class ThreadedHTTPServer(socketserver.ThreadingMixIn, socketserver.TCPServer):
     allow_reuse_address = True
 
@@ -1392,6 +1831,8 @@ def get_local_ip():
     finally:
         s.close()
     return ip
+
+threading.Thread(target=scheduled_message_worker, name='vibegram-scheduler', daemon=True).start()
 
 if __name__ == '__main__':
     ip = get_local_ip()

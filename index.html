@@ -1130,6 +1130,87 @@
     @media (prefers-reduced-motion: reduce) { .chat-item,.icon-btn,.send-btn,.attach-btn,.message { transition:none!important; animation:none!important; } }
 
   </style>
+
+<style id="vibegram-complete-features-style">
+  :root { --vg-feature-accent:#2aabee; --vg-feature-panel:#17212b; --vg-feature-panel2:#202b36; }
+  .vg-folders-bar { display:flex; align-items:center; gap:6px; overflow-x:auto; scrollbar-width:none; padding:8px 11px; background:#17212b; border-bottom:1px solid rgba(0,0,0,.2); }
+  .vg-folders-bar::-webkit-scrollbar { display:none; }
+  .vg-folder-chip { border:1px solid transparent; border-radius:15px; padding:6px 11px; flex:0 0 auto; cursor:pointer; color:#a8b6c5; background:rgba(255,255,255,.035); font-size:12px; font-weight:650; }
+  .vg-folder-chip:hover { background:rgba(42,171,238,.10); color:white; }
+  .vg-folder-chip.active { color:#fff; background:#2b5278; border-color:rgba(42,171,238,.28); }
+  .vg-folder-add { width:28px; height:28px; border-radius:50%; flex:0 0 28px; cursor:pointer; border:1px solid rgba(255,255,255,.12); color:#8eb7d4; background:transparent; }
+  .vg-header-tools { display:flex; flex:0 0 auto; gap:2px; align-items:center; margin-left:auto; }
+  .vg-header-tool { width:34px; height:34px; display:grid; place-items:center; border:0; border-radius:50%; color:#9eb4c6; cursor:pointer; background:transparent; font-size:18px; }
+  .vg-header-tool:hover { color:white; background:rgba(255,255,255,.08); }
+  .vg-composer-tool { border:0; color:#8fa9bd; background:transparent; width:34px; height:38px; flex:0 0 34px; border-radius:50%; cursor:pointer; font-size:19px; display:grid; place-items:center; }
+  .vg-composer-tool:hover { color:#2aabee; background:rgba(42,171,238,.1); }
+  .vg-composer-tool.recording { color:#fff; background:#dc4141; animation:vgRecPulse 1.1s infinite; }
+  @keyframes vgRecPulse { 50% { box-shadow:0 0 0 7px rgba(220,65,65,.15); } }
+  .vg-group-sender { display:flex; align-items:center; gap:4px; margin:0 0 5px; font-size:12px; font-weight:750; color:#6fcfff; }
+  .vg-group-admin-tag { font-size:9px; color:#9eb5c6; background:rgba(255,255,255,.08); padding:2px 5px; border-radius:6px; font-weight:600; }
+  .vg-modal { display:none; position:fixed; z-index:11000; inset:0; padding:18px; background:rgba(3,8,15,.72); backdrop-filter:blur(12px); align-items:center; justify-content:center; }
+  .vg-modal.open { display:flex; }
+  .vg-modal-card { width:min(100%,560px); max-height:min(86dvh,760px); overflow:auto; background:#17212b; border:1px solid rgba(160,190,220,.14); border-radius:22px; box-shadow:0 26px 85px rgba(0,0,0,.48); color:#f2f6fa; }
+  .vg-modal-head { display:flex; gap:12px; align-items:center; padding:16px 18px; border-bottom:1px solid rgba(255,255,255,.08); font-weight:750; }
+  .vg-modal-head button { margin-left:auto; width:30px; height:30px; border:0; border-radius:50%; background:rgba(255,255,255,.07); color:#d5e1eb; cursor:pointer; font-size:20px; }
+  .vg-modal-body { padding:16px 18px 18px; }
+  .vg-input,.vg-textarea,.vg-select { color:#f4f8fc; width:100%; background:#0e1621; border:1px solid rgba(255,255,255,.13); border-radius:12px; padding:12px 13px; outline:none; margin-bottom:10px; }
+  .vg-input:focus,.vg-textarea:focus,.vg-select:focus { border-color:rgba(42,171,238,.65); }
+  .vg-textarea { min-height:88px; resize:vertical; }
+  .vg-action-row { display:flex; flex-wrap:wrap; gap:8px; align-items:center; margin-top:8px; }
+  .vg-primary,.vg-secondary,.vg-danger { border:0; border-radius:12px; padding:10px 14px; font-weight:700; cursor:pointer; }
+  .vg-primary { background:#2aabee; color:#fff; }
+  .vg-secondary { background:rgba(255,255,255,.08); color:#dfeaf3; }
+  .vg-danger { background:rgba(239,91,91,.14); color:#ff9c9c; }
+  .vg-helper { font-size:12px; line-height:1.5; color:#8fa0b1; }
+  .vg-search-results { display:flex; flex-direction:column; gap:6px; margin-top:8px; }
+  .vg-search-result { cursor:pointer; padding:10px 11px; border-radius:12px; background:rgba(255,255,255,.045); border:1px solid transparent; }
+  .vg-search-result:hover { background:rgba(42,171,238,.09); border-color:rgba(42,171,238,.2); }
+  .vg-search-result-title { display:flex; align-items:center; gap:8px; font-size:12px; color:#8ca7ba; margin-bottom:4px; }
+  .vg-search-result-text { overflow-wrap:anywhere; white-space:pre-wrap; font-size:13px; }
+  .vg-chat-actions-btn { border:0; border-radius:50%; width:28px; height:28px; background:transparent; color:#8fa2b5; cursor:pointer; opacity:.6; flex:0 0 28px; }
+  .chat-item:hover .vg-chat-actions-btn { opacity:1; }
+  .vg-chat-actions-btn:hover { background:rgba(255,255,255,.09); color:white; }
+  .vg-chat-popover { position:fixed; z-index:12000; min-width:206px; padding:5px; border:1px solid rgba(255,255,255,.12); border-radius:14px; background:#202b36; box-shadow:0 18px 50px rgba(0,0,0,.45); }
+  .vg-chat-popover button { display:block; width:100%; text-align:left; border:0; border-radius:9px; padding:10px 11px; background:transparent; color:#e8f0f7; cursor:pointer; font-size:13px; }
+  .vg-chat-popover button:hover { background:rgba(42,171,238,.15); }
+  .vg-chat-popover button.danger { color:#ff9292; }
+  .vg-selection-toolbar { position:fixed; z-index:80; left:50%; bottom:calc(82px + env(safe-area-inset-bottom)); transform:translateX(-50%); display:none; gap:7px; align-items:center; padding:9px 10px; background:#202b36; border:1px solid rgba(255,255,255,.13); border-radius:16px; box-shadow:0 15px 40px rgba(0,0,0,.35); }
+  .vg-selection-toolbar.open { display:flex; }
+  .vg-selection-toolbar span { font-size:12px; color:#c8d7e5; white-space:nowrap; padding:0 6px; }
+  .vg-selection-toolbar button { border:0; padding:8px 10px; border-radius:10px; color:#e6f4ff; background:rgba(255,255,255,.08); cursor:pointer; font-size:12px; font-weight:700; }
+  .vg-selection-toolbar button.danger { color:#ff9292; }
+  .message.vg-selected-message { outline:2px solid #2aabee; outline-offset:2px; }
+  .vg-message-edit-badge { color:#92c9e8; font-size:10px; margin-right:3px; }
+  .message-link,.mention-link { cursor:pointer; }
+  .message-link { color:#63c9ff!important; text-decoration:underline; text-decoration-color:rgba(99,201,255,.45); text-underline-offset:2px; }
+  .vg-poll { min-width:min(260px,70vw); max-width:100%; }
+  .vg-poll-title { font-weight:750; font-size:14px; margin:2px 0 11px; white-space:pre-wrap; overflow-wrap:anywhere; }
+  .vg-poll-option { position:relative; display:flex; align-items:center; gap:8px; width:100%; text-align:left; overflow:hidden; padding:10px 11px; border-radius:11px; margin:5px 0; border:1px solid rgba(255,255,255,.11); color:#f0f5fa; background:rgba(255,255,255,.035); cursor:pointer; }
+  .vg-poll-option::before { content:""; position:absolute; inset:0 auto 0 0; width:var(--vg-vote-pct,0%); background:rgba(42,171,238,.15); pointer-events:none; }
+  .vg-poll-option span { position:relative; z-index:1; }
+  .vg-poll-option .vg-poll-count { margin-left:auto; color:#8faec3; font-size:11px; }
+  .vg-call-video { display:block; width:100%; max-height:44vh; background:#050a10; object-fit:cover; border-radius:14px; }
+  .vg-call-local { width:100px; max-height:150px; object-fit:cover; position:absolute; bottom:20px; right:20px; border:2px solid rgba(255,255,255,.65); border-radius:12px; background:#0e1621; }
+  .vg-call-stage { position:relative; min-height:190px; }
+  .vg-call-status { color:#97afc0; text-align:center; margin:9px 0 14px; }
+  .vg-call-actions { justify-content:center; }
+  .vg-call-actions button { min-width:48px; min-height:45px; }
+  .vg-message-result-flash { animation:vgMessageFlash 1.8s ease; }
+  @keyframes vgMessageFlash { 0%,100% { box-shadow:none; } 20%,65% { box-shadow:0 0 0 3px rgba(42,171,238,.75); } }
+  @media(max-width:768px) {
+    .vg-modal { padding:8px; align-items:flex-end; }
+    .vg-modal-card { border-radius:22px 22px 16px 16px; max-height:calc(92dvh - env(safe-area-inset-top)); }
+    .vg-header-tools { gap:0; }
+    .vg-header-tool { width:31px; height:34px; font-size:16px; }
+    .vg-folders-bar { padding:7px 9px; }
+    .vg-composer-tool { width:29px; flex-basis:29px; font-size:16px; }
+    .vg-selection-toolbar { width:calc(100% - 16px); justify-content:center; flex-wrap:wrap; bottom:calc(72px + env(safe-area-inset-bottom)); }
+    .vg-selection-toolbar span { width:100%; text-align:center; }
+    .vg-call-local { width:78px; right:10px; bottom:10px; }
+  }
+</style>
+
 </head>
 <body>
 
@@ -1270,7 +1351,12 @@
       <button class="context-item" id="ctxForwardBtn">➡️ <span>Переслать</span></button>
       <button class="context-item" id="ctxPinBtn">📌 <span id="ctxPinLabel">Закрепить</span></button>
       <button class="context-item" id="ctxCopyBtn">📋 <span>Копировать текст</span></button>
-      <button class="context-item danger" id="ctxDeleteBtn">🗑 <span>Удалить</span></button>
+      <button class="context-item" id="vgCtxEditBtn">✎ <span>Редактировать</span></button>
+      <button class="context-item" id="vgCtxTranslateBtn">文 <span>Перевести текст</span></button>
+      <button class="context-item" id="vgCtxSelectBtn">☑ <span>Выбрать сообщения</span></button>
+      <button class="context-item" id="vgCtxDeleteMeBtn">◌ <span>Удалить у себя</span></button>
+      <button class="context-item danger" id="ctxDeleteBtn">🗑 <span>Удалить у всех</span></button>
+      <button class="context-item danger" id="vgCtxReportBtn">⚑ <span>Пожаловаться</span></button>
     </div>
   </div>
 
@@ -1425,6 +1511,30 @@
     </div>
   </div>
 
+  <!-- Vibegram productivity and communication features -->
+  <div class="vg-modal" id="vgSearchModal" role="dialog" aria-modal="true" aria-labelledby="vgSearchTitle">
+    <section class="vg-modal-card">
+      <header class="vg-modal-head"><span id="vgSearchTitle">Поиск по сообщениям</span><button type="button" data-vg-close="vgSearchModal" aria-label="Закрыть">×</button></header>
+      <div class="vg-modal-body"><input class="vg-input" id="vgMessageSearchInput" placeholder="Текст, ссылка, файл…" autocomplete="off"><div class="vg-helper" id="vgSearchHint">Поиск по доступной истории переписки.</div><div class="vg-search-results" id="vgSearchResults"></div></div>
+    </section>
+  </div>
+  <div class="vg-modal" id="vgScheduleModal" role="dialog" aria-modal="true" aria-labelledby="vgScheduleTitle">
+    <section class="vg-modal-card" style="max-width:460px;">
+      <header class="vg-modal-head"><span id="vgScheduleTitle">Отправить позже</span><button type="button" data-vg-close="vgScheduleModal" aria-label="Закрыть">×</button></header>
+      <form class="vg-modal-body" id="vgScheduleForm"><div class="vg-helper" style="margin-bottom:10px;">Сообщение будет доставлено сервером даже если браузер закрыт.</div><textarea class="vg-textarea" id="vgScheduleText" maxlength="4000" placeholder="Текст сообщения" required></textarea><label class="vg-helper" for="vgScheduleDate">Дата и время отправки</label><input class="vg-input" id="vgScheduleDate" type="datetime-local" required><div class="vg-action-row"><button class="vg-primary" type="submit">Запланировать</button><button class="vg-secondary" type="button" data-vg-close="vgScheduleModal">Отмена</button></div></form>
+    </section>
+  </div>
+  <div class="vg-modal" id="vgScheduledListModal" role="dialog" aria-modal="true" aria-labelledby="vgScheduledListTitle">
+    <section class="vg-modal-card"><header class="vg-modal-head"><span id="vgScheduledListTitle">Отложенные сообщения</span><button type="button" data-vg-close="vgScheduledListModal" aria-label="Закрыть">×</button></header><div class="vg-modal-body"><div class="vg-search-results" id="vgScheduledList"></div><div class="vg-helper" style="margin-top:12px;">Отмена доступна до момента отправки.</div></div></section>
+  </div>
+  <div class="vg-modal" id="vgPollModal" role="dialog" aria-modal="true" aria-labelledby="vgPollTitle">
+    <section class="vg-modal-card" style="max-width:480px;"><header class="vg-modal-head"><span id="vgPollTitle">Создать опрос</span><button type="button" data-vg-close="vgPollModal" aria-label="Закрыть">×</button></header><form class="vg-modal-body" id="vgPollForm"><input class="vg-input" id="vgPollQuestion" maxlength="300" placeholder="Вопрос" required><textarea class="vg-textarea" id="vgPollOptions" placeholder="Вариант 1&#10;Вариант 2&#10;Вариант 3" required></textarea><div class="vg-helper">Укажи от 2 до 10 вариантов — каждый с новой строки. Один ответ от пользователя.</div><div class="vg-action-row"><button type="submit" class="vg-primary">Опубликовать опрос</button><button type="button" class="vg-secondary" data-vg-close="vgPollModal">Отмена</button></div></form></section>
+  </div>
+  <div class="vg-modal" id="vgCallModal" role="dialog" aria-modal="true" aria-labelledby="vgCallTitle">
+    <section class="vg-modal-card" style="max-width:520px;"><header class="vg-modal-head"><span id="vgCallTitle">Звонок Vibegram</span><button type="button" id="vgCallMinimizeBtn" aria-label="Закрыть окно звонка">×</button></header><div class="vg-modal-body"><div class="vg-call-stage"><video class="vg-call-video" id="vgRemoteVideo" autoplay playsinline></video><video class="vg-call-local" id="vgLocalVideo" autoplay muted playsinline></video><audio id="vgRemoteAudio" autoplay></audio></div><div class="vg-call-status" id="vgCallStatus">Подключение…</div><div class="vg-action-row vg-call-actions" id="vgIncomingCallActions" style="display:none;"><button class="vg-primary" type="button" id="vgAcceptCallBtn">Принять</button><button class="vg-danger" type="button" id="vgRejectCallBtn">Отклонить</button></div><div class="vg-action-row vg-call-actions" id="vgActiveCallActions" style="display:none;"><button class="vg-secondary" type="button" id="vgMuteCallBtn">🎙 Микрофон</button><button class="vg-secondary" type="button" id="vgCameraCallBtn">▣ Камера</button><button class="vg-danger" type="button" id="vgHangupCallBtn">Завершить</button></div><div class="vg-helper" style="text-align:center;margin-top:12px;">Звонки используют WebRTC. Для некоторых сетей может потребоваться TURN-сервер.</div></div></section>
+  </div>
+  <div class="vg-selection-toolbar" id="vgSelectionToolbar"><span id="vgSelectionCount">Выбрано: 0</span><button type="button" id="vgSelectCopyBtn">Копировать</button><button type="button" id="vgSelectForwardBtn">Переслать</button><button type="button" class="danger" id="vgSelectDeleteBtn">Удалить</button><button type="button" id="vgSelectCancelBtn">Отмена</button></div>
+
   <!-- Основной интерфейс -->
   <div class="app" id="app">
     <aside class="sidebar">
@@ -1445,6 +1555,13 @@
           <button class="clear-search" id="clearSearchBtn">&times;</button>
         </div>
       </div>
+      <div class="vg-folders-bar" id="vgFoldersBar" aria-label="Папки чатов">
+        <button type="button" class="vg-folder-chip active" data-vg-filter="all">Все чаты</button>
+        <button type="button" class="vg-folder-chip" data-vg-filter="unread">Непрочитанные</button>
+        <button type="button" class="vg-folder-chip" data-vg-filter="archive">Архив</button>
+        <button type="button" class="vg-folder-add" id="vgCreateGroupBtn" title="Создать группу">👥</button>
+        <button type="button" class="vg-folder-add" id="vgAddFolderBtn" title="Создать папку">+</button>
+      </div>
       <div class="chat-list" id="chatList"></div>
     </aside>
 
@@ -1460,6 +1577,12 @@
           <div class="chat-header-info" id="openPeerProfileBtn">
             <div class="chat-header-title" id="activeChatName"></div>
             <div class="chat-header-status" id="activeChatStatus"></div>
+          </div>
+          <div class="vg-header-tools">
+            <button type="button" class="vg-header-tool" id="vgSearchMessagesBtn" title="Поиск по сообщениям" aria-label="Поиск по сообщениям">⌕</button>
+            <button type="button" class="vg-header-tool" id="vgScheduledBtn" title="Отложенные сообщения" aria-label="Отложенные сообщения">◷</button>
+            <button type="button" class="vg-header-tool" id="vgVoiceCallBtn" title="Голосовой звонок" aria-label="Голосовой звонок">☎</button>
+            <button type="button" class="vg-header-tool" id="vgVideoCallBtn" title="Видеозвонок" aria-label="Видеозвонок">▣</button>
           </div>
           <button type="button" class="header-sub-pill" id="headerSubBtn" style="display:none;">Подписаться</button>
         </header>
@@ -1495,6 +1618,9 @@
           </div>
           <button type="button" class="sticker-send-btn" id="stickerSendBtn" title="Стикеры" aria-label="Открыть стикеры" aria-expanded="false">▧</button>
           <button type="button" class="attach-btn" id="attachMediaBtn" title="Фото или Видео">📎</button>
+          <button type="button" class="vg-composer-tool" id="vgPollBtn" title="Создать опрос" aria-label="Создать опрос">▤</button>
+          <button type="button" class="vg-composer-tool" id="vgScheduleBtn" title="Отправить позже" aria-label="Отправить позже">◷</button>
+          <button type="button" class="vg-composer-tool" id="vgVoiceRecordBtn" title="Записать голосовое сообщение" aria-label="Записать голосовое сообщение">🎙</button>
           <input type="text" id="messageInput" class="msg-input" placeholder="Сообщение..." autocomplete="off">
           <button type="submit" class="send-btn" title="Отправить">↑</button>
         </form>
@@ -2903,7 +3029,7 @@
         }
         serverTime = data.serverTime || Date.now();
         allSyncMessages = Array.isArray(data.messages) ? data.messages : [];
-        messagesList = allSyncMessages.filter(m => !(m.media && (m.media.type === 'voice' || m.media.type === 'video_note')));
+        messagesList = allSyncMessages.slice();
 
         // Moderator state comes from the server's bot binding, never only from
         // a localStorage flag. The creator must send the ID to @verify_bot first.
@@ -2944,14 +3070,18 @@
               const channel = usersMap[msg.to];
               const isSubscribedChannelPost = Boolean(msg.is_channel_post && channel &&
                 Array.isArray(channel.subscribers) && channel.subscribers.includes(me));
-              if (isDirectIncoming || isSubscribedChannelPost) {
-                const peerKey = isSubscribedChannelPost ? msg.to : msg.sender;
+              const groupObj = usersMap[msg.to];
+              const isGroupIncoming = Boolean(msg.is_group_message && groupObj?.is_group && (groupObj.members || []).includes(me) && msg.sender !== me);
+              if (isDirectIncoming || isSubscribedChannelPost || isGroupIncoming) {
+                const peerKey = (isSubscribedChannelPost || isGroupIncoming) ? msg.to : msg.sender;
                 const peerObj = getPeerObject(peerKey);
-                const preview = msg.text || (msg.media ? 'Медиафайл' : 'Новое сообщение');
+                const senderLabel = isGroupIncoming ? getPeerObject(msg.sender).name + ': ' : '';
+                const preview = senderLabel + (msg.text || (msg.media ? 'Медиафайл' : 'Новое сообщение'));
                 const shouldNotifyOS = activePeer !== peerKey || document.hidden;
-                const systemSoundAvailable = shouldNotifyOS && notificationsEnabled();
-                if (activePeer !== peerKey) showCustomIosBanner(peerObj.name, preview, systemSoundAvailable, peerObj);
-                if (shouldNotifyOS) notifyIncomingMessage(peerObj.name, preview, peerObj);
+                const muted = (typeof vgPrefs !== 'undefined' && vgPrefs.muted_chats || []).includes(peerKey);
+                const systemSoundAvailable = shouldNotifyOS && notificationsEnabled() && !muted;
+                if (activePeer !== peerKey && !muted) showCustomIosBanner(peerObj.name, preview, systemSoundAvailable, peerObj);
+                if (shouldNotifyOS && !muted) notifyIncomingMessage(peerObj.name, preview, peerObj);
               }
             }
           }
@@ -3044,7 +3174,7 @@
         const isSelf = peer.username === me;
         const online = !isSelf && !peer.is_channel && peer.privacy !== 'nobody' && (Date.now() - Number(peer.last_seen || 0)) < 6500;
         const avatarBg = peer.avatar ? `background-image:url('${peer.avatar}')` : `background-color:${peer.color}`;
-        const defaultIcon = isSelf ? '🔖' : (peer.is_bot ? '🤖' : (peer.is_channel ? '📢' : getInitials(peer.name)));
+        const defaultIcon = isSelf ? '🔖' : (peer.is_bot ? '🤖' : (peer.is_channel ? '📢' : (peer.is_group ? '👥' : getInitials(peer.name))));
 
         let outTicks = '';
         if (lastMsg && !peer.is_channel && lastMsg.sender === me) {
@@ -3156,11 +3286,11 @@
       activeChatAvatar.style.cssText = `width:38px;height:38px;font-size:15px;cursor:pointer;${avatarBg}`;
       activeChatAvatar.textContent = peer.avatar ? '' : (isBotChat ? '🤖' : (peer.is_channel ? '📢' : getInitials(peer.name)));
 
-      activeChatName.innerHTML = `${peer.is_channel ? '<span>📢</span>' : ''}<span class="user-nav-link" data-open-user="${escapeHtml(peer.username)}" title="Открыть профиль">${escapeHtml(peer.name)}</span> ${renderBadgesHtml(peer)}`;
+      activeChatName.innerHTML = `${peer.is_channel ? '<span>📢</span>' : (peer.is_group ? '<span>👥</span>' : '')}<span class="user-nav-link" data-open-user="${escapeHtml(peer.username)}" title="Открыть профиль">${escapeHtml(peer.name)}</span> ${renderBadgesHtml(peer)}`;
       const peerTypingNow = !peer.is_channel && !isBotChat && peer.typing_to === me && (Date.now() - Number(peer.typing_time || 0) < 5000);
       activeChatStatus.textContent = peerTypingNow
         ? 'печатает…'
-        : (isBotChat ? 'общедоступный бот верификации' : getPresenceLabel(peer, me));
+        : (isBotChat ? 'общедоступный бот верификации' : (peer.is_group ? `${(peer.members || []).length} участников · групповая переписка` : getPresenceLabel(peer, me)));
       activeChatStatus.classList.toggle('online', peerTypingNow || activeChatStatus.textContent === 'в сети');
 
       if (isBotChat) {
@@ -3209,12 +3339,14 @@
           modQueueMessages.forEach(m => combined.set(m.id, m));
         }
         chatMessages = Array.from(combined.values()).sort((a, b) => a.time - b.time);
+      } else if (peer.is_group) {
+        chatMessages = messagesList.filter(m => m.to === activePeer && m.is_group_message);
       } else {
         chatMessages = messagesList.filter(m => !m.is_channel_post && ((m.sender === me && m.to === activePeer) || (m.sender === activePeer && m.to === me)));
       }
 
       const signature = activePeer + ':' + isModeratorUnlocked + ':' + Boolean(peer.is_verified) + ':' + String(peer.avatar || '') + ':' + String(peer.name || '') + ':' + chatMessages.map(m =>
-        `${m.id}_${m.read}_${(m.views || []).length}_${(m.comments || []).length}_${m.verification_request?.status || ''}_${JSON.stringify(m.reactions || {})}`
+        `${m.id}_${m.read}_${m.edited_at || 0}_${String(m.text || '').slice(0,80)}_${JSON.stringify(m.media?.votes || {})}_${(m.views || []).length}_${(m.comments || []).length}_${m.verification_request?.status || ''}_${JSON.stringify(m.reactions || {})}`
       ).join('|');
       if (!forceScroll && signature === lastRenderedSignature) return;
       lastRenderedSignature = signature;
@@ -3242,6 +3374,13 @@
           ? `<div class="channel-post-header"><span class="user-nav-link" data-open-user="${escapeHtml(peer.username)}" title="Открыть профиль канала">${escapeHtml(peer.name)}</span>${renderBadgesHtml(peer)}</div>`
           : '';
 
+        let groupHeaderHtml = '';
+        if (peer.is_group && !isOut) {
+          const senderProfile = getPeerObject(msg.sender);
+          const senderBg = senderProfile.avatar ? `background-image:url('${senderProfile.avatar}')` : `background-color:${senderProfile.color}`;
+          groupHeaderHtml = `<div class="vg-group-sender"><span class="avatar" data-avatar-user="${escapeHtml(senderProfile.username)}" style="${senderBg};width:21px;height:21px;font-size:9px;display:inline-flex;vertical-align:middle;margin-right:5px;cursor:pointer;">${senderProfile.avatar ? '' : escapeHtml(senderProfile.is_channel?'📢':getInitials(senderProfile.name))}</span><span data-open-user="${escapeHtml(senderProfile.username)}" class="user-nav-link">${escapeHtml(senderProfile.name)}</span>${(peer.admins||{})[msg.sender] ? '<span class="vg-group-admin-tag">админ</span>' : ''}</div>`;
+        }
+
         let replyQuoteHtml = '';
         if (msg.reply_to && msg.reply_to.text) {
           replyQuoteHtml = `<div class="msg-reply-quote"><div class="msg-reply-author">${escapeHtml(msg.reply_to.name || '@' + msg.reply_to.sender)}</div><div>${renderMessageText(msg.reply_to.text)}</div></div>`;
@@ -3253,7 +3392,18 @@
             ? `<div class="message-sticker-wrap"><img class="message-sticker" src="${escapeHtml(msg.media.url)}" alt="Стикер Vibegram" loading="lazy"></div>`
             : msg.media.type === 'image'
               ? `<div class="msg-media-box" data-fullimg="${escapeHtml(msg.media.url)}"><img src="${escapeHtml(msg.media.url)}" loading="lazy" alt="Фото"><span class="media-badge">${escapeHtml(msg.media.quality || 'HD')}</span></div>`
-              : `<div class="msg-media-box"><video src="${escapeHtml(msg.media.url)}" controls playsinline preload="metadata"></video></div>`;
+              : (msg.media.type === 'voice' || msg.media.type === 'audio' || msg.media.type === 'video_note')
+                ? (msg.media.type === 'video_note'
+                  ? `<div class="msg-media-box"><video src="${escapeHtml(msg.media.url)}" controls playsinline preload="metadata" style="width:min(240px,70vw);border-radius:50%;aspect-ratio:1;object-fit:cover;"></video></div>`
+                  : `<div class="msg-media-box" style="min-width:220px;"><div style="font-size:11px;color:#8faec3;margin-bottom:5px;">${msg.media.type === 'voice' ? '🎙 Голосовое сообщение' : '♫ Аудио'}</div><audio src="${escapeHtml(msg.media.url)}" controls preload="metadata" style="width:100%;max-width:310px;"></audio></div>`)
+                : `<div class="msg-media-box"><video src="${escapeHtml(msg.media.url)}" controls playsinline preload="metadata"></video></div>`;
+        }
+        let pollHtml = '';
+        if (msg.media && msg.media.type === 'poll' && Array.isArray(msg.media.options)) {
+          const pollVotes = msg.media.votes || {};
+          const totalVotes = Object.values(pollVotes).reduce((sum, arr) => sum + (Array.isArray(arr) ? arr.length : 0), 0);
+          const ownVote = Object.keys(pollVotes).find(k => (pollVotes[k] || []).includes(me));
+          pollHtml = `<div class="vg-poll"><div class="vg-poll-title">📊 ${escapeHtml(msg.media.question || msg.text || 'Опрос')}</div>${msg.media.options.map((option, idx) => { const votes = Array.isArray(pollVotes[String(idx)]) ? pollVotes[String(idx)] : []; const pct = totalVotes ? Math.round(votes.length / totalVotes * 100) : 0; return `<button class="vg-poll-option" type="button" data-vg-poll-option="${idx}" style="--vg-vote-pct:${pct}%"><span>${ownVote === String(idx) ? '🔘 ' : '◯ '}${escapeHtml(option)}</span><span class="vg-poll-count">${pct}% · ${votes.length}</span></button>`; }).join('')}<div class="vg-helper">${totalVotes} голос(ов) · нажми на вариант, чтобы проголосовать</div></div>`;
         }
 
         let botVerifyHtml = '';
@@ -3290,12 +3440,14 @@
 
         el.innerHTML = `
           ${channelHeaderHtml}
+          ${groupHeaderHtml}
           ${replyQuoteHtml}
           ${mediaHtml}
-          ${msg.text ? `<div class="message-text" style="white-space:pre-wrap;">${renderMessageText(msg.text)}</div>` : ''}
+          ${pollHtml}
+          ${msg.text && !(msg.media && msg.media.type === 'poll') ? `<div class="message-text" style="white-space:pre-wrap;">${renderMessageText(msg.text)}</div>` : ''}
           ${botVerifyHtml}
           ${reactionsHtml}
-          <div class="msg-meta">${metaHtml}</div>
+          <div class="msg-meta">${msg.edited ? '<span class="vg-message-edit-badge">изменено ·</span>' : ''}${metaHtml}</div>
           ${commentsBarHtml}
         `;
 
@@ -3322,6 +3474,15 @@
             await pollServer();
           });
         });
+
+        el.querySelectorAll('[data-vg-poll-option]').forEach(pollBtn => pollBtn.addEventListener('click', async (ev) => {
+          ev.stopPropagation();
+          if (!myProfile) return;
+          const response = await fetch('/api/poll/vote', { method:'POST', headers:{'Content-Type':'application/json'}, body:JSON.stringify({ id:msg.id, user:myProfile.username, option:Number(pollBtn.dataset.vgPollOption) }) });
+          const result = await response.json().catch(() => ({}));
+          if (!response.ok) showCustomIosBanner('Не удалось проголосовать', result.error || 'Попробуйте ещё раз');
+          await pollServer();
+        }));
 
         const commBtn = el.querySelector('[data-open-comments]');
         if (commBtn) commBtn.addEventListener('click', (ev) => { ev.stopPropagation(); openCommentsSheet(msg.id); });
@@ -3684,7 +3845,7 @@
       const peerObj = getPeerObject(activePeer);
       const senderField = peerObj.is_channel ? (peerObj.owner || me) : me;
 
-      await fetch('/api/send', {
+      const sendResponse = await fetch('/api/send', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
@@ -3695,7 +3856,13 @@
           media: mediaPayload
         })
       });
+      const sendData = await sendResponse.json().catch(() => ({}));
+      if (!sendResponse.ok) {
+        showCustomIosBanner('Сообщение не отправлено', sendData.error || 'Проверь подключение и права в чате.');
+        return false;
+      }
       await pollServer();
+      return true;
     }
 
     messageInput.addEventListener('input', () => {
@@ -3799,6 +3966,13 @@
       msgContextWrap.style.top = Math.max(12, Math.min(y, window.innerHeight - 240)) + 'px';
     }
 
+    const vgOriginalOpenMsgContextMenu = openMsgContextMenu;
+    openMsgContextMenu = function(x, y, msg) {
+      vgOriginalOpenMsgContextMenu(x,y,msg);
+      const h = msgContextWrap.getBoundingClientRect().height || 460;
+      msgContextWrap.style.top = Math.max(8, Math.min(y, window.innerHeight - h - 8)) + 'px';
+    };
+
     async function sendReaction(msgId, emoji) {
       if (!myProfile) return;
       msgContextWrap.classList.remove('open');
@@ -3865,16 +4039,7 @@
       msgContextWrap.classList.remove('open');
     });
 
-    document.getElementById('ctxDeleteBtn').addEventListener('click', async () => {
-      if (!selectedContextMsg) return;
-      msgContextWrap.classList.remove('open');
-      await fetch('/api/delete_msg', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ id: selectedContextMsg.id })
-      });
-      await pollServer();
-    });
+    // Delete actions are handled by the feature layer below (per-user or everyone).
 
     const forwardModal = document.getElementById('forwardModal');
     const forwardChatList = document.getElementById('forwardChatList');
@@ -4659,6 +4824,356 @@
       }
       setInterval(() => { if (myProfile && !isAddingSecondAccount && document.visibilityState === 'visible') pollServer(); }, 1500);
     })();
+
+
+    /* ================= Vibegram Complete Features ================= */
+    let vgPrefs = { archived_chats: [], folders: {}, drafts: {}, hidden_messages: [], blocked_users: [], muted_chats: [], custom_folders: [], settings: {}, read_message_ids: [] };
+    let vgPrefsLoaded = false;
+    let vgActiveFilter = 'all';
+    let vgSelectionMode = false;
+    const vgSelectedIds = new Set();
+    let vgContextPopover = null;
+    let vgDraftSaveTimer = null;
+    let vgSearchActive = false;
+    let vgScheduleReloadTimer = null;
+    let vgMediaRecorder = null;
+    let vgRecordingChunks = [];
+    let vgRecordingStream = null;
+    let vgLastSignalSeq = 0;
+    const vgSeenSignals = new Set();
+    let vgCall = { pc:null, stream:null, remote:null, target:null, kind:null, incoming:null, pendingIce:[], makingOffer:false };
+    let vgCallPollTimer = null;
+
+    const vgPrefKey = () => `vibegram_feature_prefs_${(myProfile?.username || 'guest').toLowerCase()}`;
+    const vgPrefDefaults = () => ({ archived_chats:[], folders:{}, drafts:{}, hidden_messages:[], blocked_users:[], muted_chats:[], custom_folders:['Друзья','Работа'], settings:{}, read_message_ids:[] });
+    const vgClone = obj => JSON.parse(JSON.stringify(obj));
+    function vgNormalizePrefs(raw) {
+      const d = vgPrefDefaults(); const v = raw && typeof raw === 'object' ? raw : {};
+      return { ...d, ...v,
+        archived_chats:Array.isArray(v.archived_chats)?v.archived_chats:[],
+        folders:v.folders && typeof v.folders === 'object' ? v.folders : {},
+        drafts:v.drafts && typeof v.drafts === 'object' ? v.drafts : {},
+        hidden_messages:Array.isArray(v.hidden_messages)?v.hidden_messages:[],
+        blocked_users:Array.isArray(v.blocked_users)?v.blocked_users:[],
+        muted_chats:Array.isArray(v.muted_chats)?v.muted_chats:[],
+        custom_folders:Array.isArray(v.custom_folders)?v.custom_folders:d.custom_folders,
+        settings:v.settings && typeof v.settings === 'object' ? v.settings : {},
+        read_message_ids:Array.isArray(v.read_message_ids)?v.read_message_ids:[]
+      };
+    }
+    async function vgLoadPrefs() {
+      if (!myProfile?.username) return false;
+      try { const local = JSON.parse(localStorage.getItem(vgPrefKey()) || 'null'); if (local) vgPrefs = vgNormalizePrefs(local); } catch (_) {}
+      try {
+        const r = await fetch(`/api/preferences?username=${encodeURIComponent(myProfile.username)}`, {cache:'no-store'});
+        if (r.ok) { const d = await r.json(); vgPrefs = vgNormalizePrefs(d.preferences); vgPrefsLoaded = true; localStorage.setItem(vgPrefKey(), JSON.stringify(vgPrefs)); renderSidebar(); renderActiveChat(true); return true; }
+      } catch (_) {}
+      return false;
+    }
+    async function vgSavePrefs() {
+      vgPrefs = vgNormalizePrefs(vgPrefs);
+      try { localStorage.setItem(vgPrefKey(), JSON.stringify(vgPrefs)); } catch (_) {}
+      if (!myProfile?.username) return;
+      try {
+        const r = await fetch('/api/preferences', {method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({username:myProfile.username,preferences:vgPrefs})});
+        if (r.ok) { const data = await r.json(); vgPrefs = vgNormalizePrefs(data.preferences); vgPrefsLoaded = true; try { localStorage.setItem(vgPrefKey(), JSON.stringify(vgPrefs)); } catch (_) {} }
+      } catch (_) {}
+    }
+    function vgToast(title, detail='') { try { showCustomIosBanner(title, detail); } catch (_) { console.info(title, detail); } }
+    function vgOpenModal(id) { document.getElementById(id)?.classList.add('open'); }
+    function vgCloseModal(id) { document.getElementById(id)?.classList.remove('open'); }
+    document.querySelectorAll('[data-vg-close]').forEach(btn => btn.addEventListener('click', () => vgCloseModal(btn.dataset.vgClose)));
+    document.querySelectorAll('.vg-modal').forEach(modal => modal.addEventListener('click', ev => { if (ev.target === modal) modal.classList.remove('open'); }));
+
+    // Account settings are server-backed to sync between browser/PWA/desktop clients.
+    const vgOriginalSwitchAccount = switchToAccount;
+    switchToAccount = async function(username) { await vgSavePrefs(); const out = await vgOriginalSwitchAccount(username); vgPrefs = vgNormalizePrefs(null); vgPrefsLoaded = false; await vgLoadPrefs(); return out; };
+    const vgOriginalOpenChat = openChatWith;
+    openChatWith = function(username) {
+      if (messageInput && activePeer && myProfile) {
+        const previous = activePeer;
+        if (messageInput.value.trim()) vgPrefs.drafts[previous] = messageInput.value;
+        else delete vgPrefs.drafts[previous];
+        vgSavePrefs();
+      }
+      vgOriginalOpenChat(username);
+      const handle = String(username || '').toLowerCase().replace(/^@+/, '');
+      if (messageInput) messageInput.value = vgPrefs.drafts[handle] || '';
+      lastRenderedSignature = '';
+      if (vgPrefs.muted_chats.includes(handle)) activeChatStatus.title = 'Уведомления для чата отключены';
+    };
+
+    // Sidebar filters and archive/folder logic.
+    const vgOriginalBuildConversations = buildConversationsList;
+    buildConversationsList = function() {
+      const rows = vgOriginalBuildConversations();
+      const me = String(myProfile?.username || '').toLowerCase();
+      Object.values(usersMap).filter(u => u && u.is_group && ((u.members || []).includes(me) || u.owner === me)).forEach(group => {
+        if (rows.some(x => x.peer.username === group.username)) return;
+        const groupMessages = messagesList.filter(m => m.is_group_message && m.to === group.username);
+        const lastMsg = groupMessages.reduce((best,m)=>!best || Number(m.time||0)>Number(best.time||0)?m:best,null);
+        const unreadCount = groupMessages.filter(m => m.sender !== me && !(m.read_by || []).includes(me)).length;
+        rows.push({peer:enrichEntity(group),lastMsg,unreadCount});
+      });
+      const pins = pinsMap[`chatlist:${me}`] || [];
+      return rows.filter(c => {
+        const handle = c.peer.username;
+        const archived = vgPrefs.archived_chats.includes(handle);
+        if (vgActiveFilter === 'archive') return archived;
+        if (archived) return false;
+        if (vgActiveFilter === 'unread') return Number(c.unreadCount || 0) > 0;
+        if (vgActiveFilter === 'channels') return Boolean(c.peer.is_channel);
+        if (vgActiveFilter === 'pinned') return pins.includes(handle);
+        if (vgActiveFilter.startsWith('folder:')) return (vgPrefs.folders[handle] || '') === vgActiveFilter.slice(7);
+        return true;
+      });
+    };
+    const vgOriginalRenderSidebar = renderSidebar;
+    renderSidebar = function() {
+      vgOriginalRenderSidebar();
+      const bar = document.getElementById('vgFoldersBar'); if (!bar) return;
+      bar.querySelectorAll('[data-vg-filter]').forEach(b => b.classList.toggle('active', b.dataset.vgFilter === vgActiveFilter));
+      [...bar.querySelectorAll('[data-vg-custom-folder]')].forEach(b => b.remove());
+      const addBtn = document.getElementById('vgAddFolderBtn');
+      for (const folder of vgPrefs.custom_folders || []) {
+        const b = document.createElement('button'); b.type='button'; b.className='vg-folder-chip'+(vgActiveFilter === 'folder:'+folder?' active':''); b.textContent=folder; b.dataset.vgCustomFolder=folder; b.addEventListener('click',()=>{vgActiveFilter='folder:'+folder;renderSidebar();});
+        bar.insertBefore(b, addBtn);
+      }
+      // Inject per-chat action menu button without touching the existing avatar/profile click behavior.
+      chatListEl.querySelectorAll('.chat-item').forEach(item => {
+        if (item.querySelector('.vg-chat-actions-btn')) return;
+        const avatar = item.querySelector('[data-avatar-user]');
+        let handle = avatar?.getAttribute('data-avatar-user');
+        if (!handle) { const link = item.querySelector('[data-open-user]'); handle = link?.getAttribute('data-open-user'); }
+        if (!handle) return;
+        item.dataset.vgHandle = handle;
+        const button = document.createElement('button'); button.className='vg-chat-actions-btn'; button.type='button'; button.title='Действия с чатом'; button.textContent='⋯';
+        button.addEventListener('click', ev => { ev.stopPropagation(); vgShowChatMenu(button, handle); });
+        item.appendChild(button);
+      });
+    };
+    document.getElementById('vgFoldersBar').addEventListener('click', ev => {
+      const b = ev.target.closest('[data-vg-filter]'); if (!b) return; vgActiveFilter = b.dataset.vgFilter; renderSidebar();
+    });
+    document.getElementById('vgAddFolderBtn').addEventListener('click', async () => {
+      const name = prompt('Название новой папки (например: Друзья, Работа, Игры):');
+      if (!name || !name.trim()) return;
+      const clean = name.trim().slice(0,32);
+      if (!vgPrefs.custom_folders.includes(clean)) vgPrefs.custom_folders.push(clean);
+      vgActiveFilter = 'folder:' + clean; await vgSavePrefs(); renderSidebar();
+    });
+    function vgShowChatMenu(anchor, handle) {
+      vgContextPopover?.remove();
+      const pop = document.createElement('div'); pop.className='vg-chat-popover'; vgContextPopover=pop;
+      const archived = vgPrefs.archived_chats.includes(handle);
+      const muted = vgPrefs.muted_chats.includes(handle);
+      const blocked = vgPrefs.blocked_users.includes(handle);
+      const rows = [
+        [archived ? 'Вернуть из архива' : 'В архив', async()=>{vgPrefs.archived_chats = archived ? vgPrefs.archived_chats.filter(x=>x!==handle) : [...vgPrefs.archived_chats,handle]; await vgSavePrefs(); renderSidebar();}],
+        ['Переместить в папку…', async()=>{const options=['Без папки',...(vgPrefs.custom_folders||[])]; const choice=prompt('Папка для @'+handle+'\n'+options.map((v,i)=>`${i+1}. ${v}`).join('\n')+'\nВведи номер:','1'); if(choice===null)return; const idx=Number(choice)-1; if(idx===0) delete vgPrefs.folders[handle]; else if(idx>0&&idx<options.length) vgPrefs.folders[handle]=options[idx]; await vgSavePrefs(); renderSidebar();}],
+        [muted ? 'Включить уведомления' : 'Отключить уведомления', async()=>{vgPrefs.muted_chats = muted ? vgPrefs.muted_chats.filter(x=>x!==handle) : [...vgPrefs.muted_chats,handle]; await vgSavePrefs(); renderSidebar();}],
+        [blocked ? 'Разблокировать пользователя' : 'Заблокировать пользователя', async()=>{vgPrefs.blocked_users = blocked ? vgPrefs.blocked_users.filter(x=>x!==handle) : [...vgPrefs.blocked_users,handle]; await vgSavePrefs(); vgToast(blocked?'Пользователь разблокирован':'Пользователь заблокирован','@'+handle);}],
+        ['Пожаловаться…', async()=>{const reason=prompt('Причина жалобы: спам, оскорбления, мошенничество или другое.','Спам'); if(!reason)return; const r=await fetch('/api/report',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({reporter:myProfile.username,target:handle,reason})}); const d=await r.json().catch(()=>({})); vgToast(r.ok?'Жалоба отправлена':'Не удалось отправить жалобу',d.error||'');}],
+        ['Открыть отложенные сообщения', async()=>{await vgRenderScheduled(); vgOpenModal('vgScheduledListModal');}]
+      ];
+      const chatPeer = getPeerObject(handle);
+      if (chatPeer.is_group) {
+        rows.unshift(['Ссылка-приглашение', async()=>{if(!chatPeer.invite_token){vgToast('Ссылка недоступна','Проверь серверные права.');return;}const link=location.origin+location.pathname+'?joinGroup='+encodeURIComponent(chatPeer.invite_token);try{await navigator.clipboard.writeText(link);vgToast('Ссылка скопирована',link);}catch(_){prompt('Ссылка-приглашение',link);}}]);
+        rows.unshift(['Управление группой…', async()=>{await vgManageGroup(handle);}]);
+        rows.unshift(['Покинуть группу', async()=>{if(!confirm('Покинуть эту группу?'))return;await fetch('/api/delete_chat',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({me:myProfile.username,peer:handle})});if(activePeer===handle){activePeer=null;appEl.classList.remove('mobile-chat-open');}await pollServer();}]);
+      }
+      rows.forEach(([label,fn])=>{const b=document.createElement('button');b.type='button';b.textContent=label;b.addEventListener('click',async ev=>{ev.stopPropagation();pop.remove();vgContextPopover=null;await fn();});pop.appendChild(b);});
+      document.body.appendChild(pop);
+      const rect=anchor.getBoundingClientRect(); pop.style.left=Math.max(8,Math.min(rect.right-pop.offsetWidth,innerWidth-pop.offsetWidth-8))+'px'; pop.style.top=Math.max(8,Math.min(rect.bottom,innerHeight-pop.offsetHeight-8))+'px';
+      setTimeout(()=>document.addEventListener('click',function close(e){if(!pop.contains(e.target)){pop.remove();if(vgContextPopover===pop)vgContextPopover=null;document.removeEventListener('click',close);}}, {once:false}),0);
+    }
+
+    // Search through messages in every conversation currently synced for this account.
+    const vgSearchInput = document.getElementById('vgMessageSearchInput');
+    const vgSearchResults = document.getElementById('vgSearchResults');
+    function vgPeerForMessage(m) { const me=String(myProfile?.username||'').toLowerCase(); return m.is_channel_post ? m.to : (m.sender===me ? m.to : m.sender); }
+    function vgRunMessageSearch() {
+      const q=String(vgSearchInput.value||'').trim().toLowerCase(); vgSearchResults.innerHTML='';
+      if(q.length<2){document.getElementById('vgSearchHint').textContent='Введите минимум 2 символа. Ищем по тексту, ссылкам и подписям.';return;}
+      const hidden=new Set(vgPrefs.hidden_messages);
+      const source=(allSyncMessages.length?allSyncMessages:messagesList).filter(m=>!hidden.has(String(m.id)) && (String(m.text||'').toLowerCase().includes(q) || JSON.stringify(m.media||{}).toLowerCase().includes(q)));
+      source.sort((a,b)=>(b.time||0)-(a.time||0));
+      document.getElementById('vgSearchHint').textContent=`Найдено сообщений: ${source.length}`;
+      source.slice(0,100).forEach(m=>{const handle=vgPeerForMessage(m);const peer=getPeerObject(handle);const row=document.createElement('div');row.className='vg-search-result';const snippet=String(m.text|| (m.media?.type==='poll'?m.media.question:'Медиафайл') || 'Медиафайл');row.innerHTML=`<div class="vg-search-result-title"><strong>${escapeHtml(peer.name||handle)}</strong><span>@${escapeHtml(handle)}</span><span>${escapeHtml(formatTime(m.time))}</span></div><div class="vg-search-result-text">${escapeHtml(snippet.slice(0,280))}</div>`;row.addEventListener('click',()=>{vgCloseModal('vgSearchModal');openChatWith(handle);setTimeout(()=>{const target=document.getElementById('dom_'+m.id);if(target){target.scrollIntoView({behavior:'smooth',block:'center'});target.classList.add('vg-message-result-flash');setTimeout(()=>target.classList.remove('vg-message-result-flash'),1900);}},180);});vgSearchResults.appendChild(row);});
+      if(!source.length) vgSearchResults.innerHTML='<div class="vg-helper">Совпадений не найдено.</div>';
+    }
+    document.getElementById('vgSearchMessagesBtn').addEventListener('click',()=>{if(!activePeer){vgToast('Выбери чат','Поиск выполняется по истории твоих сообщений.');}vgOpenModal('vgSearchModal');vgSearchInput.value='';vgRunMessageSearch();vgSearchInput.focus();});
+    vgSearchInput.addEventListener('input',vgRunMessageSearch);
+    document.addEventListener('keydown', ev=>{
+      if((ev.ctrlKey||ev.metaKey)&&ev.key.toLowerCase()==='k'){ev.preventDefault();vgOpenModal('vgSearchModal');vgSearchInput.focus();}
+      if(ev.key==='Escape'){vgCloseModal('vgSearchModal');vgCloseModal('vgPollModal');vgCloseModal('vgScheduleModal');vgCloseModal('vgScheduledListModal');if(vgCall.pc)vgHangupCall(true);if(vgSelectionMode)vgExitSelection();}
+    });
+
+    // Drafts auto-save locally first, then to the server for cross-device sync.
+    messageInput.addEventListener('input',()=>{
+      if(!activePeer||!myProfile)return;
+      const handle=activePeer;
+      if(messageInput.value.trim()) vgPrefs.drafts[handle]=messageInput.value; else delete vgPrefs.drafts[handle];
+      try{localStorage.setItem(vgPrefKey(),JSON.stringify(vgPrefs));}catch(_){}
+      clearTimeout(vgDraftSaveTimer);vgDraftSaveTimer=setTimeout(()=>vgSavePrefs(),700);
+    });
+    const vgOriginalSubmitOutgoing = dispatchOutgoingMessage;
+    dispatchOutgoingMessage = async function(text, mediaPayload, replyPayload) {
+      if(!activePeer||!myProfile)return;
+      const target=activePeer;
+      if(vgPrefs.blocked_users.includes(target)){vgToast('Сообщение не отправлено','Ты заблокировал этого пользователя. Разблокируй его в меню чата.');return;}
+      try { const result=await vgOriginalSubmitOutgoing(text,mediaPayload,replyPayload); delete vgPrefs.drafts[target]; await vgSavePrefs(); return result; }
+      catch(e){vgToast('Не удалось отправить сообщение','Проверь подключение.');throw e;}
+    };
+    const vgOriginalMessageSubmit = messageForm.onsubmit;
+    // Current app uses addEventListener for submit, so use capture phase only to validate blocked targets.
+    messageForm.addEventListener('submit', ev=>{if(activePeer&&vgPrefs.blocked_users.includes(activePeer)){ev.preventDefault();ev.stopImmediatePropagation();vgToast('Отправка заблокирована','Сначала разблокируй пользователя.');}},true);
+
+    // Chat-specific message actions: edit, translate, hide for self, multi-select, report.
+    document.getElementById('vgCtxEditBtn').addEventListener('click',async()=>{
+      const m=selectedContextMsg;msgContextWrap.classList.remove('open');if(!m||!myProfile)return;
+      if(m.sender!==myProfile.username.toLowerCase()||m.is_channel_post){vgToast('Нельзя редактировать','Редактировать можно только своё личное сообщение.');return;}
+      const text=prompt('Изменить текст сообщения:',m.text||'');if(text===null||!text.trim())return;
+      const r=await fetch('/api/edit_msg',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({id:m.id,user:myProfile.username,text:text.trim()})});const d=await r.json().catch(()=>({}));if(!r.ok){vgToast('Не удалось изменить сообщение',d.error||'Ошибка сервера');return;}lastRenderedSignature='';await pollServer();vgToast('Сообщение изменено','');
+    });
+    document.getElementById('vgCtxTranslateBtn').addEventListener('click',()=>{const text=selectedContextMsg?.text||'';msgContextWrap.classList.remove('open');if(!text)return;window.open('https://translate.google.com/?sl=auto&tl=ru&text='+encodeURIComponent(text)+'&op=translate','_blank','noopener,noreferrer');});
+    document.getElementById('vgCtxDeleteMeBtn').addEventListener('click',async()=>{const m=selectedContextMsg;msgContextWrap.classList.remove('open');if(!m)return;vgPrefs.hidden_messages=[...new Set([...vgPrefs.hidden_messages,String(m.id)])].slice(-5000);await vgSavePrefs();lastRenderedSignature='';renderSidebar();renderActiveChat(true);vgToast('Сообщение скрыто','Оно скрыто только в твоём аккаунте.');});
+    document.getElementById('ctxDeleteBtn').addEventListener('click',async()=>{
+      const m=selectedContextMsg;msgContextWrap.classList.remove('open');if(!m||!myProfile)return;
+      if(m.sender!==myProfile.username.toLowerCase()){vgToast('Удаление у всех недоступно','Можно удалить это сообщение только у себя.');vgPrefs.hidden_messages=[...new Set([...vgPrefs.hidden_messages,String(m.id)])].slice(-5000);await vgSavePrefs();lastRenderedSignature='';renderActiveChat(true);return;}
+      if(!confirm('Удалить это сообщение у всех участников?'))return;
+      const r=await fetch('/api/delete_msgs',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({user:myProfile.username,ids:[m.id],scope:'everyone'})});const d=await r.json().catch(()=>({}));if(!r.ok){vgToast('Удаление не выполнено',d.error||'');return;}lastRenderedSignature='';await pollServer();
+    });
+    document.getElementById('vgCtxSelectBtn').addEventListener('click',()=>{msgContextWrap.classList.remove('open');vgSelectionMode=true;vgSelectedIds.clear();vgRefreshSelection();renderActiveChat(true);});
+    function vgRefreshSelection(){
+      const bar=document.getElementById('vgSelectionToolbar');bar.classList.toggle('open',vgSelectionMode);document.getElementById('vgSelectionCount').textContent='Выбрано: '+vgSelectedIds.size;
+      messagesContainer.querySelectorAll('.message').forEach(el=>{const id=el.id.replace(/^dom_/,'');el.classList.toggle('vg-selected-message',vgSelectedIds.has(id));let b=el.querySelector('.vg-select-message-btn');if(vgSelectionMode&&!b){b=document.createElement('button');b.type='button';b.className='vg-select-message-btn';b.style.cssText='position:absolute;left:-8px;top:-8px;width:24px;height:24px;border-radius:50%;border:1px solid #2aabee;background:#17212b;color:white;z-index:4;cursor:pointer;';b.textContent='✓';b.addEventListener('click',ev=>{ev.stopPropagation();if(vgSelectedIds.has(id))vgSelectedIds.delete(id);else vgSelectedIds.add(id);vgRefreshSelection();});el.style.position='relative';el.appendChild(b);}else if(!vgSelectionMode&&b)b.remove();});
+    }
+    function vgExitSelection(){vgSelectionMode=false;vgSelectedIds.clear();vgRefreshSelection();renderActiveChat(true);}
+    document.getElementById('vgSelectCancelBtn').addEventListener('click',vgExitSelection);
+    document.getElementById('vgSelectCopyBtn').addEventListener('click',async()=>{const ids=[...vgSelectedIds];const text=ids.map(id=>messagesList.find(m=>String(m.id)===id)?.text||'').filter(Boolean).join('\n\n');if(text&&navigator.clipboard)await navigator.clipboard.writeText(text);vgToast('Скопировано',`${ids.length} сообщений`);vgExitSelection();});
+    document.getElementById('vgSelectForwardBtn').addEventListener('click',()=>{const ids=[...vgSelectedIds];const m=messagesList.find(x=>String(x.id)===ids[0]);if(!m)return;selectedContextMsg=m;msgToForward=m;renderForwardList();vgOpenModal('forwardModal');vgExitSelection();});
+    document.getElementById('vgSelectDeleteBtn').addEventListener('click',async()=>{const ids=[...vgSelectedIds];if(!ids.length)return;const own=ids.filter(id=>messagesList.some(m=>String(m.id)===id&&m.sender===myProfile.username.toLowerCase()));if(!confirm(`Удалить у всех ${own.length} своих сообщений и скрыть остальные у себя?`))return;const others=ids.filter(id=>!own.includes(id));vgPrefs.hidden_messages=[...new Set([...vgPrefs.hidden_messages,...others])].slice(-5000);await vgSavePrefs();if(own.length)await fetch('/api/delete_msgs',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({user:myProfile.username,ids:own,scope:'everyone'})});vgExitSelection();await pollServer();});
+    const vgOriginalRenderActiveChat = renderActiveChat;
+    renderActiveChat = function(forceScroll=false){
+      const original=messagesList;const hidden=new Set((vgPrefs.hidden_messages||[]).map(String));
+      messagesList=original.filter(m=>!hidden.has(String(m.id)) && !(usersMap[activePeer]?.is_group && (vgPrefs.blocked_users||[]).includes(String(m.sender||''))));
+      try{vgOriginalRenderActiveChat(forceScroll);}finally{messagesList=original;}
+      const isGroup = Boolean(activePeer && usersMap[activePeer]?.is_group);
+      ['vgVoiceCallBtn','vgVideoCallBtn'].forEach(id=>{const b=document.getElementById(id);if(b)b.style.display=isGroup?'none':'';});
+      if(vgSelectionMode)vgRefreshSelection();
+    };
+    document.getElementById('vgCtxReportBtn').addEventListener('click',async()=>{const m=selectedContextMsg;msgContextWrap.classList.remove('open');if(!m||!myProfile)return;const target=vgPeerForMessage(m);if(!target||target===myProfile.username.toLowerCase())return;const reason=prompt('Причина жалобы: спам / оскорбления / мошенничество / другое','Спам');if(!reason)return;const r=await fetch('/api/report',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({reporter:myProfile.username,target,reason,message_id:m.id,details:String(m.text||'').slice(0,500)})});const d=await r.json().catch(()=>({}));vgToast(r.ok?'Жалоба отправлена':'Не удалось отправить жалобу',d.error||'Спасибо, мы сохранили обращение.');});
+
+    // Scheduled messages: server sends them even while the creator's browser is closed.
+    function vgOpenSchedule(prefill=true){if(!activePeer||!myProfile){vgToast('Сначала открой чат','');return;}document.getElementById('vgScheduleText').value=prefill?messageInput.value:'';const d=new Date(Date.now()+5*60000);d.setSeconds(0,0);const local=new Date(d.getTime()-d.getTimezoneOffset()*60000).toISOString().slice(0,16);document.getElementById('vgScheduleDate').min=new Date(Date.now()+30000-new Date().getTimezoneOffset()*60000).toISOString().slice(0,16);document.getElementById('vgScheduleDate').value=local;vgOpenModal('vgScheduleModal');}
+    document.getElementById('vgScheduleBtn').addEventListener('click',()=>vgOpenSchedule(true));
+    document.getElementById('vgScheduleForm').addEventListener('submit',async ev=>{ev.preventDefault();if(!myProfile||!activePeer)return;const text=document.getElementById('vgScheduleText').value.trim();const when=new Date(document.getElementById('vgScheduleDate').value).getTime();if(!text||!Number.isFinite(when)||when<Date.now()+30000){vgToast('Проверь сообщение и время','Отправка должна быть назначена минимум через 30 секунд.');return;}const r=await fetch('/api/schedule',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({sender:myProfile.username,to:activePeer,text,send_at:when})});const d=await r.json().catch(()=>({}));if(!r.ok){vgToast('Не удалось запланировать',d.error||'');return;}vgCloseModal('vgScheduleModal');messageInput.value='';delete vgPrefs.drafts[activePeer];await vgSavePrefs();await vgRenderScheduled();vgToast('Сообщение запланировано',new Date(when).toLocaleString());});
+    async function vgRenderScheduled(){const target=document.getElementById('vgScheduledList');target.innerHTML='';if(!myProfile)return;try{const r=await fetch('/api/scheduled?username='+encodeURIComponent(myProfile.username));const d=await r.json();(d.scheduled||[]).forEach(row=>{const el=document.createElement('div');el.className='vg-search-result';el.innerHTML=`<div class="vg-search-result-title"><b>Кому: @${escapeHtml(row.to)}</b><span>${escapeHtml(new Date(row.send_at).toLocaleString())}</span></div><div class="vg-search-result-text">${escapeHtml(row.text||'Медиафайл')}</div><div class="vg-action-row"><button type="button" class="vg-danger">Отменить</button></div>`;el.querySelector('button').addEventListener('click',async()=>{await fetch('/api/schedule',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({action:'cancel',sender:myProfile.username,id:row.id})});await vgRenderScheduled();});target.appendChild(el);});if(!(d.scheduled||[]).length)target.innerHTML='<div class="vg-helper">Нет запланированных сообщений.</div>';}catch(_){target.innerHTML='<div class="vg-helper">Не удалось загрузить список.</div>';}}
+    document.getElementById('vgScheduledBtn').addEventListener('click',async()=>{await vgRenderScheduled();vgOpenModal('vgScheduledListModal');});
+
+    // Poll creation, voting is handled alongside message rendering.
+    document.getElementById('vgPollBtn').addEventListener('click',()=>{if(!activePeer){vgToast('Сначала открой чат','');return;}document.getElementById('vgPollQuestion').value='';document.getElementById('vgPollOptions').value='';vgOpenModal('vgPollModal');});
+    document.getElementById('vgPollForm').addEventListener('submit',async ev=>{ev.preventDefault();if(!activePeer||!myProfile)return;const question=document.getElementById('vgPollQuestion').value.trim();const options=document.getElementById('vgPollOptions').value.split(/\r?\n/).map(x=>x.trim()).filter(Boolean).slice(0,10);if(options.length<2){vgToast('Добавь варианты','Для опроса нужно минимум 2 варианта.');return;}const p=getPeerObject(activePeer);const from=p.is_channel?(p.owner||myProfile.username):myProfile.username;const r=await fetch('/api/send',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({from,to:activePeer,text:'',media:{type:'poll',question,options,votes:{}}})});const d=await r.json().catch(()=>({}));if(!r.ok){vgToast('Не удалось отправить опрос',d.error||'');return;}vgCloseModal('vgPollModal');await pollServer();});
+
+    // Voice recording, uploaded with existing media endpoint and stored as a regular message.
+    document.getElementById('vgVoiceRecordBtn').addEventListener('click',async()=>{
+      const btn=document.getElementById('vgVoiceRecordBtn');
+      if(vgMediaRecorder && vgMediaRecorder.state==='recording'){vgMediaRecorder.stop();btn.classList.remove('recording');btn.textContent='🎙';btn.title='Записать голосовое сообщение';return;}
+      if(!activePeer||!myProfile){vgToast('Сначала открой чат','');return;}
+      if(!navigator.mediaDevices?.getUserMedia||!window.MediaRecorder){vgToast('Запись недоступна','Браузер не поддерживает запись аудио.');return;}
+      try{
+        vgRecordingStream=await navigator.mediaDevices.getUserMedia({audio:true});vgRecordingChunks=[];
+        const mime=['audio/webm;codecs=opus','audio/webm','audio/mp4'].find(t=>MediaRecorder.isTypeSupported?.(t));
+        vgMediaRecorder=new MediaRecorder(vgRecordingStream,mime?{mimeType:mime}:undefined);
+        vgMediaRecorder.ondataavailable=e=>{if(e.data&&e.data.size)vgRecordingChunks.push(e.data);};
+        vgMediaRecorder.onstop=async()=>{const blob=new Blob(vgRecordingChunks,{type:vgMediaRecorder.mimeType||'audio/webm'});vgRecordingStream?.getTracks().forEach(t=>t.stop());vgRecordingStream=null;vgMediaRecorder=null;if(!blob.size)return;try{const dataUrl=await new Promise((res,rej)=>{const fr=new FileReader();fr.onload=()=>res(fr.result);fr.onerror=rej;fr.readAsDataURL(blob);});const ext=(blob.type.includes('mp4')?'m4a':'webm');const upload=await fetch('/api/upload',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({data:dataUrl,ext})});const up=await upload.json();if(!upload.ok)throw new Error(up.error||'upload failed');await dispatchOutgoingMessage('',{type:'voice',url:up.url},null);vgToast('Голосовое отправлено','');}catch(e){vgToast('Не удалось отправить аудио',e.message||'');}};
+        vgMediaRecorder.start();btn.classList.add('recording');btn.textContent='■';btn.title='Остановить и отправить';vgToast('Запись началась','Нажми ■, чтобы завершить и отправить.');
+      }catch(e){vgToast('Нет доступа к микрофону','Разреши доступ к микрофону в настройках браузера.');}
+    });
+
+    // WebRTC audio/video calling with server-mediated offer/answer/ICE signaling.
+    const vgCallModal=document.getElementById('vgCallModal'), vgCallStatus=document.getElementById('vgCallStatus');
+    const vgRemoteVideo=document.getElementById('vgRemoteVideo'), vgLocalVideo=document.getElementById('vgLocalVideo'), vgRemoteAudio=document.getElementById('vgRemoteAudio');
+    function vgSetCallStatus(t){vgCallStatus.textContent=t;}
+    function vgCallButtons(incoming){document.getElementById('vgIncomingCallActions').style.display=incoming?'flex':'none';document.getElementById('vgActiveCallActions').style.display=incoming?'none':'flex';}
+    async function vgSendSignal(to,kind,payload={}){if(!myProfile||!to)return;try{await fetch('/api/call/signal',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({from:myProfile.username,to,kind,payload})});}catch(_){} }
+    function vgCreatePeer(target,kind){const pc=new RTCPeerConnection({iceServers:[{urls:'stun:stun.l.google.com:19302'},{urls:'stun:stun1.l.google.com:19302'}]});vgCall.pc=pc;vgCall.target=target;vgCall.kind=kind;vgCall.pendingIce=vgCall.pendingIce||[];pc.onicecandidate=e=>{if(e.candidate)vgSendSignal(target,'ice',e.candidate.toJSON());};pc.ontrack=e=>{const stream=e.streams[0];if(kind==='video'){vgRemoteVideo.srcObject=stream;vgRemoteVideo.muted=false;vgRemoteVideo.style.display='block';vgRemoteAudio.srcObject=stream;vgRemoteAudio.muted=true;}else{vgRemoteVideo.style.display='none';vgRemoteAudio.srcObject=stream;vgRemoteAudio.muted=false;}vgSetCallStatus('На связи с @'+target);};pc.onconnectionstatechange=()=>{if(pc.connectionState==='connected')vgSetCallStatus('На связи с @'+target);if(['failed','disconnected'].includes(pc.connectionState))vgSetCallStatus('Соединение нестабильно…');if(pc.connectionState==='closed')vgSetCallStatus('Звонок завершён');};return pc;}
+    async function vgStartCall(kind){if(!myProfile||!activePeer||activePeer===myProfile.username.toLowerCase()||activePeer==='verify_bot'||getPeerObject(activePeer).is_channel){vgToast('Этот чат не поддерживает звонки','Открой личный чат с пользователем.');return;}if(vgCall.pc){vgToast('Звонок уже активен','Сначала заверши текущий звонок.');return;}try{const stream=await navigator.mediaDevices.getUserMedia({audio:true,video:kind==='video'});vgCall.stream=stream;vgCall.kind=kind;vgCall.target=activePeer;vgLocalVideo.srcObject=stream;vgLocalVideo.style.display=kind==='video'?'block':'none';vgRemoteVideo.style.display=kind==='video'?'block':'none';vgCallModal.classList.add('open');vgCallButtons(false);vgSetCallStatus('Вызов @'+activePeer+'…');const pc=vgCreatePeer(activePeer,kind);stream.getTracks().forEach(t=>pc.addTrack(t,stream));const offer=await pc.createOffer();await pc.setLocalDescription(offer);await vgSendSignal(activePeer,'offer',{sdp:pc.localDescription,media:kind});}catch(e){vgToast('Не удалось начать звонок',e.message||'Проверь доступ к микрофону и камере.');vgHangupCall(true);}}
+    async function vgAcceptIncoming(){const call=vgCall.incoming;if(!call||!myProfile)return;try{const kind=call.payload?.media==='video'?'video':'audio';const stream=await navigator.mediaDevices.getUserMedia({audio:true,video:kind==='video'});vgCall.stream=stream;vgCall.target=call.from;vgCall.kind=kind;vgCallModal.classList.add('open');vgCallButtons(false);vgLocalVideo.srcObject=stream;vgLocalVideo.style.display=kind==='video'?'block':'none';vgRemoteVideo.style.display=kind==='video'?'block':'none';const pc=vgCreatePeer(call.from,kind);stream.getTracks().forEach(t=>pc.addTrack(t,stream));await pc.setRemoteDescription(new RTCSessionDescription(call.payload.sdp));for(const ice of vgCall.pendingIce.splice(0)){try{await pc.addIceCandidate(new RTCIceCandidate(ice));}catch(_){}}const answer=await pc.createAnswer();await pc.setLocalDescription(answer);await vgSendSignal(call.from,'answer',{sdp:pc.localDescription});vgCall.incoming=null;}catch(e){vgToast('Не удалось принять звонок',e.message||'');await vgSendSignal(call.from,'reject',{});vgHangupCall(true);}}
+    async function vgHangupCall(silent=false){const target=vgCall.target||vgCall.incoming?.from;if(target&&!silent)await vgSendSignal(target,'hangup',{});try{vgCall.pc?.close();}catch(_){}vgCall.stream?.getTracks().forEach(t=>t.stop());vgCall.remote?.getTracks().forEach(t=>t.stop());vgCall={pc:null,stream:null,remote:null,target:null,kind:null,incoming:null,pendingIce:[],makingOffer:false};vgRemoteVideo.srcObject=null;vgLocalVideo.srcObject=null;vgRemoteAudio.srcObject=null;vgCallModal.classList.remove('open');vgCallButtons(false);}
+    async function vgHandleSignal(signal){if(!signal||vgSeenSignals.has(signal.id))return;vgSeenSignals.add(signal.id);if(vgSeenSignals.size>2000)vgSeenSignals.clear();const {from,kind,payload}=signal;
+      if(kind==='offer'){
+        if(vgCall.pc||vgCall.incoming){await vgSendSignal(from,'busy',{});return;}vgCall.incoming=signal;vgCall.target=from;vgCall.kind=payload?.media||'audio';vgCallModal.classList.add('open');vgCallButtons(true);vgSetCallStatus(`Входящий ${vgCall.kind==='video'?'видеозвонок':'голосовой звонок'} от @${from}`);document.getElementById('vgCallTitle').textContent='Входящий звонок';return;
+      }
+      if(kind==='reject'||kind==='busy'){vgToast(kind==='busy'?'Пользователь занят':'Звонок отклонён','@'+from);await vgHangupCall(true);return;}
+      if(kind==='hangup'){if(vgCall.target===from||vgCall.incoming?.from===from){vgToast('Звонок завершён','@'+from);await vgHangupCall(true);}return;}
+      if(kind==='ice' && vgCall.incoming?.from===from && !vgCall.pc){vgCall.pendingIce.push(payload);return;}
+      if(vgCall.target!==from||!vgCall.pc)return;
+      if(kind==='answer'){try{await vgCall.pc.setRemoteDescription(new RTCSessionDescription(payload.sdp));for(const ice of vgCall.pendingIce.splice(0)){try{await vgCall.pc.addIceCandidate(new RTCIceCandidate(ice));}catch(_){}}vgSetCallStatus('Соединяемся с @'+from+'…');}catch(e){vgToast('Ошибка звонка',e.message||'');await vgHangupCall(true);}}
+      if(kind==='ice'){try{if(vgCall.pc.remoteDescription)await vgCall.pc.addIceCandidate(new RTCIceCandidate(payload));else vgCall.pendingIce.push(payload);}catch(_){} }
+    }
+    async function vgPollCallSignals(){if(!myProfile)return;try{const r=await fetch(`/api/call/signals?user=${encodeURIComponent(myProfile.username)}&since=${vgLastSignalSeq}`,{cache:'no-store'});if(!r.ok)return;const d=await r.json();for(const sig of d.signals||[]){vgLastSignalSeq=Math.max(vgLastSignalSeq,Number(sig.seq)||0);await vgHandleSignal(sig);} }catch(_){} }
+    document.getElementById('vgVoiceCallBtn').addEventListener('click',()=>vgStartCall('audio'));
+    document.getElementById('vgVideoCallBtn').addEventListener('click',()=>vgStartCall('video'));
+    document.getElementById('vgAcceptCallBtn').addEventListener('click',vgAcceptIncoming);
+    document.getElementById('vgRejectCallBtn').addEventListener('click',async()=>{const target=vgCall.incoming?.from;if(target)await vgSendSignal(target,'reject',{});await vgHangupCall(true);});
+    document.getElementById('vgHangupCallBtn').addEventListener('click',()=>vgHangupCall(false));
+    document.getElementById('vgCallMinimizeBtn').addEventListener('click',()=>{if(vgCall.pc)vgHangupCall(false);else vgCloseModal('vgCallModal');});
+    document.getElementById('vgMuteCallBtn').addEventListener('click',()=>{const tracks=vgCall.stream?.getAudioTracks()||[];if(!tracks.length)return;const next=tracks.some(t=>t.enabled);tracks.forEach(t=>t.enabled=!next);document.getElementById('vgMuteCallBtn').textContent=next?'🔇 Микрофон':'🎙 Микрофон';});
+    document.getElementById('vgCameraCallBtn').addEventListener('click',()=>{const tracks=vgCall.stream?.getVideoTracks()||[];if(!tracks.length){vgToast('Камера не используется','');return;}const next=tracks.some(t=>t.enabled);tracks.forEach(t=>t.enabled=!next);document.getElementById('vgCameraCallBtn').textContent=next?'◻ Камера':'▣ Камера';});
+    if(!vgCallPollTimer)vgCallPollTimer=setInterval(vgPollCallSignals,1300);
+
+
+    // Group chat creation, owner/admin tools, membership and invite-link join flow.
+    async function vgCreateGroupFlow() {
+      if (!myProfile) return;
+      const name = prompt('Название группы:'); if (!name || !name.trim()) return;
+      const defaultHandle = 'vg_group_' + Date.now().toString(36).replace(/[^a-z0-9]/g,'').slice(-12);
+      const handleInput = prompt('Username группы (латиница, цифры, _):', defaultHandle); if (!handleInput) return;
+      const handle = handleInput.trim().toLowerCase().replace(/^@+/, '');
+      const description = prompt('Описание группы (необязательно):', '') || '';
+      const memberText = prompt('Добавь участников через запятую (@username). Можно оставить пустым:', '') || '';
+      const members = memberText.split(/[\s,;]+/).map(x=>x.trim().replace(/^@+/, '').toLowerCase()).filter(Boolean);
+      const r = await fetch('/api/group/create',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({owner:myProfile.username,username:handle,name:name.trim(),description,members})});
+      const d = await r.json().catch(()=>({}));
+      if (!r.ok) { vgToast('Не удалось создать группу',d.error||'Проверь название и username.'); return; }
+      openedPeers.push(handle); await pollServer(); openChatWith(handle); vgToast('Группа создана','Ссылка-приглашение доступна в меню чата.');
+    }
+    document.getElementById('vgCreateGroupBtn').addEventListener('click',vgCreateGroupFlow);
+    async function vgGroupMemberAction(handle,action,member) {
+      const r=await fetch('/api/group/member',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({actor:myProfile.username,group:handle,action,member})});const d=await r.json().catch(()=>({}));
+      if(!r.ok){vgToast('Не удалось изменить участников',d.error||'');return false;}await pollServer();vgToast('Группа обновлена',`@${member}`);return true;
+    }
+    async function vgManageGroup(handle) {
+      const group=getPeerObject(handle);if(!group.is_group)return;
+      const action=prompt('Управление группой @'+handle+'\n1 — добавить участника\n2 — удалить участника\n3 — назначить администратора\n4 — снять администратора\n5 — настройки / медленный режим\n6 — скопировать приглашение\n\nВведи номер:','1');if(!action)return;
+      if(['1','2','3','4'].includes(action)) {const who=prompt('Username участника (@username):');if(!who)return;const member=who.trim().replace(/^@+/,'').toLowerCase();const act={'1':'add','2':'remove','3':'promote','4':'demote'}[action];await vgGroupMemberAction(handle,act,member);return;}
+      if(action==='5') {const name=prompt('Название группы:',group.name);if(name===null)return;const description=prompt('Описание:',group.cleanBio||group.bio||'');if(description===null)return;const slow=prompt('Медленный режим в секундах (0 = выключен, максимум 60):',String(group.slow_mode_seconds||0));if(slow===null)return;const r=await fetch('/api/group/settings',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({actor:myProfile.username,group:handle,name,description,slow_mode_seconds:Number(slow)})});const d=await r.json().catch(()=>({}));if(!r.ok){vgToast('Настройки не сохранены',d.error||'');return;}await pollServer();vgToast('Настройки группы сохранены','');return;}
+      if(action==='6') {const link=location.origin+location.pathname+'?joinGroup='+encodeURIComponent(group.invite_token||'');try{await navigator.clipboard.writeText(link);vgToast('Приглашение скопировано',link);}catch(_){prompt('Приглашение',link);}}
+    }
+    async function vgCheckGroupInvite() {
+      if(!myProfile)return;
+      const params=new URLSearchParams(location.search);const token=params.get('joinGroup');if(!token)return;
+      const r=await fetch('/api/group/join',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({username:myProfile.username,token})});const d=await r.json().catch(()=>({}));
+      params.delete('joinGroup');const qs=params.toString();history.replaceState({},document.title,location.pathname+(qs?'?'+qs:''));
+      if(!r.ok){vgToast('Не удалось вступить в группу',d.error||'');return;}
+      await pollServer();openChatWith(d.group.username);vgToast('Ты вступил в группу',d.group.name||'');
+    }
+    setTimeout(()=>vgCheckGroupInvite().catch(()=>{}),1800);
+
+    // Basic profile/privacy/security affordances via chat action menu.
+    window.vgGetPrefs=()=>vgClone(vgPrefs);
+    window.vgOpenScheduled=async()=>{await vgRenderScheduled();vgOpenModal('vgScheduledListModal');};
+    window.vgExportMyData=()=>{const payload={profile:myProfile,prefs:vgPrefs,messages:messagesList.filter(m=>m.sender===myProfile?.username||m.to===myProfile?.username)};const blob=new Blob([JSON.stringify(payload,null,2)],{type:'application/json'});const a=document.createElement('a');a.href=URL.createObjectURL(blob);a.download='vibegram-export.json';a.click();setTimeout(()=>URL.revokeObjectURL(a.href),1000);};
+
+    // Notification mute check is applied at presentation time; server storage and message delivery are unchanged.
+    const vgOriginalPollServer = pollServer;
+    pollServer = async function(){const ret=await vgOriginalPollServer();if(!vgPrefsLoaded&&myProfile)await vgLoadPrefs();return ret;};
+    setTimeout(()=>{vgLoadPrefs().catch(()=>{});},1200);
+    setInterval(()=>{if(myProfile&&document.visibilityState==='visible')vgPollCallSignals();},4000);
+    document.addEventListener('click', ev=>{if(vgContextPopover&&!vgContextPopover.contains(ev.target)&&!ev.target.closest('.vg-chat-actions-btn')){vgContextPopover.remove();vgContextPopover=null;}},true);
+
   </script>
 </body>
 </html>
