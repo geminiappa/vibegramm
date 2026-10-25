@@ -1092,7 +1092,9 @@
     .message.in { background:#182533; color:#edf3f8; border:0; border-bottom-left-radius:4px; }
     .message.channel-post { background:#182533; border:1px solid rgba(255,255,255,.06); border-radius:12px; border-bottom-left-radius:4px; }
     .channel-post-header,.channel-comments-bar { color:#56b9ee; }
-    .message a { color:#7dd3ff; }
+    .message a, .msg-reply-quote a, .comment-text a { color:#7dd3ff; text-decoration:underline; text-decoration-color:rgba(125,211,255,.55); text-underline-offset:2px; overflow-wrap:anywhere; cursor:pointer; }
+    .message a:hover, .msg-reply-quote a:hover, .comment-text a:hover { color:#b5e8ff; text-decoration-color:currentColor; }
+    .message-link:focus-visible { outline:2px solid #2aabee; outline-offset:2px; border-radius:3px; }
     .message-time, .msg-time, .message-meta { color:rgba(224,237,248,.62); }
     .chat-input-bar { background:#17212b; border-top:1px solid rgba(0,0,0,.24); padding:10px 18px max(10px,env(safe-area-inset-bottom)); gap:10px; backdrop-filter:none; }
     .chat-input-bar input[type="text"], .chat-input-bar textarea, #messageInput, #messageText, .message-text-input { background:#242f3d!important; color:#f0f5f9!important; border:1px solid transparent!important; border-radius:22px!important; padding:12px 16px!important; outline:none; box-shadow:none!important; }
@@ -3242,7 +3244,7 @@
 
         let replyQuoteHtml = '';
         if (msg.reply_to && msg.reply_to.text) {
-          replyQuoteHtml = `<div class="msg-reply-quote"><div class="msg-reply-author">${escapeHtml(msg.reply_to.name || '@' + msg.reply_to.sender)}</div><div>${escapeHtml(msg.reply_to.text)}</div></div>`;
+          replyQuoteHtml = `<div class="msg-reply-quote"><div class="msg-reply-author">${escapeHtml(msg.reply_to.name || '@' + msg.reply_to.sender)}</div><div>${renderMessageText(msg.reply_to.text)}</div></div>`;
         }
 
         let mediaHtml = '';
@@ -3425,7 +3427,7 @@
               ${renderBadgesHtml(senderObj)}
               <span style="margin-left:auto;font-size:10.5px;color:var(--text-secondary);">${formatTime(c.time)}</span>
             </div>
-            <div style="color:#fff;">${escapeHtml(c.text)}</div>
+            <div class="comment-text" style="color:#fff;">${renderMessageText(c.text)}</div>
           </div>
         `;
         commentsListBox.appendChild(row);
@@ -4495,11 +4497,69 @@
     }
 
     function renderMessageText(raw) {
-      const safe = escapeHtml(String(raw || ''));
-      // Only link handles that look like a real @username; click opens user or channel profile/chat.
-      return safe.replace(/(^|\s)@([a-zA-Z0-9_]{3,32})\b/g, (whole, prefix, handle) =>
-        `${prefix}<span class="mention-link" role="link" tabindex="0" data-open-user="${handle.toLowerCase()}" title="Открыть @${handle}">@${handle}</span>`
-      );
+      // Convert only plain-text URLs into safe external anchors. Build HTML from escaped
+      // text chunks so message content can never inject arbitrary HTML or event handlers.
+      // Supports http(s), ftp, www.* and common bare domains (example.com/path).
+      const text = String(raw ?? '');
+      const tokenPattern = /https?:\/\/[^\s<>"']+|ftp:\/\/[^\s<>"']+|www\.[^\s<>"']+|(?:[a-z0-9](?:[a-z0-9-]*[a-z0-9])?\.)+(?:[a-z]{2,}|рф)(?::\d{1,5})?(?:\/[^\s<>"']*)?|@[a-zA-Z0-9_]{3,32}\b/giu;
+      let html = '';
+      let lastIndex = 0;
+
+      for (const match of text.matchAll(tokenPattern)) {
+        const originalToken = match[0];
+        const index = match.index ?? 0;
+        html += escapeHtml(text.slice(lastIndex, index));
+
+        if (originalToken[0] === '@') {
+          const previous = index > 0 ? text[index - 1] : '';
+          // Do not turn an email address (person@example.com) into a profile mention.
+          if (previous && /[\w.+-]/u.test(previous)) {
+            html += escapeHtml(originalToken);
+          } else {
+            const handle = originalToken.slice(1);
+            html += `<span class="mention-link" role="link" tabindex="0" data-open-user="${escapeHtml(handle.toLowerCase())}" title="Открыть @${escapeHtml(handle)}">${escapeHtml(originalToken)}</span>`;
+          }
+          lastIndex = index + originalToken.length;
+          continue;
+        }
+
+        const previous = index > 0 ? text[index - 1] : '';
+        const hasScheme = /^(?:https?:\/\/|ftp:\/\/)/i.test(originalToken);
+        const isWww = /^www\./i.test(originalToken);
+        // Avoid making the tail of an email, file path or another URL into a separate link.
+        if (!hasScheme && !isWww && previous && /[\w@./-]/u.test(previous)) {
+          html += escapeHtml(originalToken);
+          lastIndex = index + originalToken.length;
+          continue;
+        }
+
+        let urlText = originalToken;
+        let trailing = '';
+        // Sentence punctuation usually belongs after the link, not inside its target.
+        while (/[.,!?;:…]$/.test(urlText)) {
+          trailing = urlText.slice(-1) + trailing;
+          urlText = urlText.slice(0, -1);
+        }
+        // Strip unmatched closing brackets often used around links: (https://example.com).
+        for (const [openChar, closeChar] of [['(', ')'], ['[', ']'], ['{', '}']]) {
+          while (urlText.endsWith(closeChar) &&
+                 (urlText.split(closeChar).length - 1) > (urlText.split(openChar).length - 1)) {
+            trailing = closeChar + trailing;
+            urlText = urlText.slice(0, -1);
+          }
+        }
+
+        if (!urlText) {
+          html += escapeHtml(originalToken);
+        } else {
+          let href = urlText;
+          if (/^www\./i.test(href) || !/^(?:https?:\/\/|ftp:\/\/)/i.test(href)) href = 'https://' + href;
+          html += `<a class="message-link" href="${escapeHtml(href)}" target="_blank" rel="noopener noreferrer nofollow" referrerpolicy="no-referrer">${escapeHtml(urlText)}</a>${escapeHtml(trailing)}`;
+        }
+        lastIndex = index + originalToken.length;
+      }
+      html += escapeHtml(text.slice(lastIndex));
+      return html;
     }
 
 
