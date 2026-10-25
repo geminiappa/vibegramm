@@ -1383,6 +1383,10 @@
     .vg-call-action { min-width:69px; min-height:68px; padding:7px 8px; border-radius:16px; gap:6px; }
     .vg-call-action-icon { width:34px; height:34px; border-radius:12px; }
     .vg-call-footer { padding:4px 18px 16px; }
+    .vg-call-device-controls { width:calc(100% - 24px); }
+    .vg-call-device-row { grid-template-columns:25px minmax(88px,.7fr) minmax(0,1.3fr); gap:6px; padding:5px 7px; }
+    .vg-call-device-row select { padding:8px 6px; font-size:10px; }
+    .vg-call-device-label { font-size:10px; }
     .vg-call-float { right:10px; bottom:calc(10px + env(safe-area-inset-bottom)); }
   }
   @media(prefers-reduced-motion:reduce) { .vg-call-wave { animation:none!important; } .vg-call-action,.chat-item,.icon-btn,.send-btn { transition:none!important; } }
@@ -1448,6 +1452,18 @@
   .vg-call-volume-control label strong { color:#d7effc; font-weight:750; font-variant-numeric:tabular-nums; }
   .vg-call-volume-control input { display:block; width:100%; accent-color:#2aabee; cursor:pointer; }
   .vg-call-volume-control[hidden] { display:none; }
+  .vg-call-device-controls { width:min(390px,calc(100% - 30px)); margin:0 auto; display:grid; gap:7px; padding:4px 0 5px; }
+  .vg-call-device-row { display:grid; grid-template-columns:28px minmax(110px, .85fr) minmax(0,1.35fr); gap:9px; align-items:center; min-height:43px; padding:5px 10px; border:1px solid rgba(161,197,219,.10); border-radius:13px; background:rgba(255,255,255,.035); color:#d5e6f1; }
+  .vg-call-device-icon { width:27px; height:27px; display:grid; place-items:center; color:#78d3ff; background:rgba(42,171,238,.12); border-radius:9px; }
+  .vg-call-device-label { font-size:11px; font-weight:750; color:#a8bdcc; }
+  .vg-call-device-row select { min-width:0; width:100%; border:1px solid rgba(168,204,227,.11); border-radius:9px; outline:none; padding:8px 9px; background:#101c27; color:#eef6fb; font:inherit; font-size:11px; }
+  .vg-call-device-row select:focus { border-color:rgba(42,171,238,.65); }
+  .vg-call-device-row select:disabled { color:#748b9c; opacity:.8; }
+  .vg-call-device-note { color:#7790a2; font-size:10px; line-height:1.45; padding:0 3px; }
+  .vg-call-device-note[hidden] { display:none; }
+  .vg-call-pick-output { justify-self:start; border:1px solid rgba(42,171,238,.20); background:rgba(42,171,238,.08); color:#88d9ff; border-radius:10px; padding:8px 10px; font-size:11px; font-weight:750; cursor:pointer; }
+  .vg-call-pick-output:hover { background:rgba(42,171,238,.15); }
+  .vg-call-pick-output[hidden] { display:none; }
   #vgRemoteAudio { display:none; }
   @media(max-width:768px) { .vg-call-volume-control { width:calc(100% - 48px); } }
 </style>
@@ -1827,6 +1843,20 @@
       <div class="vg-call-volume-control" id="vgCallVolumeControl">
         <label for="vgCallOutputVolume"><span>Громкость собеседника</span><strong id="vgCallVolumeValue">65%</strong></label>
         <input id="vgCallOutputVolume" type="range" min="0" max="100" step="1" value="65" aria-label="Громкость собеседника">
+      </div>
+      <div class="vg-call-device-controls" id="vgCallDeviceControls" aria-label="Устройства звонка">
+        <label class="vg-call-device-row" for="vgCallMicSelect">
+          <span class="vg-call-device-icon" aria-hidden="true"><svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="9" y="3" width="6" height="12" rx="3"></rect><path d="M5 11a7 7 0 0 0 14 0M12 18v3m-4 0h8"></path></svg></span>
+          <span class="vg-call-device-label">Микрофон</span>
+          <select id="vgCallMicSelect" aria-label="Выбрать микрофон"><option value="">Системный по умолчанию</option></select>
+        </label>
+        <label class="vg-call-device-row" for="vgCallOutputSelect">
+          <span class="vg-call-device-icon" aria-hidden="true"><svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M4 14v-3a8 8 0 0 1 16 0v3"></path><rect x="3" y="12" width="4" height="7" rx="2"></rect><rect x="17" y="12" width="4" height="7" rx="2"></rect><path d="M17 19a5 5 0 0 1-5 3h-1"></path></svg></span>
+          <span class="vg-call-device-label">Наушники / вывод</span>
+          <select id="vgCallOutputSelect" aria-label="Выбрать устройство вывода"><option value="">Системное устройство</option></select>
+        </label>
+        <div class="vg-call-device-note" id="vgCallDeviceHint" role="status">Выбор устройств появится после разрешения доступа к микрофону.</div>
+        <button type="button" class="vg-call-pick-output" id="vgCallPickOutputBtn" hidden>🎧 Выбрать устройство вывода…</button>
       </div>
       <div class="vg-call-actions vg-call-incoming-actions" id="vgIncomingCallActions" style="display:none;">
         <button class="vg-call-action vg-call-accept" type="button" id="vgAcceptCallBtn"><span class="vg-call-action-icon">✓</span><span>Принять</span></button>
@@ -3307,6 +3337,20 @@
     if ('serviceWorker' in navigator && /^https?:$/.test(window.location.protocol)) {
       getPwaServiceWorker().catch(() => {});
       navigator.serviceWorker.addEventListener('message', event => {
+        if(event.data?.type==='VIBEGRAM_CALL_NOTIFICATION_ACTION'){
+          const from=String(event.data.from||'').toLowerCase();
+          const action=String(event.data.action||'open');
+          window.focus();
+          if(action==='accept_call'||action==='reject_call'){
+            vgPendingCallNotificationAction={action,from,callId:String(event.data.callId||'')};
+            if(vgCall?.incoming && (!from||vgCall.incoming.from===from) && (!event.data.callId||vgCall.incoming.payload?.callId===event.data.callId)){
+              const pending=vgPendingCallNotificationAction;vgPendingCallNotificationAction=null;
+              if(pending.action==='accept_call')vgAcceptIncoming();
+              else {vgSendSignal(from,'reject',{callId:vgCall.callId}).finally(()=>vgHangupCall(true));}
+            }
+          } else if(vgCall?.incoming && (!from||vgCall.incoming.from===from))vgOpenCallModal();
+          return;
+        }
         const handle = String(event.data?.username || '').toLowerCase();
         if ((event.data?.type === 'VIBEGRAM_OPEN_CHAT' || event.data?.type === 'VIBEGRAM_PUSH_RECEIVED') && handle && usersMap[handle]) {
           if (event.data?.type === 'VIBEGRAM_PUSH_RECEIVED' && !document.hidden) {
@@ -5239,6 +5283,14 @@
     let vgCallIceServers = [{urls:'stun:stun.l.google.com:19302'},{urls:'stun:stun1.l.google.com:19302'}];
     let vgCallRingContext = null;
     let vgCallPollTimer = null;
+    let vgPendingCallNotificationAction = (() => {
+      try {
+        const params = new URLSearchParams(window.location.search);
+        const action = params.get('callAction');
+        if(action==='accept_call'||action==='reject_call')return {action,from:String(params.get('callFrom')||'').toLowerCase(),callId:String(params.get('callId')||'')};
+      } catch(_) {}
+      return null;
+    })();
 
     const vgPrefKey = () => `vibegram_feature_prefs_${(myProfile?.username || 'guest').toLowerCase()}`;
     const vgPrefDefaults = () => ({ archived_chats:[], folders:{}, drafts:{}, hidden_messages:[], blocked_users:[], muted_chats:[], custom_folders:['Друзья','Работа'], settings:{}, read_message_ids:[] });
@@ -5481,12 +5533,36 @@
       channelCount: { ideal: 1 },
       sampleRate: { ideal: 48000 }
     };
-    async function vgGetSpeechStream(kind = 'audio') {
-      const constraints = {
-        audio: { ...VG_SPEECH_AUDIO_CONSTRAINTS },
+    function vgDevicePreferenceKey(kind) {
+      const user = String(myProfile?.username || 'guest').toLowerCase();
+      return `vibegram_call_${kind}_device_${user}`;
+    }
+    function vgSavedDeviceId(kind) {
+      try { return localStorage.getItem(vgDevicePreferenceKey(kind)) || ''; } catch (_) { return ''; }
+    }
+    function vgStoreDeviceId(kind, id) {
+      try { if (id) localStorage.setItem(vgDevicePreferenceKey(kind), id); else localStorage.removeItem(vgDevicePreferenceKey(kind)); } catch (_) {}
+    }
+    function vgSelectedMicDeviceId() {
+      const select = document.getElementById('vgCallMicSelect');
+      return select && !select.disabled && select.options.length > 1 ? select.value : vgSavedDeviceId('mic');
+    }
+    async function vgGetSpeechStream(kind = 'audio', preferredDeviceId = vgSelectedMicDeviceId()) {
+      const makeConstraints = (deviceId) => ({
+        audio: { ...VG_SPEECH_AUDIO_CONSTRAINTS, ...(deviceId ? { deviceId: { exact: deviceId } } : {}) },
         video: kind === 'video' ? { width: { ideal: 1280 }, height: { ideal: 720 }, facingMode: 'user' } : false
-      };
-      const stream = await navigator.mediaDevices.getUserMedia(constraints);
+      });
+      let stream;
+      try {
+        stream = await navigator.mediaDevices.getUserMedia(makeConstraints(preferredDeviceId));
+      } catch (error) {
+        // A previously saved device id may change when the browser resets its device IDs.
+        if (!preferredDeviceId || !['OverconstrainedError', 'NotFoundError', 'DevicesNotFoundError'].includes(error?.name)) throw error;
+        vgStoreDeviceId('mic', '');
+        const micSelect = document.getElementById('vgCallMicSelect');
+        if (micSelect) micSelect.value = '';
+        stream = await navigator.mediaDevices.getUserMedia(makeConstraints(''));
+      }
       const track = stream.getAudioTracks?.()[0];
       if (track?.applyConstraints) {
         try { await track.applyConstraints({ ...VG_SPEECH_AUDIO_CONSTRAINTS }); } catch (_) {}
@@ -5602,11 +5678,117 @@
     const vgRemoteVideo=document.getElementById('vgRemoteVideo'), vgLocalVideo=document.getElementById('vgLocalVideo'), vgRemoteAudio=document.getElementById('vgRemoteAudio');
     const vgCallPeerName=document.getElementById('vgCallPeerName'), vgCallAvatar=document.getElementById('vgCallAvatar'), vgCallDuration=document.getElementById('vgCallDuration');
     const vgCallFloatBtn=document.getElementById('vgCallFloatBtn');
+    const vgCallMicSelect=document.getElementById('vgCallMicSelect');
+    const vgCallOutputSelect=document.getElementById('vgCallOutputSelect');
+    const vgCallDeviceHint=document.getElementById('vgCallDeviceHint');
+    const vgCallPickOutputBtn=document.getElementById('vgCallPickOutputBtn');
+    let vgCallNotification = null;
+    let vgCallOutputSupported = Boolean(vgRemoteAudio && typeof vgRemoteAudio.setSinkId === 'function');
     const vgCallOutputVolume=document.getElementById('vgCallOutputVolume');
     const vgCallVolumeValue=document.getElementById('vgCallVolumeValue');
     function vgCurrentOutputVolume(){const raw=Number(vgCallOutputVolume?.value);return Math.max(0,Math.min(1,(Number.isFinite(raw)?raw:72)/100));}
     function vgApplyCallOutputVolume(){const volume=vgCurrentOutputVolume();vgRemoteAudio.volume=volume;vgRemoteVideo.volume=volume;if(vgCallVolumeValue)vgCallVolumeValue.textContent=Math.round(volume*100)+'%';}
     if(vgCallOutputVolume){vgCallOutputVolume.value=window.matchMedia('(min-width: 769px)').matches?'65':'90';vgApplyCallOutputVolume();vgCallOutputVolume.addEventListener('input',vgApplyCallOutputVolume);}
+    function vgSetDeviceSelectOptions(select, devices, type, savedValue) {
+      if(!select)return;
+      const selected = select.value || savedValue || '';
+      const first = document.createElement('option');
+      first.value = '';
+      first.textContent = type==='audioinput' ? 'Системный микрофон' : 'Системный вывод';
+      select.replaceChildren(first);
+      let n=0;
+      for(const device of devices.filter(d=>d.kind===type)){
+        n++;
+        const option=document.createElement('option');
+        option.value=String(device.deviceId||'');
+        option.textContent=String(device.label||`${type==='audioinput'?'Микрофон':'Устройство вывода'} ${n}`);
+        select.appendChild(option);
+      }
+      if(Array.from(select.options).some(o=>o.value===selected))select.value=selected;
+      else select.value='';
+      select.disabled = type==='audiooutput' ? !vgCallOutputSupported : !navigator.mediaDevices?.getUserMedia;
+    }
+    async function vgRefreshCallDevices(showHint=true) {
+      if(!navigator.mediaDevices?.enumerateDevices)return;
+      try {
+        const devices=await navigator.mediaDevices.enumerateDevices();
+        vgSetDeviceSelectOptions(vgCallMicSelect,devices,'audioinput',vgSavedDeviceId('mic'));
+        vgSetDeviceSelectOptions(vgCallOutputSelect,devices,'audiooutput',vgSavedDeviceId('output'));
+        if(vgCallDeviceHint){
+          vgCallDeviceHint.hidden=false;
+          if(vgCallPickOutputBtn)vgCallPickOutputBtn.hidden=!vgCallOutputSupported||typeof navigator.mediaDevices?.selectAudioOutput!=='function';
+          if(!vgCallOutputSupported)vgCallDeviceHint.textContent='Этот браузер не поддерживает переключение вывода из веб-приложения. Выбери наушники или динамик в системном меню звука.';
+          else if(!devices.some(d=>d.kind==='audiooutput'))vgCallDeviceHint.textContent='Если список пуст, нажми «Выбрать устройство вывода» (если доступно) или проверь разрешения браузера.';
+          else vgCallDeviceHint.textContent='Выбор сохраняется на этом устройстве и применяется к следующим звонкам.';
+        }
+      } catch(e) {
+        if(showHint&&vgCallDeviceHint)vgCallDeviceHint.textContent='Не удалось получить список устройств. Проверь разрешения браузера.';
+      }
+    }
+    async function vgApplyCallOutputDevice(showMessage=false) {
+      if(!vgCallOutputSupported)return false;
+      const deviceId=vgCallOutputSelect ? vgCallOutputSelect.value : (vgSavedDeviceId('output') || '');
+      try {
+        await Promise.all([vgRemoteAudio,vgRemoteVideo].map(el=>el?.setSinkId ? el.setSinkId(deviceId) : Promise.resolve()));
+        vgStoreDeviceId('output',deviceId);
+        return true;
+      } catch(e) {
+        if(showMessage)vgToast('Не удалось сменить вывод звука',e?.message||'Проверь подключение выбранных наушников.');
+        return false;
+      }
+    }
+    async function vgSwitchCallMicrophone(deviceId, showMessage=true) {
+      const previousDeviceId=vgSavedDeviceId('mic');
+      if(!vgCall.stream){
+        vgStoreDeviceId('mic',deviceId||'');
+        if(showMessage)vgToast('Микрофон сохранён','Он будет использоваться в следующем звонке.');
+        return true;
+      }
+      let replacementStream=null;
+      try {
+        replacementStream=await navigator.mediaDevices.getUserMedia({audio:{...VG_SPEECH_AUDIO_CONSTRAINTS,...(deviceId?{deviceId:{exact:deviceId}}:{})},video:false});
+        const newTrack=replacementStream.getAudioTracks()[0];
+        if(!newTrack)throw new Error('Браузер не вернул аудиодорожку микрофона.');
+        const oldTrack=vgCall.stream.getAudioTracks()[0];
+        if(oldTrack)newTrack.enabled=oldTrack.enabled;
+        const sender=vgCall.pc?.getSenders?.().find(item=>item.track?.kind==='audio');
+        // If a call peer already exists, swap its microphone live. If setup is still
+        // in progress, update the stream before tracks are added to the peer connection.
+        if(sender)await sender.replaceTrack(newTrack);
+        if(oldTrack)vgCall.stream.removeTrack(oldTrack);
+        vgCall.stream.addTrack(newTrack);
+        if(oldTrack)oldTrack.stop();
+        vgStoreDeviceId('mic',deviceId||'');
+        // The new track belongs to vgCall.stream now, not to the temporary stream.
+        replacementStream.removeTrack(newTrack);
+        await vgRefreshCallDevices(false);
+        if(vgCallMicSelect)vgCallMicSelect.value=deviceId||'';
+        if(showMessage)vgToast('Микрофон изменён',deviceId?(vgCallMicSelect?.selectedOptions?.[0]?.textContent||'Новое устройство выбрано'):'Используется системный микрофон.');
+        return true;
+      } catch(e) {
+        replacementStream?.getTracks().forEach(t=>t.stop());
+        vgStoreDeviceId('mic',previousDeviceId);
+        if(showMessage)vgToast('Не удалось сменить микрофон',e?.message||'Проверь, что устройство подключено и доступ к нему разрешён.');
+        await vgRefreshCallDevices(false);
+        if(vgCallMicSelect)vgCallMicSelect.value=previousDeviceId;
+        return false;
+      }
+    }
+    vgCallMicSelect?.addEventListener('change',async()=>{const id=vgCallMicSelect.value;if(await vgSwitchCallMicrophone(id,false))vgToast('Микрофон выбран',vgCallMicSelect.selectedOptions?.[0]?.textContent||'Системный микрофон');else vgCallMicSelect.value=vgSavedDeviceId('mic');});
+    vgCallOutputSelect?.addEventListener('change',async()=>{const id=vgCallOutputSelect.value;if(await vgApplyCallOutputDevice(true))vgToast('Вывод звука изменён',vgCallOutputSelect.selectedOptions?.[0]?.textContent||'Системное устройство');else vgCallOutputSelect.value=vgSavedDeviceId('output');});
+    vgCallPickOutputBtn?.addEventListener('click',async()=>{
+      if(typeof navigator.mediaDevices?.selectAudioOutput!=='function'){vgToast('Выбор недоступен','В этом браузере нет системного выбора аудиовыхода.');return;}
+      try{
+        const device=await navigator.mediaDevices.selectAudioOutput(vgSavedDeviceId('output')?{deviceId:vgSavedDeviceId('output')}:undefined);
+        if(!device?.deviceId)return;
+        if(!Array.from(vgCallOutputSelect.options).some(o=>o.value===device.deviceId)){
+          const option=document.createElement('option');option.value=device.deviceId;option.textContent=device.label||'Выбранное устройство';vgCallOutputSelect.appendChild(option);
+        }
+        vgCallOutputSelect.disabled=false;vgCallOutputSelect.value=device.deviceId;
+        if(await vgApplyCallOutputDevice(true))vgToast('Вывод звука изменён',device.label||'Выбранное устройство');
+      }catch(e){if(e?.name!=='NotAllowedError')vgToast('Не удалось выбрать устройство',e?.message||'Попробуй ещё раз.');}
+    });
+    if(navigator.mediaDevices?.addEventListener)navigator.mediaDevices.addEventListener('devicechange',()=>vgRefreshCallDevices(false));
     function vgCallId(){return (window.crypto&&crypto.randomUUID)?crypto.randomUUID():('vg-'+Date.now().toString(36)+'-'+Math.random().toString(36).slice(2,11));}
     function vgCallPeerDisplay(handle){try{const p=getPeerObject(handle);return {name:p.name||handle,username:p.username||handle,color:p.color||'#2aabee'};}catch(_){return {name:handle,username:handle,color:'#2aabee'};}}
     function vgCallIdentity(handle){const p=vgCallPeerDisplay(handle);vgCallPeerName.textContent=p.name;vgCallAvatar.textContent=(typeof getInitials==='function'?getInitials(p.name):String(p.name||'V').slice(0,1).toUpperCase());vgCallAvatar.style.backgroundColor=p.color;vgCallModal.dataset.callPeer=handle||'';}
@@ -5615,8 +5797,64 @@
     function vgOpenCallModal(){vgCallModal.classList.add('open');vgCallFloatBtn.hidden=true;}
     function vgMinimizeCall(){if(vgCall.pc||vgCall.incoming){vgCallModal.classList.remove('open');vgCallFloatBtn.hidden=false;const handle=vgCall.target||vgCall.incoming?.from||'';document.getElementById('vgCallFloatText').textContent=handle?`Звонок · @${handle}`:'Звонок продолжается';}else vgCallModal.classList.remove('open');}
     function vgCloseCallFloat(){vgCallFloatBtn.hidden=true;}
-    function vgStartRing(){vgStopRing();try{const Ctx=window.AudioContext||window.webkitAudioContext;if(!Ctx)return;vgCallRingContext=vgCallRingContext||new Ctx();vgCallRingContext.resume?.().catch(()=>{});const beep=()=>{if(!vgCallRingContext)return;try{const osc=vgCallRingContext.createOscillator(),gain=vgCallRingContext.createGain();osc.type='sine';osc.frequency.value=660;gain.gain.setValueAtTime(.0001,vgCallRingContext.currentTime);gain.gain.exponentialRampToValueAtTime(.08,vgCallRingContext.currentTime+.025);gain.gain.exponentialRampToValueAtTime(.0001,vgCallRingContext.currentTime+.26);osc.connect(gain);gain.connect(vgCallRingContext.destination);osc.start();osc.stop(vgCallRingContext.currentTime+.28);}catch(_){}};beep();vgCall.ringTimer=setInterval(beep,1250);}catch(_){}}
-    function vgStopRing(){if(vgCall.ringTimer){clearInterval(vgCall.ringTimer);vgCall.ringTimer=null;}}
+    function vgUnlockRingtoneAudio(){
+      try{
+        const Ctx=window.AudioContext||window.webkitAudioContext;
+        if(!Ctx)return;
+        vgCallRingContext=vgCallRingContext||new Ctx();
+        if(vgCallRingContext.state==='suspended')vgCallRingContext.resume().catch(()=>{});
+      }catch(_){}
+    }
+    document.addEventListener('pointerdown',vgUnlockRingtoneAudio,{once:true,passive:true});
+    document.addEventListener('keydown',vgUnlockRingtoneAudio,{once:true});
+    function vgStartRing(mode='incoming'){
+      vgStopRing();
+      try {
+        const Ctx=window.AudioContext||window.webkitAudioContext;
+        if(!Ctx)return;
+        vgCallRingContext=vgCallRingContext||new Ctx();
+        const playPattern=()=>{
+          if(!vgCallRingContext||vgCallRingContext.state==='closed')return;
+          vgCallRingContext.resume?.().catch(()=>{});
+          // Separate incoming melody from outbound ringback, with pause between bursts.
+          const notes=mode==='outgoing'
+            ? [{f:440,t:0},{f:494,t:.18},{f:440,t:.36},{f:494,t:.54}]
+            : [{f:523.25,t:0},{f:659.25,t:.16},{f:783.99,t:.32},{f:659.25,t:.72},{f:783.99,t:.88}];
+          notes.forEach(({f,t})=>{
+            try{
+              const start=vgCallRingContext.currentTime+t;
+              const osc=vgCallRingContext.createOscillator(), gain=vgCallRingContext.createGain();
+              osc.type='sine'; osc.frequency.setValueAtTime(f,start);
+              gain.gain.setValueAtTime(.0001,start);
+              gain.gain.exponentialRampToValueAtTime(mode==='outgoing'?.035:.065,start+.022);
+              gain.gain.exponentialRampToValueAtTime(.0001,start+(mode==='outgoing'?.19:.14));
+              osc.connect(gain); gain.connect(vgCallRingContext.destination);
+              osc.start(start); osc.stop(start+(mode==='outgoing'?.21:.16));
+            }catch(_){}
+          });
+        };
+        playPattern();
+        vgCall.ringTimer=setInterval(playPattern,mode==='outgoing'?3000:2600);
+        if(mode==='incoming'&&navigator.vibrate) { try { navigator.vibrate([180,100,180,720]); } catch(_){} }
+      } catch(_) {}
+    }
+    function vgStopRing(){
+      if(vgCall.ringTimer){clearInterval(vgCall.ringTimer);vgCall.ringTimer=null;}
+      if(navigator.vibrate){try{navigator.vibrate(0);}catch(_){}}
+      if(vgCallNotification){try{vgCallNotification.close();}catch(_){} vgCallNotification=null;}
+    }
+    async function vgShowIncomingCallNotification(from, kind, callId){
+      if(!('Notification' in window)||Notification.permission!=='granted'||document.visibilityState!=='hidden')return;
+      const title=kind==='video'?'Входящий видеозвонок Vibegram':'Входящий звонок Vibegram';
+      const body='@'+from+' звонит тебе';
+      const options={body,icon:'/facuicon.jpeg',badge:'/pwa-192.png',tag:'vibegram-call-'+String(callId||from),renotify:false,requireInteraction:true,
+        actions:[{action:'accept_call',title:'Принять'},{action:'reject_call',title:'Отклонить'}],
+        data:{type:'VIBEGRAM_INCOMING_CALL',from:String(from||''),callId:String(callId||''),media:kind==='video'?'video':'audio',url:'/?callAction=open&callFrom='+encodeURIComponent(from||'')}};
+      try{
+        if('serviceWorker' in navigator){const reg=await getPwaServiceWorker();await reg.showNotification(title,options);}
+        else {vgCallNotification=new Notification(title,options);vgCallNotification.onclick=()=>{window.focus();vgCallNotification?.close();};}
+      }catch(e){try{vgCallNotification=new Notification(title,{body,icon:'/facuicon.jpeg',tag:'vibegram-call-'+String(callId||from)});vgCallNotification.onclick=()=>{window.focus();vgCallNotification?.close();};}catch(_) {}}
+    }
     async function vgLoadCallConfig(){try{const r=await fetch('/api/call/config',{cache:'no-store'});if(r.ok){const d=await r.json();if(Array.isArray(d.iceServers)&&d.iceServers.length)vgCallIceServers=d.iceServers;}}catch(_){}return vgCallIceServers;}
     async function vgSendSignal(to,kind,payload={}){if(!myProfile||!to)return false;const id=payload?.callId||vgCall.callId||vgCall.incoming?.payload?.callId||null;const body={from:myProfile.username,to,kind,payload:{...(payload&&typeof payload==='object'?payload:{}),...(id?{callId:id}:{})}};try{const r=await fetch('/api/call/signal',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify(body),cache:'no-store'});if(!r.ok){const d=await r.json().catch(()=>({}));throw new Error(d.error||`HTTP ${r.status}`);}return true;}catch(e){console.warn('[Vibegram call signalling]',e);return false;}}
     function vgSetCallConnected(){
@@ -5631,6 +5869,7 @@
           vgCallDuration.textContent=String(Math.floor(seconds/60)).padStart(2,'0')+':'+String(seconds%60).padStart(2,'0');
         },1000);
       }
+      vgStopRing();
       vgSetCallStatus('На связи');
       const track=vgCall.stream?.getAudioTracks?.()[0];
       const settings=track?.getSettings?.()||{};
@@ -5648,6 +5887,7 @@
       vgRemoteAudio.srcObject=null;
       vgRemoteVideo.srcObject=null;
       vgApplyCallOutputVolume();
+      vgApplyCallOutputDevice(false).catch(()=>{});
       if(kind==='video'){
         vgRemoteAudio.muted=true;
         vgRemoteAudio.volume=0;
@@ -5704,14 +5944,14 @@
       return pc;
     }
         async function vgFlushPendingIce(){const pc=vgCall.pc;if(!pc||!pc.remoteDescription)return;for(const candidate of vgCall.pendingIce.splice(0)){try{await pc.addIceCandidate(new RTCIceCandidate(candidate));}catch(e){console.debug('[Vibegram ICE candidate]',e);}}}
-    async function vgStartCall(kind){if(!myProfile||!activePeer||activePeer===myProfile.username.toLowerCase()||activePeer==='verify_bot'||getPeerObject(activePeer).is_channel||getPeerObject(activePeer).is_group){vgToast('Звонок недоступен','Открой личный чат с пользователем.');return;}if(vgCall.pc||vgCall.incoming){vgToast('Звонок уже активен','Заверши текущий звонок перед новым.');return;}if(!window.isSecureContext||!navigator.mediaDevices?.getUserMedia||!window.RTCPeerConnection){vgToast('Звонки недоступны','Открой Vibegram через HTTPS и используй актуальный браузер.');return;}const target=activePeer;vgCall={pc:null,stream:null,remote:null,target,kind,incoming:null,pendingIce:[],makingOffer:false,callId:vgCallId(),startedAt:0,timer:null,timeout:null,ringTimer:null};try{await vgLoadCallConfig();vgCall.stream=await vgGetSpeechStream(kind);vgCallIdentity(target);vgOpenCallModal();vgCallButtons(false);vgCallDuration.textContent='';vgLocalVideo.srcObject=vgCall.stream;vgLocalVideo.style.display=kind==='video'?'block':'none';vgRemoteVideo.srcObject=null;vgRemoteVideo.style.display='none';document.getElementById('vgCallAudioArt').style.display=kind==='video'?'none':'grid';document.getElementById('vgCallTitle').textContent=kind==='video'?'Видеозвонок':'Голосовой звонок';document.getElementById('vgCallFooter').textContent='Вызов отправлен. Дождись ответа собеседника…';vgSetCallStatus('Вызов @'+target+'…');const pc=await vgCreatePeer(target,kind);vgCall.stream.getTracks().forEach(t=>pc.addTrack(t,vgCall.stream));const offer=await pc.createOffer();await pc.setLocalDescription(offer);const sent=await vgSendSignal(target,'offer',{sdp:pc.localDescription,media:kind,callId:vgCall.callId});if(!sent)throw new Error('Сервер не принял запрос звонка.');vgCall.timeout=setTimeout(async()=>{if(vgCall.pc&&!vgCall.startedAt){await vgSendSignal(target,'cancel',{callId:vgCall.callId});vgToast('Нет ответа','Звонок завершён по тайм-ауту.');await vgHangupCall(true);}},50000);}catch(e){vgToast('Не удалось начать звонок',e.message||'Проверь доступ к микрофону и камере.');await vgHangupCall(true);}}
-    async function vgAcceptIncoming(){const call=vgCall.incoming;if(!call||!myProfile)return;const from=call.from;const kind=call.payload?.media==='video'?'video':'audio';vgStopRing();try{if(!window.isSecureContext||!navigator.mediaDevices?.getUserMedia)throw new Error('Для звонков нужен HTTPS и разрешение на микрофон.');vgCall.target=from;vgCall.callId=call.payload?.callId||vgCall.callId||vgCallId();vgCall.kind=kind;vgCallIdentity(from);vgOpenCallModal();vgCallButtons(false);vgCallDuration.textContent='';vgRemoteVideo.srcObject=null;vgLocalVideo.srcObject=null;vgLocalVideo.style.display=kind==='video'?'block':'none';vgRemoteVideo.style.display=kind==='video'?'block':'none';document.getElementById('vgCallAudioArt').style.display=kind==='video'?'none':'grid';document.getElementById('vgCallEnableAudio').hidden=true;vgCall.stream=await vgGetSpeechStream(kind);vgLocalVideo.srcObject=vgCall.stream;const pc=await vgCreatePeer(from,kind);vgCall.stream.getTracks().forEach(t=>pc.addTrack(t,vgCall.stream));await pc.setRemoteDescription(new RTCSessionDescription(call.payload.sdp));await vgFlushPendingIce();const answer=await pc.createAnswer();await pc.setLocalDescription(answer);if(!await vgSendSignal(from,'answer',{sdp:pc.localDescription,callId:vgCall.callId}))throw new Error('Не удалось отправить ответ на звонок.');vgCall.incoming=null;document.getElementById('vgCallTitle').textContent=kind==='video'?'Видеозвонок':'Голосовой звонок';document.getElementById('vgCallFooter').textContent='Подключаем защищённый медиаканал…';vgSetCallStatus('Соединяемся…');}catch(e){vgToast('Не удалось принять звонок',e.message||'');await vgSendSignal(from,'reject',{callId:vgCall.callId});await vgHangupCall(true);}}
+    async function vgStartCall(kind){if(!myProfile||!activePeer||activePeer===myProfile.username.toLowerCase()||activePeer==='verify_bot'||getPeerObject(activePeer).is_channel||getPeerObject(activePeer).is_group){vgToast('Звонок недоступен','Открой личный чат с пользователем.');return;}if(vgCall.pc||vgCall.incoming){vgToast('Звонок уже активен','Заверши текущий звонок перед новым.');return;}if(!window.isSecureContext||!navigator.mediaDevices?.getUserMedia||!window.RTCPeerConnection){vgToast('Звонки недоступны','Открой Vibegram через HTTPS и используй актуальный браузер.');return;}const target=activePeer;vgCall={pc:null,stream:null,remote:null,target,kind,incoming:null,pendingIce:[],makingOffer:false,callId:vgCallId(),startedAt:0,timer:null,timeout:null,ringTimer:null};try{await vgLoadCallConfig();vgCall.stream=await vgGetSpeechStream(kind);await vgRefreshCallDevices(false);await vgApplyCallOutputDevice(false);vgCallIdentity(target);vgOpenCallModal();vgCallButtons(false);vgCallDuration.textContent='';vgLocalVideo.srcObject=vgCall.stream;vgLocalVideo.style.display=kind==='video'?'block':'none';vgRemoteVideo.srcObject=null;vgRemoteVideo.style.display='none';document.getElementById('vgCallAudioArt').style.display=kind==='video'?'none':'grid';document.getElementById('vgCallTitle').textContent=kind==='video'?'Видеозвонок':'Голосовой звонок';document.getElementById('vgCallFooter').textContent='Вызов отправлен. Дождись ответа собеседника…';vgSetCallStatus('Вызов @'+target+'…');vgStartRing('outgoing');const pc=await vgCreatePeer(target,kind);vgCall.stream.getTracks().forEach(t=>pc.addTrack(t,vgCall.stream));const offer=await pc.createOffer();await pc.setLocalDescription(offer);const sent=await vgSendSignal(target,'offer',{sdp:pc.localDescription,media:kind,callId:vgCall.callId});if(!sent)throw new Error('Сервер не принял запрос звонка.');vgCall.timeout=setTimeout(async()=>{if(vgCall.pc&&!vgCall.startedAt){await vgSendSignal(target,'cancel',{callId:vgCall.callId});vgToast('Нет ответа','Звонок завершён по тайм-ауту.');await vgHangupCall(true);}},50000);}catch(e){vgToast('Не удалось начать звонок',e.message||'Проверь доступ к микрофону и камере.');await vgHangupCall(true);}}
+    async function vgAcceptIncoming(){const call=vgCall.incoming;if(!call||!myProfile)return;const from=call.from;const kind=call.payload?.media==='video'?'video':'audio';vgStopRing();try{if(!window.isSecureContext||!navigator.mediaDevices?.getUserMedia)throw new Error('Для звонков нужен HTTPS и разрешение на микрофон.');vgCall.target=from;vgCall.callId=call.payload?.callId||vgCall.callId||vgCallId();vgCall.kind=kind;vgCallIdentity(from);vgOpenCallModal();vgCallButtons(false);vgCallDuration.textContent='';vgRemoteVideo.srcObject=null;vgLocalVideo.srcObject=null;vgLocalVideo.style.display=kind==='video'?'block':'none';vgRemoteVideo.style.display=kind==='video'?'block':'none';document.getElementById('vgCallAudioArt').style.display=kind==='video'?'none':'grid';document.getElementById('vgCallEnableAudio').hidden=true;vgCall.stream=await vgGetSpeechStream(kind);await vgRefreshCallDevices(false);await vgApplyCallOutputDevice(false);vgLocalVideo.srcObject=vgCall.stream;const pc=await vgCreatePeer(from,kind);vgCall.stream.getTracks().forEach(t=>pc.addTrack(t,vgCall.stream));await pc.setRemoteDescription(new RTCSessionDescription(call.payload.sdp));await vgFlushPendingIce();const answer=await pc.createAnswer();await pc.setLocalDescription(answer);if(!await vgSendSignal(from,'answer',{sdp:pc.localDescription,callId:vgCall.callId}))throw new Error('Не удалось отправить ответ на звонок.');vgCall.incoming=null;document.getElementById('vgCallTitle').textContent=kind==='video'?'Видеозвонок':'Голосовой звонок';document.getElementById('vgCallFooter').textContent='Подключаем защищённый медиаканал…';vgSetCallStatus('Соединяемся…');}catch(e){vgToast('Не удалось принять звонок',e.message||'');await vgSendSignal(from,'reject',{callId:vgCall.callId});await vgHangupCall(true);}}
     async function vgHangupCall(silent=false){const target=vgCall.target||vgCall.incoming?.from;const callId=vgCall.callId||vgCall.incoming?.payload?.callId;if(target&&!silent)await vgSendSignal(target,'hangup',{callId});vgStopRing();if(vgCall.timeout)clearTimeout(vgCall.timeout);if(vgCall.timer)clearInterval(vgCall.timer);try{vgCall.pc?.getSenders?.().forEach(s=>{try{s.track?.stop();}catch(_){}});vgCall.pc?.close();}catch(_){}vgCall.stream?.getTracks().forEach(t=>t.stop());vgCall.remote?.getTracks().forEach(t=>t.stop());vgCall={pc:null,stream:null,remote:null,target:null,kind:null,incoming:null,pendingIce:[],makingOffer:false,callId:null,startedAt:0,timer:null,timeout:null,ringTimer:null};try{vgRemoteVideo.pause();vgRemoteAudio.pause();}catch(_){}vgRemoteVideo.srcObject=null;vgLocalVideo.srcObject=null;vgRemoteAudio.srcObject=null;vgRemoteVideo.muted=true;vgRemoteAudio.muted=false;vgRemoteVideo.style.display='none';vgLocalVideo.style.display='none';document.getElementById('vgCallAudioArt').style.display='grid';document.getElementById('vgCallEnableAudio').hidden=true;vgCallDuration.textContent='';vgCallModal.classList.remove('open');vgCallFloatBtn.hidden=true;vgCallButtons(false);document.getElementById('vgCallTitle').textContent='Звонок Vibegram';document.getElementById('vgCallFooter').textContent='Для звонка разреши доступ к микрофону. Видеозвонок также использует камеру.';}
     async function vgHandleSignal(signal){if(!signal||vgSeenSignals.has(signal.id))return;vgSeenSignals.add(signal.id);if(vgSeenSignals.size>3000){const arr=Array.from(vgSeenSignals);vgSeenSignals.clear();arr.slice(-1000).forEach(x=>vgSeenSignals.add(x));}const {from,kind,payload={}}=signal;const incomingId=payload.callId||null;
       if(kind==='offer'){
         if(vgCall.pc||vgCall.incoming){await vgSendSignal(from,'busy',{callId:incomingId});return;}
         vgCall={pc:null,stream:null,remote:null,target:from,kind:payload.media==='video'?'video':'audio',incoming:signal,pendingIce:[],makingOffer:false,callId:incomingId||vgCallId(),startedAt:0,timer:null,timeout:null,ringTimer:null};
-        vgCallIdentity(from);vgCallModal.classList.add('open');vgCallFloatBtn.hidden=true;vgRemoteVideo.style.display='none';vgLocalVideo.style.display='none';vgCallButtons(true);vgCallDuration.textContent='';document.getElementById('vgCallEnableAudio').hidden=true;document.getElementById('vgCallTitle').textContent=vgCall.kind==='video'?'Входящий видеозвонок':'Входящий звонок';document.getElementById('vgCallFooter').textContent='Тебе звонят в Vibegram';vgSetCallStatus(`${vgCall.kind==='video'?'Видеозвонок':'Голосовой звонок'} от @${from}`);document.getElementById('vgCallAudioArt').style.display='grid';vgStartRing();if(document.visibilityState==='hidden'&&'Notification'in window&&Notification.permission==='granted'){try{new Notification('Входящий звонок Vibegram',{body:`@${from} ${vgCall.kind==='video'?'звонит по видео':'звонит'}`,tag:'vibegram-call'});}catch(_){}}return;
+        vgCallIdentity(from);vgCallModal.classList.add('open');vgCallFloatBtn.hidden=true;vgRemoteVideo.style.display='none';vgLocalVideo.style.display='none';vgCallButtons(true);vgCallDuration.textContent='';document.getElementById('vgCallEnableAudio').hidden=true;document.getElementById('vgCallTitle').textContent=vgCall.kind==='video'?'Входящий видеозвонок':'Входящий звонок';document.getElementById('vgCallFooter').textContent='Тебе звонят в Vibegram';vgSetCallStatus(`${vgCall.kind==='video'?'Видеозвонок':'Голосовой звонок'} от @${from}`);document.getElementById('vgCallAudioArt').style.display='grid';vgStartRing();vgShowIncomingCallNotification(from,vgCall.kind,vgCall.callId);if(vgPendingCallNotificationAction&&(!vgPendingCallNotificationAction.from||vgPendingCallNotificationAction.from===from)&&(!vgPendingCallNotificationAction.callId||vgPendingCallNotificationAction.callId===incomingId)){const pending=vgPendingCallNotificationAction;vgPendingCallNotificationAction=null;setTimeout(async()=>{if(!vgCall.incoming||vgCall.incoming.from!==from)return;if(pending.action==='accept_call')await vgAcceptIncoming();else if(pending.action==='reject_call'){await vgSendSignal(from,'reject',{callId:vgCall.callId});await vgHangupCall(true);}},200);}return;
       }
       const currentId=vgCall.callId||vgCall.incoming?.payload?.callId||null;
       // Ignore late signals from an earlier call or another peer; they must not tear down the current call.

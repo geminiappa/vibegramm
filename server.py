@@ -1307,14 +1307,19 @@ class VibegramHandler(http.server.SimpleHTTPRequestHandler):
                     base_url = self._public_base_url()
                     sender_profile = USERS.get(sender, {})
                     media = str((payload or {}).get('media') or 'audio') if isinstance(payload, dict) else 'audio'
+                    call_id = str((payload or {}).get('callId') or '') if isinstance(payload, dict) else ''
                     send_web_push(target, {
+                        'type': 'VIBEGRAM_INCOMING_CALL',
                         'title': 'Входящий звонок Vibegram',
                         'body': f"@{sender} {'звонит по видео' if media == 'video' else 'звонит'}",
                         'icon': _absolute_public_url(sender_profile.get('avatar'), base_url, sender),
                         'badge': base_url + '/pwa-192.png',
                         'username': sender,
-                        'url': base_url + '/?openChat=' + sender,
-                        'tag': 'vibegram-call-' + sender
+                        'from': sender,
+                        'callId': call_id,
+                        'media': 'video' if media == 'video' else 'audio',
+                        'url': base_url + '/?callAction=open&callFrom=' + sender,
+                        'tag': 'vibegram-call-' + (call_id or sender)
                     })
                 except Exception as exc:
                     print(f'[Vibegram call push] {str(exc)[:200]}', flush=True)
