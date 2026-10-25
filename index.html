@@ -872,7 +872,7 @@
       </div>
       <div class="auth-field">
         <label>Номер телефона</label>
-        <input type="tel" id="regPhoneInput" class="auth-input" value="+375 (29) ">
+        <input type="tel" id="regPhoneInput" class="auth-input" value="+375 (29) " inputmode="tel" autocomplete="tel" maxlength="20">
       </div>
       <div class="auth-field">
         <label>Email для получения кода</label>
@@ -885,7 +885,7 @@
       <div class="auth-logo">📩</div>
       <div style="font-size:20px;font-weight:800;color:#fff;">Код подтверждения</div>
       <div style="font-size:13px;color:var(--text-secondary);" id="authEmailSentDesc"></div>
-      <input type="text" id="regCodeInput" class="auth-input code-input" maxlength="6" placeholder="••••••">
+      <input type="text" id="regCodeInput" class="auth-input code-input" maxlength="6" inputmode="numeric" autocomplete="one-time-code" pattern="[0-9]{6}" placeholder="••••••">
       <div id="authCodeHintBox" style="font-size:12.5px;color:#64d2ff;background:rgba(10,132,255,0.14);padding:8px 12px;border-radius:12px;"></div>
       <button type="button" class="btn-primary" id="verifyEmailCodeBtn">Подтвердить и войти</button>
       <button type="button" class="icon-btn" id="backToStep1Btn" style="margin:0 auto;font-size:13px;border-radius:10px;">← Назад</button>
@@ -1752,6 +1752,14 @@
       document.getElementById('authScreen').classList.remove('active');
     });
 
+    document.getElementById('regPhoneInput').addEventListener('input', (event) => {
+      // Keep phone formatting characters, but never allow letters.
+      event.target.value = event.target.value.replace(/[^0-9+()\s-]/g, '').replace(/(?!^)\+/g, '');
+    });
+    document.getElementById('regCodeInput').addEventListener('input', (event) => {
+      event.target.value = event.target.value.replace(/\D/g, '').slice(0, 6);
+    });
+
     document.getElementById('sendEmailCodeBtn').addEventListener('click', async () => {
       const name = document.getElementById('regNameInput').value.trim();
       const username = document.getElementById('regUsernameInput').value.trim().replace(/^@+/, '').toLowerCase().replace(/[^a-z0-9_]/g, '');
@@ -1782,8 +1790,32 @@
         }
       } catch (e) {}
 
-      generatedEmailCode = String(Math.floor(100000 + Math.random() * 900000));
+      const phoneDigits = phone.replace(/\D/g, '');
+      if (phoneDigits.length < 7 || phoneDigits.length > 15) {
+        alert('Введите номер телефона только с 7–15 цифрами, включая код страны.');
+        return;
+      }
       const assignedUid = username === 'paveldurov' ? 1 : (Object.keys(usersMap).length + 1);
+      const sendBtn = document.getElementById('sendEmailCodeBtn');
+      sendBtn.disabled = true;
+      sendBtn.textContent = 'Отправляем код…';
+      try {
+        const sendRes = await fetch('/api/auth/send-code', {
+          method: 'POST', headers: {'Content-Type': 'application/json'},
+          body: JSON.stringify({email, username, phone})
+        });
+        const sendData = await sendRes.json();
+        if (!sendRes.ok || !sendData.ok) {
+          alert(sendData.error || 'Не удалось отправить код.');
+          return;
+        }
+      } catch (err) {
+        alert('Сервер недоступен. Не удалось отправить письмо.');
+        return;
+      } finally {
+        sendBtn.disabled = false;
+        sendBtn.textContent = 'Получить код на Email';
+      }
 
       pendingRegData = {
         uid: assignedUid,
@@ -1805,9 +1837,9 @@
       document.getElementById('authStep1').style.display = 'none';
       document.getElementById('authStep2').style.display = 'flex';
       document.getElementById('authEmailSentDesc').innerHTML = `Код отправлен на <b>${escapeHtml(email)}</b>`;
-      document.getElementById('authCodeHintBox').innerHTML = `📬 Код из письма Vibegram: <b>${generatedEmailCode}</b><br><span style="font-size:11px;opacity:0.85;">Ваш ID: ${assignedUid}</span>`;
+      document.getElementById('authCodeHintBox').textContent = `Проверьте входящие и папку «Спам». Код действует 10 минут. Ваш ID: ${assignedUid}.`;
 
-      showCustomIosBanner('Почта Vibegram', `Код подтверждения для @${username}: ${generatedEmailCode}`);
+      showCustomIosBanner('Почта Vibegram', `Код подтверждения отправлен на ${email}`);
       document.getElementById('regCodeInput').value = '';
       document.getElementById('regCodeInput').focus();
     });
@@ -1818,8 +1850,23 @@
     });
 
     document.getElementById('verifyEmailCodeBtn').addEventListener('click', async () => {
-      if (document.getElementById('regCodeInput').value.trim() !== generatedEmailCode) {
-        alert('Неверный 6-значный код!');
+      const enteredCode = document.getElementById('regCodeInput').value.trim();
+      if (!/^\d{6}$/.test(enteredCode)) {
+        alert('Введите 6-значный код из письма.');
+        return;
+      }
+      try {
+        const verifyRes = await fetch('/api/auth/verify-code', {
+          method: 'POST', headers: {'Content-Type': 'application/json'},
+          body: JSON.stringify({email: pendingRegData?.email, username: pendingRegData?.username, code: enteredCode})
+        });
+        const verifyData = await verifyRes.json();
+        if (!verifyRes.ok || !verifyData.verified) {
+          alert(verifyData.error || 'Не удалось подтвердить код.');
+          return;
+        }
+      } catch (err) {
+        alert('Сервер недоступен. Не удалось проверить код.');
         return;
       }
       saveChatsCacheForCurrentAccount();
