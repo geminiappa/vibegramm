@@ -82,25 +82,108 @@ def ensure_system_bot():
             'is_channel': False, 'last_seen': int(time.time() * 1000)
         }
 
+def _configured_admin_handle():
+    """Optional trusted creator identity configured in Render, without the @."""
+    return str(os.environ.get('VIBEGRAM_ADMIN_USERNAME', '')).strip().lower().lstrip('@')
+
 def _numeric_user_id(obj):
+    obj = obj or {}
+    handle = str(obj.get('username') or '').strip().lower().lstrip('@')
+    configured = _configured_admin_handle()
+    # A Render-controlled account is the creator even if it was registered before
+    # the admin setting existed and still has a legacy numeric ID in the database.
+    if configured and handle == configured and not any(obj.get(k) for k in ('is_channel', 'is_group', 'is_bot')):
+        return 1
     try:
-        return int((obj or {}).get('id') or (obj or {}).get('uid') or 0)
+        return int(obj.get('id') or obj.get('uid') or 0)
     except (TypeError, ValueError, OverflowError):
         return 0
 
 def _creator_username():
+    configured = _configured_admin_handle()
+    if configured:
+        obj = USERS.get(configured)
+        if not obj or any(obj.get(k) for k in ('is_channel', 'is_group', 'is_bot')):
+            return None
+        return configured
     if VERIFY_BOT_ADMIN:
-        obj = USERS.get(str(VERIFY_BOT_ADMIN).lower().lstrip('@'), {})
-        if _numeric_user_id(obj) == 1 and not any(obj.get(k) for k in ('is_channel','is_group','is_bot')):
-            return str(VERIFY_BOT_ADMIN).lower().lstrip('@')
+        bound = str(VERIFY_BOT_ADMIN).lower().lstrip('@')
+        obj = USERS.get(bound, {})
+        if _numeric_user_id(obj) == 1 and not any(obj.get(k) for k in ('is_channel', 'is_group', 'is_bot')):
+            return bound
     candidates = [name for name, obj in USERS.items()
-        if _numeric_user_id(obj) == 1 and not any(obj.get(k) for k in ('is_channel','is_group','is_bot'))]
+        if _numeric_user_id(obj) == 1 and not any(obj.get(k) for k in ('is_channel', 'is_group', 'is_bot'))]
     return candidates[0] if len(candidates) == 1 else None
 
 def _is_admin_id_one(actor):
     handle = str(actor or '').strip().lower().lstrip('@')
     creator = _creator_username()
-    return bool(creator and handle == creator and _numeric_user_id(USERS.get(handle, {})) == 1)
+    obj = USERS.get(handle, {})
+    return bool(creator and handle == creator and obj and
+                not any(obj.get(k) for k in ('is_channel', 'is_group', 'is_bot')) and
+                _numeric_user_id(obj) == 1)
+
+def _create_rainbow_request(applicant, target, now):
+    """Create/route one rainbow request. Returns a JSON-ready result and new messages."""
+    applicant = str(applicant or '').strip().lower().lstrip('@')
+    target = str(target or applicant).strip().lower().lstrip('@')
+    if not applicant or applicant not in USERS or any(USERS[applicant].get(k) for k in ('is_channel', 'is_group', 'is_bot')):
+        return {'ok': False, 'status': 403, 'error': 'Заявитель должен быть обычным аккаунтом.'}
+    if not target or target not in USERS:
+        return {'ok': False, 'status': 404, 'error': 'Профиль или канал не найден.'}
+    target_obj = USERS[target]
+    if target_obj.get('is_group') or target_obj.get('is_bot'):
+        return {'ok': False, 'status': 400, 'error': 'Радужное оформление доступно только профилям пользователей и каналам.'}
+    if target_obj.get('is_channel'):
+        permissions = (target_obj.get('admins') or {}).get(applicant, {})
+        if applicant != target_obj.get('owner') and not permissions.get('can_promote'):
+            return {'ok': False, 'status': 403, 'error': 'Для канала заявку может подать владелец или администратор с правом управления.'}
+    elif target != applicant:
+        return {'ok': False, 'status': 403, 'error': 'Для личного профиля можно подать заявку только за себя.'}
+    if target_obj.get('rainbow_nick') and target_obj.get('rainbow_grant_version') == 1:
+        return {'ok': False, 'status': 409, 'error': 'Радужный ник уже выдан.'}
+
+    creator = _creator_username()
+    if not creator:
+        configured = _configured_admin_handle()
+        if configured:
+            reason = f'Аккаунт @{configured} из VIBEGRAM_ADMIN_USERNAME не найден. Проверь переменную в Render и войди этим аккаунтом.'
+        else:
+            reason = 'Создатель не определён. В Render добавь VIBEGRAM_ADMIN_USERNAME со своим @username без символа @.'
+        return {'ok': False, 'status': 503, 'error': reason}
+
+    with DB_LOCK:
+        existing_req = next((m for m in reversed(MESSAGES)
+            if isinstance(m.get('rainbow_request'), dict)
+            and str(m['rainbow_request'].get('target') or '').lower() == target
+            and m['rainbow_request'].get('status') == 'pending'), None)
+        if existing_req:
+            # Re-route legacy pending requests to the currently configured creator.
+            existing_req['to'] = creator
+            target_obj['rainbow_pending'] = True
+            save_db()
+            return {'ok': True, 'request_id': str(existing_req.get('id') or ''), 'already_pending': True, 'creator': creator, 'messages': []}
+        # Repair stale pending flags left by old versions or interrupted requests.
+        target_obj['rainbow_pending'] = False
+        req_id = f'rainbow_{int(now)}_{secrets.token_hex(4)}'
+        target_type = 'channel' if target_obj.get('is_channel') else 'profile'
+        req = {'target': target, 'target_name': target_obj.get('name', target),
+               'target_type': target_type, 'applicant': applicant, 'status': 'pending'}
+        admin_msg = {
+            'id': req_id, 'sender': 'rainbow_bot', 'to': creator,
+            'text': f'🌈 ЗАЯВКА НА РАДУЖНЫЙ НИК\nОбъект: @{target} ({target_type})\nЗаявитель: @{applicant}\nРешение принимает только Admin ID 1.',
+            'time': int(now), 'read': False, 'reactions': {}, 'rainbow_request': req
+        }
+        ack = {
+            'id': f'{req_id}_ack', 'sender': 'rainbow_bot', 'to': applicant,
+            'text': f'📨 Заявка на радужный ник для @{target} отправлена создателю Vibegram. Выдача произойдёт только после одобрения Admin ID 1.',
+            'time': int(now) + 1, 'read': False, 'reactions': {}
+        }
+        target_obj['rainbow_pending'] = True
+        MESSAGES.extend([admin_msg, ack])
+        save_db()
+    return {'ok': True, 'request_id': req_id, 'already_pending': False, 'creator': creator, 'messages': [admin_msg, ack]}
+
 
 def assign_user_id(username):
     u = str(username or '').strip().lower().lstrip('@')
@@ -227,6 +310,11 @@ def _avatar_public_path(username, avatar_value):
 def _public_user(username, user_obj):
     """Return a lightweight profile: avatar bytes stay in DB, sync sends only a URL."""
     result = dict(user_obj or {})
+    if (str(username or '').strip().lower().lstrip('@') == _configured_admin_handle()
+            and result and not any(result.get(k) for k in ('is_channel', 'is_group', 'is_bot'))):
+        # Keep the UI's developer badge and ID display consistent with Render admin config.
+        result['id'] = 1
+        result['uid'] = 1
     avatar_value = str(result.get('avatar') or '').strip()
     if avatar_value:
         result['avatar'] = _avatar_public_path(username, avatar_value)
@@ -493,6 +581,34 @@ def save_db():
                 raise
 
 load_db()
+# The Render-configured creator is the authority for both official bots; this avoids
+# requiring a separate manual claim in @verify_bot before @rainbow_bot can operate.
+_boot_creator = _creator_username()
+if _boot_creator:
+    if _configured_admin_handle():
+        # Enforce a single numeric ID 1 when a creator username is explicitly set.
+        max_user_id = 1000
+        for existing_name, existing_obj in USERS.items():
+            if any(existing_obj.get(k) for k in ('is_channel', 'is_group', 'is_bot')):
+                continue
+            try:
+                max_user_id = max(max_user_id, int(existing_obj.get('id') or existing_obj.get('uid') or 0))
+            except (TypeError, ValueError, OverflowError):
+                pass
+        for existing_name, existing_obj in USERS.items():
+            if existing_name == _boot_creator or any(existing_obj.get(k) for k in ('is_channel', 'is_group', 'is_bot')):
+                continue
+            try:
+                raw_id = int(existing_obj.get('id') or existing_obj.get('uid') or 0)
+            except (TypeError, ValueError, OverflowError):
+                raw_id = 0
+            if raw_id == 1:
+                max_user_id += 1
+                existing_obj['id'] = max_user_id
+    if _numeric_user_id(USERS.get(_boot_creator, {})) == 1:
+        USERS[_boot_creator]['id'] = 1
+        VERIFY_BOT_ADMIN = _boot_creator
+        save_db()
 
 class VibegramHandler(http.server.SimpleHTTPRequestHandler):
     extensions_map = {
@@ -671,6 +787,8 @@ class VibegramHandler(http.server.SimpleHTTPRequestHandler):
                 'messages': my_messages,
                 'pins': PINS,
                 'verifyBotAdmin': VERIFY_BOT_ADMIN,
+                'isCreatorAdmin': bool(me and me == _creator_username()),
+                'creatorConfigured': bool(_creator_username()),
                 'serverTime': now
             })
             return
@@ -796,7 +914,9 @@ class VibegramHandler(http.server.SimpleHTTPRequestHandler):
             # Keep a valid numeric ID for an existing user; legacy malformed IDs
             # must never leak into the numeric account-ID field.
             user_id = _numeric_user_id(existing)
-            if user_id <= 0:
+            if u == _configured_admin_handle():
+                user_id = 1
+            elif user_id <= 0:
                 user_id = assign_user_id(u)
             
             # Public profile channel links are persisted server-side. Accept only
@@ -856,6 +976,29 @@ class VibegramHandler(http.server.SimpleHTTPRequestHandler):
                 'typing_to': existing.get('typing_to', ''),
                 'typing_time': existing.get('typing_time', 0)
             }
+            if u == _configured_admin_handle():
+                # If the configured creator account is created after server startup,
+                # migrate any old ID 1 assignment and keep exactly one creator ID.
+                max_id = 1000
+                for existing_name, existing_obj in USERS.items():
+                    if any(existing_obj.get(k) for k in ('is_channel', 'is_group', 'is_bot')):
+                        continue
+                    try:
+                        max_id = max(max_id, int(existing_obj.get('id') or existing_obj.get('uid') or 0))
+                    except (TypeError, ValueError, OverflowError):
+                        pass
+                for existing_name, existing_obj in USERS.items():
+                    if existing_name == u or any(existing_obj.get(k) for k in ('is_channel', 'is_group', 'is_bot')):
+                        continue
+                    try:
+                        raw_id = int(existing_obj.get('id') or existing_obj.get('uid') or 0)
+                    except (TypeError, ValueError, OverflowError):
+                        raw_id = 0
+                    if raw_id == 1:
+                        max_id += 1
+                        existing_obj['id'] = max_id
+                USERS[u]['id'] = 1
+                VERIFY_BOT_ADMIN = u
             save_db()
             return self.send_json({'ok': True, 'profile': _public_user(u, USERS[u])})
 
@@ -1558,6 +1701,70 @@ class VibegramHandler(http.server.SimpleHTTPRequestHandler):
                 USERS[sender]['typing_to'] = ''
                 USERS[sender]['typing_time'] = 0
 
+            # Direct conversation with @rainbow_bot supports /start, /help, /request and /channel.
+            if to == 'rainbow_bot':
+                if sender not in USERS or any(USERS[sender].get(k) for k in ('is_channel', 'is_group', 'is_bot')):
+                    return self.send_json({'error': 'Сначала войдите в обычный аккаунт Vibegram.'}, 403)
+                user_msg = {
+                    'id': f"msg_{now}_{len(MESSAGES)}_rainbow_user", 'sender': sender,
+                    'to': 'rainbow_bot', 'text': text, 'time': now, 'read': True,
+                    'reply_to': reply_to, 'media': media, 'reactions': {}
+                }
+                MESSAGES.append(user_msg)
+                command_parts = text.strip().split()
+                command = command_parts[0].lower() if command_parts else ''
+                if command in ('/start', '/help', 'help', 'старт', 'помощь'):
+                    bot_reply = ('🌈 Rainbow Nick Bot\n\n'
+                                 'Запроси радужное оформление имени профиля или канала. Решение принимает только создатель с ID 1.\n\n'
+                                 'Команды:\n/request — запросить для своего профиля\n'
+                                 '/channel @username — запросить для канала, которым ты управляешь\n'
+                                 '/request @username — запрос для указанного тобой профиля или канала')
+                    bot_msg = {'id': f'msg_{now + 1}_{len(MESSAGES)}_rainbow_help', 'sender': 'rainbow_bot',
+                               'to': sender, 'text': bot_reply, 'time': now + 1, 'read': False, 'reactions': {}}
+                    MESSAGES.append(bot_msg)
+                    save_db()
+                    try: dispatch_push_for_messages([bot_msg], self._public_base_url())
+                    except Exception as exc: print(f'[Vibegram rainbow push] {exc}', flush=True)
+                    return self.send_json({'ok': True, 'message': user_msg, 'reply': bot_msg})
+                if command in ('/request', '/profile', '/channel'):
+                    if command == '/channel' and len(command_parts) < 2:
+                        result = {'ok': False, 'status': 400, 'error': 'Укажи username канала: /channel @username'}
+                    else:
+                        target = command_parts[1] if len(command_parts) > 1 else sender
+                        result = _create_rainbow_request(sender, target, now + 1)
+                    if result.get('ok'):
+                        new_messages = result.get('messages') or []
+                        if new_messages:
+                            try: dispatch_push_for_messages(new_messages, self._public_base_url())
+                            except Exception as exc: print(f'[Vibegram rainbow push] {exc}', flush=True)
+                        elif result.get('already_pending'):
+                            bot_msg = {'id': f'msg_{now + 1}_{len(MESSAGES)}_rainbow_pending', 'sender': 'rainbow_bot',
+                                       'to': sender, 'text': '⏳ Эта заявка уже ожидает решения создателя. Новую отправлять не нужно.',
+                                       'time': now + 1, 'read': False, 'reactions': {}}
+                            MESSAGES.append(bot_msg)
+                            save_db()
+                            try: dispatch_push_for_messages([bot_msg], self._public_base_url())
+                            except Exception as exc: print(f'[Vibegram rainbow push] {exc}', flush=True)
+                        return self.send_json({'ok': True, 'message': user_msg, 'request_id': result.get('request_id'),
+                                               'already_pending': bool(result.get('already_pending'))})
+                    bot_msg = {'id': f'msg_{now + 1}_{len(MESSAGES)}_rainbow_error', 'sender': 'rainbow_bot',
+                               'to': sender, 'text': '❌ ' + str(result.get('error') or 'Заявку не удалось отправить.'),
+                               'time': now + 1, 'read': False, 'reactions': {}}
+                    MESSAGES.append(bot_msg)
+                    save_db()
+                    try: dispatch_push_for_messages([bot_msg], self._public_base_url())
+                    except Exception as exc: print(f'[Vibegram rainbow push] {exc}', flush=True)
+                    return self.send_json({'ok': False, 'message': user_msg, 'reply': bot_msg,
+                                           'error': result.get('error'), 'status': result.get('status', 400)})
+                bot_msg = {'id': f'msg_{now + 1}_{len(MESSAGES)}_rainbow_help', 'sender': 'rainbow_bot',
+                           'to': sender, 'text': 'Чтобы подать заявку, нажми кнопку запроса в профиле или отправь /request. Для канала: /channel @username. Подсказка: /help.',
+                           'time': now + 1, 'read': False, 'reactions': {}}
+                MESSAGES.append(bot_msg)
+                save_db()
+                try: dispatch_push_for_messages([bot_msg], self._public_base_url())
+                except Exception as exc: print(f'[Vibegram rainbow push] {exc}', flush=True)
+                return self.send_json({'ok': True, 'message': user_msg, 'reply': bot_msg})
+
             # 1. Если пользователь пишет общедоступному боту @verify_bot
             if to == 'verify_bot':
                 user_msg = {
@@ -1694,7 +1901,7 @@ class VibegramHandler(http.server.SimpleHTTPRequestHandler):
                 # Авторизация Создателя в боте по вводу ID "1" или "/id 1".
                 # It remains separate from badge grants; ID alone can no longer grant Premium/team status.
                 elif clean_cmd in ('1', 'id 1', '/id 1', '/auth 1', 'id: 1'):
-                    if sender_id == 1:
+                    if _is_admin_id_one(sender):
                         sender_obj['id'] = 1
                         VERIFY_BOT_ADMIN = sender
                         # Перенаправляем все нерассмотренные заявки этому аккаунту
@@ -1895,42 +2102,28 @@ class VibegramHandler(http.server.SimpleHTTPRequestHandler):
         if parsed.path == '/api/rainbow/request':
             applicant = str(body.get('applicant') or '').strip().lower().lstrip('@')
             target = str(body.get('target') or applicant).strip().lower().lstrip('@')
-            if applicant not in USERS or USERS[applicant].get('is_channel') or USERS[applicant].get('is_group') or USERS[applicant].get('is_bot'):
-                return self.send_json({'error': 'Заявитель должен быть обычным аккаунтом.'}, 403)
-            if target not in USERS:
-                return self.send_json({'error': 'Профиль или канал не найден.'}, 404)
-            target_obj = USERS[target]
-            if target_obj.get('is_group') or target_obj.get('is_bot'):
-                return self.send_json({'error': 'Радужное оформление можно запросить только для личного профиля или канала.'}, 400)
-            if target_obj.get('is_channel'):
-                permissions = (target_obj.get('admins') or {}).get(applicant, {})
-                if applicant != target_obj.get('owner') and not permissions.get('can_promote'):
-                    return self.send_json({'error': 'Для канала заявку может подать владелец или администратор с правом управления.'}, 403)
-            elif target != applicant:
-                return self.send_json({'error': 'Для личного профиля можно подать заявку только за себя.'}, 403)
-            if target_obj.get('rainbow_nick') and target_obj.get('rainbow_grant_version') == 1:
-                return self.send_json({'error': 'Радужный ник уже выдан.'}, 409)
-            if target_obj.get('rainbow_pending'):
-                return self.send_json({'error': 'Заявка уже ожидает решения создателя.'}, 409)
-            creator = _creator_username()
-            if not creator:
-                return self.send_json({'error': 'Создатель с ID 1 пока не привязал бота. Сначала привяжи @verify_bot.'}, 503)
-            target_obj['rainbow_pending'] = True
-            req_id = f'rainbow_{now}_{len(MESSAGES)}'
-            target_type = 'channel' if target_obj.get('is_channel') else 'profile'
-            admin_msg = {
-                'id': req_id, 'sender': 'rainbow_bot', 'to': creator,
-                'text': f'🌈 ЗАЯВКА НА РАДУЖНЫЙ НИК\nОбъект: @{target} ({target_type})\nЗаявитель: @{applicant}\nРешение принимает только Admin ID 1.',
-                'time': now, 'read': False, 'reactions': {},
-                'rainbow_request': {'target': target, 'target_name': target_obj.get('name', target), 'target_type': target_type, 'applicant': applicant, 'status': 'pending'}
+            result = _create_rainbow_request(applicant, target, now)
+            if not result.get('ok'):
+                return self.send_json({'error': result.get('error', 'Не удалось создать заявку.')}, int(result.get('status') or 400))
+            # Keep the requester-side bot conversation visible when the request
+            # was submitted by a profile button rather than by typing /request.
+            request_text = f'/channel @{target}' if USERS.get(target, {}).get('is_channel') else '/request'
+            request_chat_msg = {
+                'id': f"{result.get('request_id') or 'rainbow'}_chat_{secrets.token_hex(3)}",
+                'sender': applicant, 'to': 'rainbow_bot', 'text': request_text,
+                'time': int(now) - 1, 'read': True, 'reactions': {}
             }
-            ack = {'id': f'{req_id}_ack', 'sender': 'rainbow_bot', 'to': applicant,
-                'text': f'📨 Заявка на радужный ник для @{target} отправлена создателю Vibegram. Выдача произойдёт только после одобрения Admin ID 1.',
-                'time': now + 1, 'read': False, 'reactions': {}}
-            MESSAGES.extend([admin_msg, ack])
+            MESSAGES.append(request_chat_msg)
             save_db()
-            dispatch_push_for_messages([admin_msg, ack], self._public_base_url())
-            return self.send_json({'ok': True, 'request_id': req_id})
+            new_messages = result.get('messages') or []
+            if new_messages:
+                try:
+                    dispatch_push_for_messages(new_messages, self._public_base_url())
+                except Exception as exc:
+                    print(f'[Vibegram rainbow push] {exc}', flush=True)
+            return self.send_json({'ok': True, 'request_id': result.get('request_id'),
+                                   'already_pending': bool(result.get('already_pending')),
+                                   'creator': result.get('creator')})
 
         if parsed.path == '/api/rainbow/decide':
             msg_id = str(body.get('msg_id') or '')

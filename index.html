@@ -3691,7 +3691,7 @@
 
         // Moderator state comes from the server's bot binding, never only from
         // a localStorage flag. The creator must send the ID to @verify_bot first.
-        const isServerCreator = data.verifyBotAdmin === me && Number(usersMap[me]?.id || 0) === 1;
+        const isServerCreator = Boolean(data.isCreatorAdmin) || (data.verifyBotAdmin === me && Number(usersMap[me]?.id || 0) === 1);
         isModeratorUnlocked = Boolean(isServerCreator);
         if (isServerCreator) localStorage.setItem(MODERATOR_UNLOCKED_KEY, '1');
         else localStorage.removeItem(MODERATOR_UNLOCKED_KEY);
@@ -6488,7 +6488,7 @@
     async function vgSubmitRainbowRequest(targetHandle){
       if(!myProfile)return;const target=String(targetHandle||myProfile.username).trim().toLowerCase().replace(/^@+/, '');
       const button=document.getElementById(target===myProfile.username.toLowerCase()?'requestRainbowNickBtn':'iosRainbowQuickBtn');if(button)button.disabled=true;
-      try{const response=await fetch('/api/rainbow/request',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({applicant:myProfile.username,target})});const data=await response.json().catch(()=>({}));if(!response.ok)throw new Error(data.error||'Заявка не отправлена');vgToast('Заявка отправлена','Решение доступно только создателю с ID 1.');await pollServer();openChatWith('rainbow_bot');}
+      try{const response=await fetch('/api/rainbow/request',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({applicant:myProfile.username,target})});const data=await response.json().catch(()=>({}));if(!response.ok)throw new Error(data.error||'Заявка не отправлена');vgToast(data.already_pending?'Заявка уже рассматривается':'Заявка отправлена',data.already_pending?'Создатель уже получил её.':'Решение появится в чате @rainbow_bot у создателя с ID 1.');await pollServer();openChatWith('rainbow_bot');}
       catch(error){vgToast('Не удалось отправить заявку',error.message||'');}
       finally{if(button)button.disabled=false;}
     }
@@ -6770,6 +6770,143 @@ button:disabled {cursor:not-allowed;}
 @media(prefers-reduced-motion:reduce){.vg-rainbow-name,.vg-account-unread,.reaction-pill:active{animation:none!important}}
 
 .dev-svg-badge{display:inline-flex;align-items:center;justify-content:center;vertical-align:middle;width:18px;height:18px;flex:0 0 auto;filter:drop-shadow(0 1px 4px rgba(42,171,238,.26));transition:transform .18s ease,filter .18s ease}.dev-svg-badge svg{width:18px!important;height:18px!important;display:block}.dev-svg-badge:hover{transform:translateY(-1px) scale(1.08);filter:drop-shadow(0 2px 7px rgba(42,171,238,.4))}
+</style>
+
+
+<style id="vibegram-profile-card-size-fix">
+/* Keep user, group and channel profiles as compact centered cards rather than stretched sheets. */
+#peerProfileModal.modal-overlay {
+  align-items: center !important;
+  justify-content: center !important;
+  padding: max(12px, env(safe-area-inset-top)) max(12px, env(safe-area-inset-right)) max(12px, env(safe-area-inset-bottom)) max(12px, env(safe-area-inset-left)) !important;
+  overflow: hidden;
+}
+#peerProfileModal > .ios-sheet-modal {
+  width: min(420px, calc(100vw - 28px)) !important;
+  min-width: 0 !important;
+  max-width: 420px !important;
+  height: auto !important;
+  min-height: 0 !important;
+  max-height: min(850px, calc(100dvh - env(safe-area-inset-top) - env(safe-area-inset-bottom) - 24px)) !important;
+  margin: 0 !important;
+  flex: 0 1 auto !important;
+  align-self: center !important;
+  display: flex !important;
+  flex-direction: column !important;
+  overflow: hidden !important;
+  border-radius: 24px !important;
+  isolation: isolate;
+}
+#peerProfileModal .ios-hero {
+  width: 100%;
+  min-width: 0;
+  flex: 0 0 auto;
+  padding: 24px 18px 15px !important;
+  box-sizing: border-box;
+  overflow: hidden;
+}
+#peerProfileModal .ios-hero-avatar {
+  width: 82px !important;
+  height: 82px !important;
+  min-width: 82px;
+  min-height: 82px;
+  flex: 0 0 82px;
+}
+#peerProfileModal #peerProfileName {
+  width: 100%;
+  min-width: 0;
+  line-height: 1.25;
+  font-size: clamp(17px, 4.2vw, 20px) !important;
+  overflow-wrap: anywhere;
+  word-break: break-word;
+}
+#peerProfileModal #peerProfileStatus {
+  max-width: 100%;
+  overflow-wrap: anywhere;
+  line-height: 1.4;
+}
+#peerProfileModal .ios-actions-grid {
+  grid-template-columns: repeat(4, minmax(0, 1fr)) !important;
+  gap: 7px !important;
+  width: 100%;
+}
+#peerProfileModal .ios-action-btn {
+  min-width: 0;
+  min-height: 60px;
+  padding: 9px 3px !important;
+  line-height: 1.2;
+  overflow-wrap: anywhere;
+  word-break: break-word;
+}
+#peerProfileModal .ios-action-btn span {
+  max-width: 100%;
+  font-size: 10.5px;
+  text-align: center;
+}
+#peerProfileModal .ios-sheet-body {
+  width: 100%;
+  min-width: 0;
+  min-height: 0;
+  flex: 1 1 auto;
+  padding: 12px 14px 16px !important;
+  overflow-y: auto !important;
+  overflow-x: hidden !important;
+  overscroll-behavior: contain;
+  -webkit-overflow-scrolling: touch;
+  box-sizing: border-box;
+}
+#peerProfileModal .ios-card-group,
+#peerProfileModal .profile-linked-channels,
+#peerProfileModal .vg-created-entities,
+#peerProfileModal #sharedMediaSection,
+#peerProfileModal #applyVerifyBtn {
+  width: 100%;
+  min-width: 0;
+  max-width: 100%;
+  box-sizing: border-box;
+}
+#peerProfileModal .ios-cell,
+#peerProfileModal .ios-cell-val,
+#peerProfileModal #peerProfileUsername,
+#peerProfileModal #peerProfileBio,
+#peerProfileModal #peerVerifiedText {
+  min-width: 0;
+  max-width: 100%;
+  overflow-wrap: anywhere;
+  word-break: break-word;
+}
+#peerProfileModal .profile-linked-channel-card,
+#peerProfileModal .vg-created-entity-row {
+  width: 100%;
+  min-width: 0;
+  box-sizing: border-box;
+}
+@media (max-width: 768px) {
+  #peerProfileModal.modal-overlay {
+    align-items: center !important;
+    justify-content: center !important;
+    padding: max(12px, env(safe-area-inset-top)) 12px max(12px, env(safe-area-inset-bottom)) !important;
+  }
+  #peerProfileModal > .ios-sheet-modal {
+    width: min(420px, calc(100vw - 24px)) !important;
+    max-width: 420px !important;
+    max-height: calc(100dvh - env(safe-area-inset-top) - env(safe-area-inset-bottom) - 24px) !important;
+    margin: 0 !important;
+    border-radius: 24px !important;
+  }
+  #peerProfileModal .ios-hero { padding: 22px 14px 13px !important; }
+  #peerProfileModal .ios-actions-grid { grid-template-columns: repeat(4, minmax(0, 1fr)) !important; gap: 5px !important; }
+  #peerProfileModal .ios-action-btn { min-height: 58px; }
+  #peerProfileModal .ios-action-btn span { font-size: 9.5px; }
+  #peerProfileModal .ios-sheet-body { padding: 10px 11px calc(12px + env(safe-area-inset-bottom)) !important; }
+}
+@media (max-width: 360px) {
+  #peerProfileModal .ios-actions-grid { grid-template-columns: repeat(3, minmax(0, 1fr)) !important; }
+  #peerProfileModal .ios-hero-avatar { width: 74px !important; height: 74px !important; min-width: 74px; min-height: 74px; flex-basis: 74px; }
+}
+@media (prefers-reduced-motion: reduce) {
+  #peerProfileModal > .ios-sheet-modal { animation: none !important; }
+}
 </style>
 
 </body>
