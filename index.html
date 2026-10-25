@@ -1418,6 +1418,74 @@
   @media(prefers-reduced-motion:reduce) { * { scroll-behavior:auto!important; } }
 </style>
 
+
+<style id="vibegram-mobile-chat-tap-fix">
+  @media (max-width: 768px) {
+    .app { position: relative; overflow: hidden; isolation: isolate; }
+    .app > .sidebar { position: relative; z-index: 30; width: 100%; min-width: 0; flex: 0 0 100%; }
+    .app > .chat-area {
+      position: fixed; inset: 0; width: 100%; max-width: 100vw; min-width: 0;
+      z-index: 40; transform: translate3d(100%,0,0); pointer-events: none;
+      transition: transform .26s cubic-bezier(.2,.8,.2,1); will-change: transform;
+      touch-action: pan-y;
+    }
+    .app.mobile-chat-open > .sidebar { z-index: 1; }
+    .app.mobile-chat-open > .chat-area {
+      transform: translate3d(0,0,0); pointer-events: auto;
+    }
+    .chat-list, .chat-item { touch-action: pan-y; }
+    .chat-item { cursor: pointer; -webkit-tap-highlight-color: transparent; }
+    .chat-item > * { pointer-events: none; }
+    .chat-item [data-ver-user] { pointer-events: auto; }
+    .back-btn { position: relative; z-index: 5; flex: 0 0 34px; }
+  }
+</style>
+
+
+<style id="vibegram-voice-quality-fix">
+  .vg-call-volume-control { width:min(330px,calc(100% - 36px)); margin:0 auto; padding:3px 0 7px; }
+  .vg-call-volume-control label { display:flex; justify-content:space-between; gap:10px; margin:0 0 7px; color:#91a8b9; font-size:11px; }
+  .vg-call-volume-control label strong { color:#d7effc; font-weight:750; font-variant-numeric:tabular-nums; }
+  .vg-call-volume-control input { display:block; width:100%; accent-color:#2aabee; cursor:pointer; }
+  .vg-call-volume-control[hidden] { display:none; }
+  #vgRemoteAudio { display:none; }
+  @media(max-width:768px) { .vg-call-volume-control { width:calc(100% - 48px); } }
+</style>
+
+
+<style id="vibegram-telegram-voice-player">
+  .vg-voice-media { width:min(310px,76vw); min-width:min(245px,70vw)!important; padding:0!important; overflow:hidden; }
+  .vg-voice-player { --vg-voice-progress:0%; display:flex; gap:12px; align-items:center; width:100%; min-width:0; padding:12px 13px 11px; border-radius:16px; background:linear-gradient(140deg,rgba(42,171,238,.10),rgba(42,171,238,.025)); }
+  .vg-voice-play { width:43px; height:43px; flex:0 0 43px; border:0; border-radius:50%; color:#fff; display:grid; place-items:center; font-size:17px; font-weight:850; cursor:pointer; background:linear-gradient(145deg,#37baf0,#268bc9); box-shadow:0 5px 15px rgba(42,171,238,.20); transition:transform .15s,filter .15s; }
+  .vg-voice-play:hover { filter:brightness(1.08); transform:scale(1.04); }
+  .vg-voice-play:disabled { opacity:.5; cursor:not-allowed; }
+  .vg-voice-play-icon { line-height:1; transform:translateX(1px); }
+  .vg-voice-main { flex:1; min-width:0; }
+  .vg-voice-heading,.vg-voice-footer { display:flex; align-items:center; justify-content:space-between; gap:8px; }
+  .vg-voice-heading strong { color:#edf7fc; font-size:12px; line-height:1.2; font-weight:780; }
+  .vg-voice-current { color:#87d8ff; font-size:11px; font-variant-numeric:tabular-nums; white-space:nowrap; }
+  .vg-voice-waveform { display:flex; align-items:center; justify-content:space-between; gap:2px; height:29px; margin:5px 0 4px; cursor:pointer; touch-action:manipulation; outline:none; }
+  .vg-voice-waveform:focus-visible { border-radius:6px; outline:2px solid rgba(42,171,238,.8); outline-offset:2px; }
+  .vg-voice-waveform i { flex:1 1 2px; min-width:2px; max-width:4px; height:var(--vg-bar-height,12px); border-radius:3px; background:rgba(135,170,194,.40); transition:background .12s; }
+  .vg-voice-waveform i.played { background:#2aabee; }
+  .message.out .vg-voice-player { background:rgba(5,25,40,.12); }
+  .message.out .vg-voice-heading strong { color:#f6fbff; }
+  .message.out .vg-voice-waveform i { background:rgba(228,245,255,.38); }
+  .message.out .vg-voice-waveform i.played { background:#b9ecff; }
+  .message.out .vg-voice-current { color:#b9ebff; }
+  .vg-voice-footer { color:#8299ab; font-size:9px; letter-spacing:.65px; }
+  .message.out .vg-voice-footer { color:rgba(226,243,255,.62); }
+  .vg-voice-audio { display:none!important; }
+  #vgVoiceRecordBtn.recording { width:78px!important; min-width:78px!important; flex-basis:78px!important; border-radius:12px!important; font-size:12px!important; white-space:nowrap; }
+  @media(max-width:768px) {
+    .vg-voice-media { width:min(290px,76vw); min-width:min(230px,70vw)!important; }
+    .vg-voice-player { padding:10px 11px; gap:10px; }
+    .vg-voice-play { width:40px; height:40px; flex-basis:40px; }
+    #vgVoiceRecordBtn.recording { width:76px!important; min-width:76px!important; flex-basis:76px!important; }
+    .vg-voice-waveform { gap:2px; }
+  }
+</style>
+
 </head>
 <body>
 
@@ -1754,8 +1822,12 @@
         <video class="vg-call-video" id="vgRemoteVideo" autoplay playsinline></video>
         <video class="vg-call-local" id="vgLocalVideo" autoplay muted playsinline></video>
       </div>
-      <audio id="vgRemoteAudio" autoplay></audio>
+      <audio id="vgRemoteAudio" autoplay playsinline></audio>
       <button type="button" class="vg-call-enable-audio" id="vgCallEnableAudio" hidden>Включить звук</button>
+      <div class="vg-call-volume-control" id="vgCallVolumeControl">
+        <label for="vgCallOutputVolume"><span>Громкость собеседника</span><strong id="vgCallVolumeValue">65%</strong></label>
+        <input id="vgCallOutputVolume" type="range" min="0" max="100" step="1" value="65" aria-label="Громкость собеседника">
+      </div>
       <div class="vg-call-actions vg-call-incoming-actions" id="vgIncomingCallActions" style="display:none;">
         <button class="vg-call-action vg-call-accept" type="button" id="vgAcceptCallBtn"><span class="vg-call-action-icon">✓</span><span>Принять</span></button>
         <button class="vg-call-action vg-call-reject" type="button" id="vgRejectCallBtn"><span class="vg-call-action-icon">×</span><span>Отклонить</span></button>
@@ -2385,8 +2457,30 @@
     }, true);
 
     document.addEventListener('click', (ev) => {
-      // Capture before row-level click handlers: avatars and @usernames open profiles,
-      // while tapping the rest of the row still opens the conversation.
+      // Badge explanation is an explicit action on every device.
+      const badgeEl = ev.target.closest('[data-ver-user]');
+      if (badgeEl) {
+        ev.preventDefault();
+        ev.stopPropagation();
+        openBadgeExplanationModal(badgeEl.getAttribute('data-ver-user'), badgeEl.getAttribute('data-badge-type') || '');
+        return;
+      }
+
+      // Mobile messenger navigation: a tap anywhere on a chat/search-result row
+      // opens that conversation. Previously, taps on the avatar/name were caught
+      // first by profile navigation, making rows feel like they could not be opened.
+      const mobileChatRow = ev.target.closest('.chat-item[data-chat-username]');
+      if (mobileChatRow && window.matchMedia('(max-width: 768px)').matches) {
+        const handle = mobileChatRow.dataset.chatUsername;
+        if (handle) {
+          ev.preventDefault();
+          ev.stopPropagation();
+          openChatWith(handle);
+          return;
+        }
+      }
+
+      // On larger screens avatars and usernames are direct profile links.
       const avatarLink = ev.target.closest('[data-avatar-user]');
       if (avatarLink) {
         ev.preventDefault();
@@ -2401,13 +2495,6 @@
         ev.stopPropagation();
         const handle = userLink.getAttribute('data-open-user');
         if (handle) openUserProfile(handle);
-        return;
-      }
-      const badgeEl = ev.target.closest('[data-ver-user]');
-      if (badgeEl) {
-        ev.preventDefault();
-        ev.stopPropagation();
-        openBadgeExplanationModal(badgeEl.getAttribute('data-ver-user'), badgeEl.getAttribute('data-badge-type') || '');
         return;
       }
       msgContextWrap.classList.remove('open');
@@ -3407,6 +3494,7 @@
       conversations.forEach(({ peer, lastMsg, unreadCount }) => {
         const item = document.createElement('div');
         item.className = 'chat-item' + (activePeer === peer.username ? ' active' : '');
+        item.dataset.chatUsername = peer.username;
         const isSelf = peer.username === me;
         const online = !isSelf && !peer.is_channel && peer.privacy !== 'nobody' && (Date.now() - Number(peer.last_seen || 0)) < 6500;
         const avatarBg = peer.avatar ? `background-image:url('${peer.avatar}')` : `background-color:${peer.color}`;
@@ -3466,6 +3554,7 @@
           globalMatches.forEach(u => {
             const gItem = document.createElement('div');
             gItem.className = 'chat-item';
+            gItem.dataset.chatUsername = u.username;
             const avatarBg = u.avatar ? `background-image:url('${u.avatar}')` : `background-color:${u.color}`;
             gItem.innerHTML = `
               <div class="avatar clickable-avatar" data-avatar-user="${escapeHtml(u.username)}" role="button" tabindex="0" aria-label="Открыть профиль @${escapeHtml(u.username)}" style="${avatarBg}">${u.avatar ? '' : (u.is_channel ? '📢' : getInitials(u.name))}</div>
@@ -3631,7 +3720,9 @@
               : (msg.media.type === 'voice' || msg.media.type === 'audio' || msg.media.type === 'video_note')
                 ? (msg.media.type === 'video_note'
                   ? `<div class="msg-media-box"><video src="${escapeHtml(msg.media.url)}" controls playsinline preload="metadata" style="width:min(240px,70vw);border-radius:50%;aspect-ratio:1;object-fit:cover;"></video></div>`
-                  : `<div class="msg-media-box" style="min-width:220px;"><div style="font-size:11px;color:#8faec3;margin-bottom:5px;">${msg.media.type === 'voice' ? '🎙 Голосовое сообщение' : '♫ Аудио'}</div><audio src="${escapeHtml(msg.media.url)}" controls preload="metadata" style="width:100%;max-width:310px;"></audio></div>`)
+                  : (msg.media.type === 'voice'
+                    ? `<div class="msg-media-box vg-voice-media"><div class="vg-voice-player" data-vg-voice-player><button type="button" class="vg-voice-play" data-vg-voice-play aria-label="Воспроизвести голосовое сообщение"><span class="vg-voice-play-icon">▶</span></button><div class="vg-voice-main"><div class="vg-voice-heading"><strong>Голосовое сообщение</strong><span class="vg-voice-current" data-vg-voice-current>0:00</span></div><div class="vg-voice-waveform" data-vg-voice-waveform role="slider" tabindex="0" aria-label="Позиция голосового сообщения" aria-valuemin="0" aria-valuemax="100" aria-valuenow="0">${Array.from({length:34},(_,i)=>{const h=[8,12,17,10,21,14,7,18,23,12,16,9,20,14,24,11,17,8,13,22,10,18,7,15,23,12,19,9,14,21,8,16,11,18][i];return `<i style="--vg-bar-height:${h}px"></i>`;}).join('')}</div><div class="vg-voice-footer"><span data-vg-voice-duration>0:00</span><span>VIBEGRAM VOICE</span></div></div><audio class="vg-voice-audio" src="${escapeHtml(msg.media.url)}" preload="metadata"></audio></div></div>`
+                    : `<div class="msg-media-box" style="min-width:220px;"><div style="font-size:11px;color:#8faec3;margin-bottom:5px;">♫ Аудио</div><audio src="${escapeHtml(msg.media.url)}" controls preload="metadata" style="width:100%;max-width:310px;"></audio></div>`))
                 : `<div class="msg-media-box"><video src="${escapeHtml(msg.media.url)}" controls playsinline preload="metadata"></video></div>`;
         }
         let pollHtml = '';
@@ -3725,6 +3816,73 @@
 
         const imgBox = el.querySelector('[data-fullimg]');
         if (imgBox) imgBox.addEventListener('click', (ev) => { ev.stopPropagation(); lightboxImg.src = imgBox.getAttribute('data-fullimg'); lightboxOverlay.classList.add('open'); });
+
+        // Telegram-style voice-note player: one-at-a-time playback, seekable waveform,
+        // elapsed/total time and click handling isolated from the message context menu.
+        el.querySelectorAll('[data-vg-voice-player]').forEach(player => {
+          const audio = player.querySelector('.vg-voice-audio');
+          const play = player.querySelector('[data-vg-voice-play]');
+          const waveform = player.querySelector('[data-vg-voice-waveform]');
+          const currentLabel = player.querySelector('[data-vg-voice-current]');
+          const durationLabel = player.querySelector('[data-vg-voice-duration]');
+          const formatVoiceTime = seconds => {
+            if (!Number.isFinite(seconds) || seconds < 0) return '0:00';
+            const n = Math.floor(seconds);
+            return `${Math.floor(n / 60)}:${String(n % 60).padStart(2,'0')}`;
+          };
+          const refreshVoicePlayer = () => {
+            const duration = Number.isFinite(audio.duration) ? audio.duration : 0;
+            const progress = duration > 0 ? Math.max(0,Math.min(1,audio.currentTime/duration)) : 0;
+            const pct = Math.round(progress*100);
+            player.style.setProperty('--vg-voice-progress', `${pct}%`);
+            currentLabel.textContent = formatVoiceTime(audio.currentTime || 0);
+            durationLabel.textContent = formatVoiceTime(duration);
+            waveform.setAttribute('aria-valuemax', String(Math.max(1,Math.floor(duration))));
+            waveform.setAttribute('aria-valuenow', String(Math.floor(audio.currentTime || 0)));
+            waveform.querySelectorAll('i').forEach((bar,index,bars) => bar.classList.toggle('played', index / Math.max(1,bars.length) <= progress));
+            play.querySelector('.vg-voice-play-icon').textContent = audio.paused ? '▶' : 'Ⅱ';
+            play.setAttribute('aria-label', audio.paused ? 'Воспроизвести голосовое сообщение' : 'Приостановить голосовое сообщение');
+            player.classList.toggle('is-playing', !audio.paused);
+          };
+          const toggleVoicePlayback = async ev => {
+            ev?.preventDefault(); ev?.stopPropagation();
+            if (audio.paused) {
+              messagesContainer.querySelectorAll('.vg-voice-audio').forEach(other => {
+                if (other !== audio) { other.pause(); other.currentTime = other.currentTime || 0; }
+              });
+              try { await audio.play(); } catch (_) { showCustomIosBanner('Не удалось воспроизвести', 'Проверь файл и громкость устройства.'); }
+            } else audio.pause();
+            refreshVoicePlayer();
+          };
+          play.addEventListener('click', toggleVoicePlayback);
+          waveform.addEventListener('click', ev => {
+            ev.preventDefault(); ev.stopPropagation();
+            if (!Number.isFinite(audio.duration) || audio.duration <= 0) return;
+            const rect = waveform.getBoundingClientRect();
+            const ratio = Math.max(0,Math.min(1,(ev.clientX-rect.left)/Math.max(1,rect.width)));
+            audio.currentTime = ratio * audio.duration;
+            refreshVoicePlayer();
+          });
+          waveform.addEventListener('keydown', ev => {
+            if (!['ArrowLeft','ArrowRight','Home','End',' ','Enter'].includes(ev.key)) return;
+            ev.preventDefault(); ev.stopPropagation();
+            if (!Number.isFinite(audio.duration) || audio.duration <= 0) return;
+            if (ev.key === 'Home') audio.currentTime = 0;
+            else if (ev.key === 'End') audio.currentTime = audio.duration;
+            else if (ev.key === 'ArrowLeft') audio.currentTime = Math.max(0,audio.currentTime-5);
+            else if (ev.key === 'ArrowRight') audio.currentTime = Math.min(audio.duration,audio.currentTime+5);
+            else { toggleVoicePlayback(ev); return; }
+            refreshVoicePlayer();
+          });
+          audio.addEventListener('loadedmetadata',refreshVoicePlayer);
+          audio.addEventListener('timeupdate',refreshVoicePlayer);
+          audio.addEventListener('play',refreshVoicePlayer);
+          audio.addEventListener('pause',refreshVoicePlayer);
+          audio.addEventListener('ended',refreshVoicePlayer);
+          audio.addEventListener('error',()=>{durationLabel.textContent='Недоступно';play.disabled=true;play.title='Аудиофайл недоступен';});
+          audio.addEventListener('click',ev=>{ev.preventDefault();ev.stopPropagation();});
+          refreshVoicePlayer();
+        });
 
         el.querySelectorAll('.reaction-pill').forEach(pill => {
           pill.addEventListener('click', (ev) => {
@@ -5314,20 +5472,129 @@
     document.getElementById('vgPollBtn').addEventListener('click',()=>{if(!activePeer){vgToast('Сначала открой чат','');return;}document.getElementById('vgPollQuestion').value='';document.getElementById('vgPollOptions').value='';vgOpenModal('vgPollModal');});
     document.getElementById('vgPollForm').addEventListener('submit',async ev=>{ev.preventDefault();if(!activePeer||!myProfile)return;const question=document.getElementById('vgPollQuestion').value.trim();const options=document.getElementById('vgPollOptions').value.split(/\r?\n/).map(x=>x.trim()).filter(Boolean).slice(0,10);if(options.length<2){vgToast('Добавь варианты','Для опроса нужно минимум 2 варианта.');return;}const p=getPeerObject(activePeer);const from=p.is_channel?(p.owner||myProfile.username):myProfile.username;const r=await fetch('/api/send',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({from,to:activePeer,text:'',media:{type:'poll',question,options,votes:{}}})});const d=await r.json().catch(()=>({}));if(!r.ok){vgToast('Не удалось отправить опрос',d.error||'');return;}vgCloseModal('vgPollModal');await pollServer();});
 
+    // Voice-capture settings for messenger speech: mono Opus, echo cancellation and
+    // noise suppression, with automatic gain disabled by preference to reduce feedback.
+    const VG_SPEECH_AUDIO_CONSTRAINTS = {
+      echoCancellation: { ideal: true },
+      noiseSuppression: { ideal: true },
+      autoGainControl: { ideal: false },
+      channelCount: { ideal: 1 },
+      sampleRate: { ideal: 48000 }
+    };
+    async function vgGetSpeechStream(kind = 'audio') {
+      const constraints = {
+        audio: { ...VG_SPEECH_AUDIO_CONSTRAINTS },
+        video: kind === 'video' ? { width: { ideal: 1280 }, height: { ideal: 720 }, facingMode: 'user' } : false
+      };
+      const stream = await navigator.mediaDevices.getUserMedia(constraints);
+      const track = stream.getAudioTracks?.()[0];
+      if (track?.applyConstraints) {
+        try { await track.applyConstraints({ ...VG_SPEECH_AUDIO_CONSTRAINTS }); } catch (_) {}
+      }
+      return stream;
+    }
+
     // Voice recording, uploaded with existing media endpoint and stored as a regular message.
-    document.getElementById('vgVoiceRecordBtn').addEventListener('click',async()=>{
-      const btn=document.getElementById('vgVoiceRecordBtn');
-      if(vgMediaRecorder && vgMediaRecorder.state==='recording'){vgMediaRecorder.stop();btn.classList.remove('recording');btn.textContent='🎙';btn.title='Записать голосовое сообщение';return;}
-      if(!activePeer||!myProfile){vgToast('Сначала открой чат','');return;}
-      if(!navigator.mediaDevices?.getUserMedia||!window.MediaRecorder){vgToast('Запись недоступна','Браузер не поддерживает запись аудио.');return;}
-      try{
-        vgRecordingStream=await navigator.mediaDevices.getUserMedia({audio:true});vgRecordingChunks=[];
-        const mime=['audio/webm;codecs=opus','audio/webm','audio/mp4'].find(t=>MediaRecorder.isTypeSupported?.(t));
-        vgMediaRecorder=new MediaRecorder(vgRecordingStream,mime?{mimeType:mime}:undefined);
-        vgMediaRecorder.ondataavailable=e=>{if(e.data&&e.data.size)vgRecordingChunks.push(e.data);};
-        vgMediaRecorder.onstop=async()=>{const blob=new Blob(vgRecordingChunks,{type:vgMediaRecorder.mimeType||'audio/webm'});vgRecordingStream?.getTracks().forEach(t=>t.stop());vgRecordingStream=null;vgMediaRecorder=null;if(!blob.size)return;try{const dataUrl=await new Promise((res,rej)=>{const fr=new FileReader();fr.onload=()=>res(fr.result);fr.onerror=rej;fr.readAsDataURL(blob);});const ext=(blob.type.includes('mp4')?'m4a':'webm');const upload=await fetch('/api/upload',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({data:dataUrl,ext})});const up=await upload.json();if(!upload.ok)throw new Error(up.error||'upload failed');await dispatchOutgoingMessage('',{type:'voice',url:up.url},null);vgToast('Голосовое отправлено','');}catch(e){vgToast('Не удалось отправить аудио',e.message||'');}};
-        vgMediaRecorder.start();btn.classList.add('recording');btn.textContent='■';btn.title='Остановить и отправить';vgToast('Запись началась','Нажми ■, чтобы завершить и отправить.');
-      }catch(e){vgToast('Нет доступа к микрофону','Разреши доступ к микрофону в настройках браузера.');}
+    let vgVoiceRecordingTimer = null;
+    let vgVoiceRecordingStartedAt = 0;
+    const vgVoiceDefaultButtonTitle = 'Записать голосовое сообщение';
+    function vgResetVoiceRecordButton() {
+      if (vgVoiceRecordingTimer) clearInterval(vgVoiceRecordingTimer);
+      vgVoiceRecordingTimer = null;
+      vgVoiceRecordingStartedAt = 0;
+      const b = document.getElementById('vgVoiceRecordBtn');
+      b.classList.remove('recording');
+      b.textContent = '🎙';
+      b.title = vgVoiceDefaultButtonTitle;
+      b.setAttribute('aria-label', vgVoiceDefaultButtonTitle);
+    }
+    document.getElementById('vgVoiceRecordBtn').addEventListener('click', async () => {
+      const btn = document.getElementById('vgVoiceRecordBtn');
+      if (vgMediaRecorder && vgMediaRecorder.state === 'recording') {
+        try { vgMediaRecorder.stop(); } catch (_) {}
+        vgResetVoiceRecordButton();
+        vgToast('Голосовое обрабатывается', 'Сейчас отправим запись в чат.');
+        return;
+      }
+      if (!activePeer || !myProfile) { vgToast('Сначала открой чат', ''); return; }
+      if (!navigator.mediaDevices?.getUserMedia || !window.MediaRecorder) {
+        vgToast('Запись недоступна', 'Браузер не поддерживает запись аудио.'); return;
+      }
+      try {
+        vgRecordingStream = await vgGetSpeechStream('audio');
+        vgRecordingChunks = [];
+        const mime = [
+          'audio/webm;codecs=opus', 'audio/ogg;codecs=opus', 'audio/webm', 'audio/mp4'
+        ].find(type => MediaRecorder.isTypeSupported?.(type));
+        const options = { audioBitsPerSecond: 32000 };
+        if (mime) options.mimeType = mime;
+        try { vgMediaRecorder = new MediaRecorder(vgRecordingStream, options); }
+        catch (_) { vgMediaRecorder = new MediaRecorder(vgRecordingStream, mime ? { mimeType: mime } : undefined); }
+
+        vgMediaRecorder.ondataavailable = e => {
+          if (e.data && e.data.size) vgRecordingChunks.push(e.data);
+        };
+        vgMediaRecorder.onerror = () => {
+          vgRecordingStream?.getTracks().forEach(track => track.stop());
+          vgRecordingStream = null;
+          vgMediaRecorder = null;
+          vgResetVoiceRecordButton();
+          vgToast('Ошибка записи', 'Попробуй ещё раз и проверь микрофон.');
+        };
+        vgMediaRecorder.onstop = async () => {
+          const recorder = vgMediaRecorder;
+          const blob = new Blob(vgRecordingChunks, { type: recorder?.mimeType || mime || 'audio/webm' });
+          vgRecordingStream?.getTracks().forEach(track => track.stop());
+          vgRecordingStream = null;
+          vgMediaRecorder = null;
+          vgRecordingChunks = [];
+          vgResetVoiceRecordButton();
+          if (!blob.size) return;
+          try {
+            const dataUrl = await new Promise((resolve, reject) => {
+              const reader = new FileReader();
+              reader.onload = () => resolve(reader.result);
+              reader.onerror = reject;
+              reader.readAsDataURL(blob);
+            });
+            const ext = blob.type.includes('mp4') ? 'm4a' : (blob.type.includes('ogg') ? 'ogg' : 'webm');
+            const upload = await fetch('/api/upload', {
+              method: 'POST', headers: { 'Content-Type': 'application/json' },
+              body: JSON.stringify({ data: dataUrl, ext })
+            });
+            const uploaded = await upload.json();
+            if (!upload.ok) throw new Error(uploaded.error || 'Не удалось загрузить аудио');
+            await dispatchOutgoingMessage('', { type: 'voice', url: uploaded.url }, null);
+            vgToast('Голосовое отправлено', 'Аудио обработано для речи.');
+          } catch (error) {
+            vgToast('Не удалось отправить аудио', error.message || 'Проверь подключение.');
+          }
+        };
+        // Timeslices keep memory use predictable on long recordings; voice notes are capped at 3 min.
+        vgMediaRecorder.start(250);
+        vgVoiceRecordingStartedAt = Date.now();
+        btn.classList.add('recording');
+        btn.textContent = '00:00 ■';
+        btn.title = 'Остановить и отправить голосовое сообщение';
+        btn.setAttribute('aria-label', btn.title);
+        vgVoiceRecordingTimer = setInterval(() => {
+          if (!vgVoiceRecordingStartedAt || !vgMediaRecorder || vgMediaRecorder.state !== 'recording') return;
+          const seconds = Math.floor((Date.now() - vgVoiceRecordingStartedAt) / 1000);
+          btn.textContent = `${String(Math.floor(seconds / 60)).padStart(2,'0')}:${String(seconds % 60).padStart(2,'0')} ■`;
+          if (seconds >= 180) {
+            try { vgMediaRecorder.stop(); } catch (_) {}
+            vgResetVoiceRecordButton();
+            vgToast('Лимит записи достигнут', 'Голосовое до 3 минут отправляется в чат.');
+          }
+        }, 250);
+        vgToast('Запись началась', 'Говори и нажми кнопку ещё раз, чтобы отправить.');
+      } catch (error) {
+        vgRecordingStream?.getTracks().forEach(track => track.stop());
+        vgRecordingStream = null;
+        vgMediaRecorder = null;
+        vgResetVoiceRecordButton();
+        vgToast('Нет доступа к микрофону', 'Разреши микрофон в браузере и проверь, что он не занят другой программой.');
+      }
     });
 
     // Vibegram real-time 1:1 calling. Signalling is handled by the server; media flows peer-to-peer over WebRTC.
@@ -5335,6 +5602,11 @@
     const vgRemoteVideo=document.getElementById('vgRemoteVideo'), vgLocalVideo=document.getElementById('vgLocalVideo'), vgRemoteAudio=document.getElementById('vgRemoteAudio');
     const vgCallPeerName=document.getElementById('vgCallPeerName'), vgCallAvatar=document.getElementById('vgCallAvatar'), vgCallDuration=document.getElementById('vgCallDuration');
     const vgCallFloatBtn=document.getElementById('vgCallFloatBtn');
+    const vgCallOutputVolume=document.getElementById('vgCallOutputVolume');
+    const vgCallVolumeValue=document.getElementById('vgCallVolumeValue');
+    function vgCurrentOutputVolume(){const raw=Number(vgCallOutputVolume?.value);return Math.max(0,Math.min(1,(Number.isFinite(raw)?raw:72)/100));}
+    function vgApplyCallOutputVolume(){const volume=vgCurrentOutputVolume();vgRemoteAudio.volume=volume;vgRemoteVideo.volume=volume;if(vgCallVolumeValue)vgCallVolumeValue.textContent=Math.round(volume*100)+'%';}
+    if(vgCallOutputVolume){vgCallOutputVolume.value=window.matchMedia('(min-width: 769px)').matches?'65':'90';vgApplyCallOutputVolume();vgCallOutputVolume.addEventListener('input',vgApplyCallOutputVolume);}
     function vgCallId(){return (window.crypto&&crypto.randomUUID)?crypto.randomUUID():('vg-'+Date.now().toString(36)+'-'+Math.random().toString(36).slice(2,11));}
     function vgCallPeerDisplay(handle){try{const p=getPeerObject(handle);return {name:p.name||handle,username:p.username||handle,color:p.color||'#2aabee'};}catch(_){return {name:handle,username:handle,color:'#2aabee'};}}
     function vgCallIdentity(handle){const p=vgCallPeerDisplay(handle);vgCallPeerName.textContent=p.name;vgCallAvatar.textContent=(typeof getInitials==='function'?getInitials(p.name):String(p.name||'V').slice(0,1).toUpperCase());vgCallAvatar.style.backgroundColor=p.color;vgCallModal.dataset.callPeer=handle||'';}
@@ -5347,12 +5619,94 @@
     function vgStopRing(){if(vgCall.ringTimer){clearInterval(vgCall.ringTimer);vgCall.ringTimer=null;}}
     async function vgLoadCallConfig(){try{const r=await fetch('/api/call/config',{cache:'no-store'});if(r.ok){const d=await r.json();if(Array.isArray(d.iceServers)&&d.iceServers.length)vgCallIceServers=d.iceServers;}}catch(_){}return vgCallIceServers;}
     async function vgSendSignal(to,kind,payload={}){if(!myProfile||!to)return false;const id=payload?.callId||vgCall.callId||vgCall.incoming?.payload?.callId||null;const body={from:myProfile.username,to,kind,payload:{...(payload&&typeof payload==='object'?payload:{}),...(id?{callId:id}:{})}};try{const r=await fetch('/api/call/signal',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify(body),cache:'no-store'});if(!r.ok){const d=await r.json().catch(()=>({}));throw new Error(d.error||`HTTP ${r.status}`);}return true;}catch(e){console.warn('[Vibegram call signalling]',e);return false;}}
-    function vgSetCallConnected(){if(!vgCall.startedAt){vgCall.startedAt=Date.now();if(vgCall.timeout){clearTimeout(vgCall.timeout);vgCall.timeout=null;}vgCallDuration.textContent='00:00';if(vgCall.timer)clearInterval(vgCall.timer);vgCall.timer=setInterval(()=>{if(!vgCall.startedAt)return;const s=Math.max(0,Math.floor((Date.now()-vgCall.startedAt)/1000));vgCallDuration.textContent=String(Math.floor(s/60)).padStart(2,'0')+':'+String(s%60).padStart(2,'0');},1000);}vgSetCallStatus('На связи');document.getElementById('vgCallFooter').textContent=vgCall.kind==='video'?'Видеозвонок защищён прямым WebRTC-соединением.':'Голосовой звонок защищён прямым WebRTC-соединением.';}
-    async function vgCreatePeer(target,kind){const cfg=await vgLoadCallConfig();const pc=new RTCPeerConnection({iceServers:cfg,iceCandidatePoolSize:4,bundlePolicy:'max-bundle'});vgCall.pc=pc;vgCall.target=target;vgCall.kind=kind;pc.onicecandidate=e=>{if(e.candidate)vgSendSignal(target,'ice',{...e.candidate.toJSON(),callId:vgCall.callId});};pc.ontrack=e=>{let stream=e.streams?.[0];if(!stream){stream=vgCall.remote||new MediaStream();if(!stream.getTracks().some(t=>t.id===e.track.id))stream.addTrack(e.track);}vgCall.remote=stream;if(kind==='video'){vgRemoteVideo.srcObject=stream;vgRemoteVideo.muted=false;vgRemoteVideo.style.display='block';vgRemoteAudio.srcObject=null;vgRemoteAudio.muted=true;document.getElementById('vgCallAudioArt').style.display='none';vgRemoteVideo.play().catch(()=>document.getElementById('vgCallEnableAudio').hidden=false);}else{vgRemoteVideo.style.display='none';vgRemoteAudio.srcObject=stream;vgRemoteAudio.muted=false;vgRemoteAudio.play().catch(()=>document.getElementById('vgCallEnableAudio').hidden=false);}if(pc.connectionState==='connected')vgSetCallConnected();};pc.onconnectionstatechange=()=>{if(pc.connectionState==='connected')vgSetCallConnected();else if(pc.connectionState==='connecting')vgSetCallStatus('Устанавливаем соединение…');else if(pc.connectionState==='disconnected'){vgSetCallStatus('Восстанавливаем связь…');}else if(pc.connectionState==='failed'){vgSetCallStatus('Не удалось установить соединение');document.getElementById('vgCallFooter').textContent='Попробуй снова. Если устройства в разных сетях, настрой TURN-сервер в Render.';} };pc.oniceconnectionstatechange=()=>{if(pc.iceConnectionState==='connected'||pc.iceConnectionState==='completed')vgSetCallConnected();else if(pc.iceConnectionState==='failed'){vgSetCallStatus('Проблема сетевого соединения');document.getElementById('vgCallFooter').textContent='Для соединения через строгие NAT/VPN может понадобиться TURN-сервер.';}};pc.onicecandidateerror=e=>{if(e.errorCode===701)console.debug('[Vibegram] STUN/TURN server unreachable',e.url);};return pc;}
-    async function vgFlushPendingIce(){const pc=vgCall.pc;if(!pc||!pc.remoteDescription)return;for(const candidate of vgCall.pendingIce.splice(0)){try{await pc.addIceCandidate(new RTCIceCandidate(candidate));}catch(e){console.debug('[Vibegram ICE candidate]',e);}}}
-    async function vgStartCall(kind){if(!myProfile||!activePeer||activePeer===myProfile.username.toLowerCase()||activePeer==='verify_bot'||getPeerObject(activePeer).is_channel||getPeerObject(activePeer).is_group){vgToast('Звонок недоступен','Открой личный чат с пользователем.');return;}if(vgCall.pc||vgCall.incoming){vgToast('Звонок уже активен','Заверши текущий звонок перед новым.');return;}if(!window.isSecureContext||!navigator.mediaDevices?.getUserMedia||!window.RTCPeerConnection){vgToast('Звонки недоступны','Открой Vibegram через HTTPS и используй актуальный браузер.');return;}const target=activePeer;vgCall={pc:null,stream:null,remote:null,target,kind,incoming:null,pendingIce:[],makingOffer:false,callId:vgCallId(),startedAt:0,timer:null,timeout:null,ringTimer:null};try{await vgLoadCallConfig();vgCall.stream=await navigator.mediaDevices.getUserMedia({audio:{echoCancellation:true,noiseSuppression:true,autoGainControl:true},video:kind==='video'?{width:{ideal:1280},height:{ideal:720},facingMode:'user'}:false});vgCallIdentity(target);vgOpenCallModal();vgCallButtons(false);vgCallDuration.textContent='';vgLocalVideo.srcObject=vgCall.stream;vgLocalVideo.style.display=kind==='video'?'block':'none';vgRemoteVideo.srcObject=null;vgRemoteVideo.style.display='none';document.getElementById('vgCallAudioArt').style.display=kind==='video'?'none':'grid';document.getElementById('vgCallTitle').textContent=kind==='video'?'Видеозвонок':'Голосовой звонок';document.getElementById('vgCallFooter').textContent='Вызов отправлен. Дождись ответа собеседника…';vgSetCallStatus('Вызов @'+target+'…');const pc=await vgCreatePeer(target,kind);vgCall.stream.getTracks().forEach(t=>pc.addTrack(t,vgCall.stream));const offer=await pc.createOffer();await pc.setLocalDescription(offer);const sent=await vgSendSignal(target,'offer',{sdp:pc.localDescription,media:kind,callId:vgCall.callId});if(!sent)throw new Error('Сервер не принял запрос звонка.');vgCall.timeout=setTimeout(async()=>{if(vgCall.pc&&!vgCall.startedAt){await vgSendSignal(target,'cancel',{callId:vgCall.callId});vgToast('Нет ответа','Звонок завершён по тайм-ауту.');await vgHangupCall(true);}},50000);}catch(e){vgToast('Не удалось начать звонок',e.message||'Проверь доступ к микрофону и камере.');await vgHangupCall(true);}}
-    async function vgAcceptIncoming(){const call=vgCall.incoming;if(!call||!myProfile)return;const from=call.from;const kind=call.payload?.media==='video'?'video':'audio';vgStopRing();try{if(!window.isSecureContext||!navigator.mediaDevices?.getUserMedia)throw new Error('Для звонков нужен HTTPS и разрешение на микрофон.');vgCall.target=from;vgCall.callId=call.payload?.callId||vgCall.callId||vgCallId();vgCall.kind=kind;vgCallIdentity(from);vgOpenCallModal();vgCallButtons(false);vgCallDuration.textContent='';vgRemoteVideo.srcObject=null;vgLocalVideo.srcObject=null;vgLocalVideo.style.display=kind==='video'?'block':'none';vgRemoteVideo.style.display=kind==='video'?'block':'none';document.getElementById('vgCallAudioArt').style.display=kind==='video'?'none':'grid';document.getElementById('vgCallEnableAudio').hidden=true;vgCall.stream=await navigator.mediaDevices.getUserMedia({audio:{echoCancellation:true,noiseSuppression:true,autoGainControl:true},video:kind==='video'?{width:{ideal:1280},height:{ideal:720},facingMode:'user'}:false});vgLocalVideo.srcObject=vgCall.stream;const pc=await vgCreatePeer(from,kind);vgCall.stream.getTracks().forEach(t=>pc.addTrack(t,vgCall.stream));await pc.setRemoteDescription(new RTCSessionDescription(call.payload.sdp));await vgFlushPendingIce();const answer=await pc.createAnswer();await pc.setLocalDescription(answer);if(!await vgSendSignal(from,'answer',{sdp:pc.localDescription,callId:vgCall.callId}))throw new Error('Не удалось отправить ответ на звонок.');vgCall.incoming=null;document.getElementById('vgCallTitle').textContent=kind==='video'?'Видеозвонок':'Голосовой звонок';document.getElementById('vgCallFooter').textContent='Подключаем защищённый медиаканал…';vgSetCallStatus('Соединяемся…');}catch(e){vgToast('Не удалось принять звонок',e.message||'');await vgSendSignal(from,'reject',{callId:vgCall.callId});await vgHangupCall(true);}}
-    async function vgHangupCall(silent=false){const target=vgCall.target||vgCall.incoming?.from;const callId=vgCall.callId||vgCall.incoming?.payload?.callId;if(target&&!silent)await vgSendSignal(target,'hangup',{callId});vgStopRing();if(vgCall.timeout)clearTimeout(vgCall.timeout);if(vgCall.timer)clearInterval(vgCall.timer);try{vgCall.pc?.getSenders?.().forEach(s=>{try{s.track?.stop();}catch(_){}});vgCall.pc?.close();}catch(_){}vgCall.stream?.getTracks().forEach(t=>t.stop());vgCall.remote?.getTracks().forEach(t=>t.stop());vgCall={pc:null,stream:null,remote:null,target:null,kind:null,incoming:null,pendingIce:[],makingOffer:false,callId:null,startedAt:0,timer:null,timeout:null,ringTimer:null};vgRemoteVideo.srcObject=null;vgLocalVideo.srcObject=null;vgRemoteAudio.srcObject=null;vgRemoteVideo.style.display='none';vgLocalVideo.style.display='none';document.getElementById('vgCallAudioArt').style.display='grid';document.getElementById('vgCallEnableAudio').hidden=true;vgCallDuration.textContent='';vgCallModal.classList.remove('open');vgCallFloatBtn.hidden=true;vgCallButtons(false);document.getElementById('vgCallTitle').textContent='Звонок Vibegram';document.getElementById('vgCallFooter').textContent='Для звонка разреши доступ к микрофону. Видеозвонок также использует камеру.';}
+    function vgSetCallConnected(){
+      if(!vgCall.startedAt){
+        vgCall.startedAt=Date.now();
+        if(vgCall.timeout){clearTimeout(vgCall.timeout);vgCall.timeout=null;}
+        vgCallDuration.textContent='00:00';
+        if(vgCall.timer)clearInterval(vgCall.timer);
+        vgCall.timer=setInterval(()=>{
+          if(!vgCall.startedAt)return;
+          const seconds=Math.max(0,Math.floor((Date.now()-vgCall.startedAt)/1000));
+          vgCallDuration.textContent=String(Math.floor(seconds/60)).padStart(2,'0')+':'+String(seconds%60).padStart(2,'0');
+        },1000);
+      }
+      vgSetCallStatus('На связи');
+      const track=vgCall.stream?.getAudioTracks?.()[0];
+      const settings=track?.getSettings?.()||{};
+      const dsp=settings.echoCancellation===false
+        ? ' Эхоподавление недоступно в текущем браузере: для ПК подключи гарнитуру или выбери микрофон с эхоподавлением.'
+        : ' Эхоподавление и фильтрация шума включены.';
+      document.getElementById('vgCallFooter').textContent=(vgCall.kind==='video'?'Видеозвонок':'Голосовой звонок')+' · защищённый прямой канал.'+dsp;
+      vgApplyCallOutputVolume();
+    }
+    function vgAttachRemoteCallStream(stream,kind){
+      // Detach the other output element first. In video calls the video element carries
+      // audio too; keeping both elements connected would play the other person twice.
+      try{vgRemoteAudio.pause();}catch(_){}
+      try{vgRemoteVideo.pause();}catch(_){}
+      vgRemoteAudio.srcObject=null;
+      vgRemoteVideo.srcObject=null;
+      vgApplyCallOutputVolume();
+      if(kind==='video'){
+        vgRemoteAudio.muted=true;
+        vgRemoteAudio.volume=0;
+        vgRemoteVideo.muted=false;
+        vgRemoteVideo.volume=vgCurrentOutputVolume();
+        vgRemoteVideo.srcObject=stream;
+        vgRemoteVideo.style.display='block';
+        vgRemoteAudio.style.display='none';
+        document.getElementById('vgCallAudioArt').style.display='none';
+        vgRemoteVideo.play().catch(()=>document.getElementById('vgCallEnableAudio').hidden=false);
+      }else{
+        vgRemoteVideo.muted=true;
+        vgRemoteVideo.style.display='none';
+        vgRemoteAudio.muted=false;
+        vgRemoteAudio.volume=vgCurrentOutputVolume();
+        vgRemoteAudio.srcObject=stream;
+        vgRemoteAudio.style.display='none';
+        document.getElementById('vgCallAudioArt').style.display='grid';
+        vgRemoteAudio.play().catch(()=>document.getElementById('vgCallEnableAudio').hidden=false);
+      }
+    }
+    async function vgCreatePeer(target,kind){
+      const cfg=await vgLoadCallConfig();
+      const pc=new RTCPeerConnection({iceServers:cfg,iceCandidatePoolSize:4,bundlePolicy:'max-bundle'});
+      vgCall.pc=pc;vgCall.target=target;vgCall.kind=kind;
+      pc.onicecandidate=e=>{if(e.candidate)vgSendSignal(target,'ice',{...e.candidate.toJSON(),callId:vgCall.callId});};
+      pc.ontrack=e=>{
+        let stream=e.streams?.[0];
+        if(!stream){
+          stream=vgCall.remote||new MediaStream();
+          if(!stream.getTracks().some(t=>t.id===e.track.id))stream.addTrack(e.track);
+        }
+        vgCall.remote=stream;
+        vgAttachRemoteCallStream(stream,kind);
+        if(pc.connectionState==='connected')vgSetCallConnected();
+      };
+      pc.onconnectionstatechange=()=>{
+        if(pc.connectionState==='connected')vgSetCallConnected();
+        else if(pc.connectionState==='connecting')vgSetCallStatus('Устанавливаем соединение…');
+        else if(pc.connectionState==='disconnected')vgSetCallStatus('Восстанавливаем связь…');
+        else if(pc.connectionState==='failed'){
+          vgSetCallStatus('Не удалось установить соединение');
+          document.getElementById('vgCallFooter').textContent='Попробуй снова. Если устройства в разных сетях, настрой TURN-сервер в Render.';
+        }
+      };
+      pc.oniceconnectionstatechange=()=>{
+        if(pc.iceConnectionState==='connected'||pc.iceConnectionState==='completed')vgSetCallConnected();
+        else if(pc.iceConnectionState==='failed'){
+          vgSetCallStatus('Проблема сетевого соединения');
+          document.getElementById('vgCallFooter').textContent='Для соединения через строгие NAT/VPN может понадобиться TURN-сервер.';
+        }
+      };
+      pc.onicecandidateerror=e=>{if(e.errorCode===701)console.debug('[Vibegram] STUN/TURN server unreachable',e.url);};
+      return pc;
+    }
+        async function vgFlushPendingIce(){const pc=vgCall.pc;if(!pc||!pc.remoteDescription)return;for(const candidate of vgCall.pendingIce.splice(0)){try{await pc.addIceCandidate(new RTCIceCandidate(candidate));}catch(e){console.debug('[Vibegram ICE candidate]',e);}}}
+    async function vgStartCall(kind){if(!myProfile||!activePeer||activePeer===myProfile.username.toLowerCase()||activePeer==='verify_bot'||getPeerObject(activePeer).is_channel||getPeerObject(activePeer).is_group){vgToast('Звонок недоступен','Открой личный чат с пользователем.');return;}if(vgCall.pc||vgCall.incoming){vgToast('Звонок уже активен','Заверши текущий звонок перед новым.');return;}if(!window.isSecureContext||!navigator.mediaDevices?.getUserMedia||!window.RTCPeerConnection){vgToast('Звонки недоступны','Открой Vibegram через HTTPS и используй актуальный браузер.');return;}const target=activePeer;vgCall={pc:null,stream:null,remote:null,target,kind,incoming:null,pendingIce:[],makingOffer:false,callId:vgCallId(),startedAt:0,timer:null,timeout:null,ringTimer:null};try{await vgLoadCallConfig();vgCall.stream=await vgGetSpeechStream(kind);vgCallIdentity(target);vgOpenCallModal();vgCallButtons(false);vgCallDuration.textContent='';vgLocalVideo.srcObject=vgCall.stream;vgLocalVideo.style.display=kind==='video'?'block':'none';vgRemoteVideo.srcObject=null;vgRemoteVideo.style.display='none';document.getElementById('vgCallAudioArt').style.display=kind==='video'?'none':'grid';document.getElementById('vgCallTitle').textContent=kind==='video'?'Видеозвонок':'Голосовой звонок';document.getElementById('vgCallFooter').textContent='Вызов отправлен. Дождись ответа собеседника…';vgSetCallStatus('Вызов @'+target+'…');const pc=await vgCreatePeer(target,kind);vgCall.stream.getTracks().forEach(t=>pc.addTrack(t,vgCall.stream));const offer=await pc.createOffer();await pc.setLocalDescription(offer);const sent=await vgSendSignal(target,'offer',{sdp:pc.localDescription,media:kind,callId:vgCall.callId});if(!sent)throw new Error('Сервер не принял запрос звонка.');vgCall.timeout=setTimeout(async()=>{if(vgCall.pc&&!vgCall.startedAt){await vgSendSignal(target,'cancel',{callId:vgCall.callId});vgToast('Нет ответа','Звонок завершён по тайм-ауту.');await vgHangupCall(true);}},50000);}catch(e){vgToast('Не удалось начать звонок',e.message||'Проверь доступ к микрофону и камере.');await vgHangupCall(true);}}
+    async function vgAcceptIncoming(){const call=vgCall.incoming;if(!call||!myProfile)return;const from=call.from;const kind=call.payload?.media==='video'?'video':'audio';vgStopRing();try{if(!window.isSecureContext||!navigator.mediaDevices?.getUserMedia)throw new Error('Для звонков нужен HTTPS и разрешение на микрофон.');vgCall.target=from;vgCall.callId=call.payload?.callId||vgCall.callId||vgCallId();vgCall.kind=kind;vgCallIdentity(from);vgOpenCallModal();vgCallButtons(false);vgCallDuration.textContent='';vgRemoteVideo.srcObject=null;vgLocalVideo.srcObject=null;vgLocalVideo.style.display=kind==='video'?'block':'none';vgRemoteVideo.style.display=kind==='video'?'block':'none';document.getElementById('vgCallAudioArt').style.display=kind==='video'?'none':'grid';document.getElementById('vgCallEnableAudio').hidden=true;vgCall.stream=await vgGetSpeechStream(kind);vgLocalVideo.srcObject=vgCall.stream;const pc=await vgCreatePeer(from,kind);vgCall.stream.getTracks().forEach(t=>pc.addTrack(t,vgCall.stream));await pc.setRemoteDescription(new RTCSessionDescription(call.payload.sdp));await vgFlushPendingIce();const answer=await pc.createAnswer();await pc.setLocalDescription(answer);if(!await vgSendSignal(from,'answer',{sdp:pc.localDescription,callId:vgCall.callId}))throw new Error('Не удалось отправить ответ на звонок.');vgCall.incoming=null;document.getElementById('vgCallTitle').textContent=kind==='video'?'Видеозвонок':'Голосовой звонок';document.getElementById('vgCallFooter').textContent='Подключаем защищённый медиаканал…';vgSetCallStatus('Соединяемся…');}catch(e){vgToast('Не удалось принять звонок',e.message||'');await vgSendSignal(from,'reject',{callId:vgCall.callId});await vgHangupCall(true);}}
+    async function vgHangupCall(silent=false){const target=vgCall.target||vgCall.incoming?.from;const callId=vgCall.callId||vgCall.incoming?.payload?.callId;if(target&&!silent)await vgSendSignal(target,'hangup',{callId});vgStopRing();if(vgCall.timeout)clearTimeout(vgCall.timeout);if(vgCall.timer)clearInterval(vgCall.timer);try{vgCall.pc?.getSenders?.().forEach(s=>{try{s.track?.stop();}catch(_){}});vgCall.pc?.close();}catch(_){}vgCall.stream?.getTracks().forEach(t=>t.stop());vgCall.remote?.getTracks().forEach(t=>t.stop());vgCall={pc:null,stream:null,remote:null,target:null,kind:null,incoming:null,pendingIce:[],makingOffer:false,callId:null,startedAt:0,timer:null,timeout:null,ringTimer:null};try{vgRemoteVideo.pause();vgRemoteAudio.pause();}catch(_){}vgRemoteVideo.srcObject=null;vgLocalVideo.srcObject=null;vgRemoteAudio.srcObject=null;vgRemoteVideo.muted=true;vgRemoteAudio.muted=false;vgRemoteVideo.style.display='none';vgLocalVideo.style.display='none';document.getElementById('vgCallAudioArt').style.display='grid';document.getElementById('vgCallEnableAudio').hidden=true;vgCallDuration.textContent='';vgCallModal.classList.remove('open');vgCallFloatBtn.hidden=true;vgCallButtons(false);document.getElementById('vgCallTitle').textContent='Звонок Vibegram';document.getElementById('vgCallFooter').textContent='Для звонка разреши доступ к микрофону. Видеозвонок также использует камеру.';}
     async function vgHandleSignal(signal){if(!signal||vgSeenSignals.has(signal.id))return;vgSeenSignals.add(signal.id);if(vgSeenSignals.size>3000){const arr=Array.from(vgSeenSignals);vgSeenSignals.clear();arr.slice(-1000).forEach(x=>vgSeenSignals.add(x));}const {from,kind,payload={}}=signal;const incomingId=payload.callId||null;
       if(kind==='offer'){
         if(vgCall.pc||vgCall.incoming){await vgSendSignal(from,'busy',{callId:incomingId});return;}
