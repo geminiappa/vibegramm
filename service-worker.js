@@ -1,4 +1,4 @@
-const CACHE_NAME = 'vibegram-pwa-v2';
+const CACHE_NAME = 'vibegram-pwa-v3';
 const APP_SHELL = ['/', '/manifest.webmanifest', '/facuicon.jpeg', '/pwa-192.png', '/pwa-512.png'];
 
 self.addEventListener('install', event => {

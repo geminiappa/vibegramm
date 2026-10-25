@@ -1681,6 +1681,10 @@
           <span class="drawer-ico vg-ico-blue"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2M9 11a4 4 0 1 0 0-8 4 4 0 0 0 0 8M19 8v6M16 11h6"/></svg></span>
           <span><strong>Создать группу</strong><small>Общий чат с участниками</small></span>
         </button>
+        <button type="button" class="drawer-btn" id="drawerCreateFolderBtn">
+          <span class="drawer-ico vg-ico-cyan"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M3 6a2 2 0 0 1 2-2h5l2 2h7a2 2 0 0 1 2 2v10a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2Z"/><path d="M12 10v6M9 13h6"/></svg></span>
+          <span><strong>Создать папку чатов</strong><small>Собрать переписки по темам</small></span>
+        </button>
         <button type="button" class="drawer-btn" id="drawerCreateChannelBtn">
           <span class="drawer-ico vg-ico-purple"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 4h16v13H8l-4 3V4Z M8 8h8M8 12h5"/></svg></span>
           <span><strong>Создать канал</strong><small>Публикации и подписчики</small></span>
@@ -1692,7 +1696,6 @@
         <button type="button" class="drawer-btn" id="drawerAppsBtn">
           <span class="drawer-ico vg-ico-green"><svg viewBox="0 0 24 24" aria-hidden="true"><rect x="3" y="4" width="18" height="12" rx="2"/><path d="M8 20h8M12 16v4M7 8h10"/></svg></span>
           <span><strong>Скачать Vibegram</strong><small>ПК · iOS · Android</small></span>
-          <span class="drawer-soon-dot">SOON</span>
         </button>
       </div>
 
@@ -1714,6 +1717,14 @@
         <button type="button" class="drawer-btn" id="drawerOpenVerifyBotBtn">
           <span class="drawer-ico vg-ico-green"><svg viewBox="0 0 24 24" aria-hidden="true"><rect x="4" y="7" width="16" height="13" rx="3"/><path d="M12 3v4M8 12h.01M16 12h.01M9 16h6"/></svg></span>
           <span><strong>Верификация</strong><small>@verify_bot · заявки и статус</small></span>
+        </button>
+        <button type="button" class="drawer-btn" id="drawerOpenRainbowBotBtn">
+          <span class="drawer-ico vg-ico-purple"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 19a8 8 0 0 1 16 0M7 15a5 5 0 0 1 10 0M10 11a2 2 0 0 1 4 0"/><path d="M3 5h18"/></svg></span>
+          <span><strong>Радужные ники</strong><small>@rainbow_bot · запросы на оформление</small></span>
+        </button>
+        <button type="button" class="drawer-btn" id="drawerNotificationsBtn">
+          <span class="drawer-ico vg-ico-amber"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M18 8a6 6 0 0 0-12 0c0 7-3 7-3 9h18c0-2-3-2-3-9M10 21h4"/></svg></span>
+          <span><strong>Уведомления</strong><small>Push и звуки на этом устройстве</small></span>
         </button>
         <button type="button" class="drawer-btn" id="drawerPremiumBtn">
           <span class="drawer-ico vg-ico-gold"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="m12 3 2.7 5.5 6.1.9-4.4 4.3 1 6.1-5.4-2.9-5.4 2.9 1-6.1-4.4-4.3 6.1-.9L12 3Z"/></svg></span>
@@ -1994,11 +2005,11 @@
       <header class="vg-modal-head"><span id="vgApplicationsTitle">Приложения Vibegram</span><button type="button" data-vg-close="vgApplicationsModal" aria-label="Закрыть">×</button></header>
       <div class="vg-modal-body"><div class="vg-apps-intro"><div class="vg-apps-logo">V</div><div><strong>Один аккаунт на всех устройствах</strong><p>Переписки и настройки синхронизируются между поддерживаемыми клиентами.</p></div></div>
         <div class="vg-apps-grid">
-          <article class="vg-app-platform"><div class="vg-app-platform-icon"><svg viewBox="0 0 24 24" aria-hidden="true"><rect x="3" y="4" width="18" height="13" rx="2"/><path d="M8 21h8M12 17v4M7 8h10"/></svg></div><strong>ПК / Windows</strong><span>Нативная версия</span><b>Скоро</b></article>
-          <article class="vg-app-platform"><div class="vg-app-platform-icon"><svg viewBox="0 0 24 24" aria-hidden="true"><rect x="6" y="2" width="12" height="20" rx="3"/><path d="M10 18h4"/></svg></div><strong>iPhone / iOS</strong><span>Мобильное приложение</span><b>Скоро</b></article>
-          <article class="vg-app-platform"><div class="vg-app-platform-icon"><svg viewBox="0 0 24 24" aria-hidden="true"><rect x="5" y="3" width="14" height="18" rx="2"/><path d="m8 7 1 1m6-1 1 1M10 17h4"/></svg></div><strong>Android</strong><span>Мобильное приложение</span><b>Скоро</b></article>
+          <article class="vg-app-platform"><div class="vg-app-platform-icon"><svg viewBox="0 0 24 24" aria-hidden="true"><rect x="3" y="4" width="18" height="13" rx="2"/><path d="M8 21h8M12 17v4M7 8h10"/></svg></div><strong>ПК / Windows</strong><span>Десктопная версия</span><a class="vg-platform-download" href="https://drive.google.com/file/d/1eXJnGrOzTtbe6U3capzHV6u_F7bsKjCw/view?usp=sharing" target="_blank" rel="noopener noreferrer">Скачать для ПК <span aria-hidden="true">↗</span></a></article>
+          <article class="vg-app-platform"><div class="vg-app-platform-icon"><svg viewBox="0 0 24 24" aria-hidden="true"><rect x="6" y="2" width="12" height="20" rx="3"/><path d="M10 18h4"/></svg></div><strong>iPhone / iOS</strong><span>Веб-приложение на экран «Домой»</span><button type="button" class="vg-platform-download" id="vgAppsInstallIOSBtn">Установить Vibegram</button></article>
+          <article class="vg-app-platform"><div class="vg-app-platform-icon"><svg viewBox="0 0 24 24" aria-hidden="true"><rect x="5" y="3" width="14" height="18" rx="2"/><path d="m8 7 1 1m6-1 1 1M10 17h4"/></svg></div><strong>Android</strong><span>Нативное приложение</span><b>Скоро</b></article>
         </div>
-        <div class="vg-apps-web"><div><strong>Vibegram Web</strong><span>Уже доступен в браузере. Можно установить как PWA на поддерживаемых устройствах.</span></div><button type="button" class="vg-primary" id="vgAppsInstallBtn">Установить веб-версию</button></div>
+        <div class="vg-apps-web"><div><strong>Веб-версия Vibegram</strong><span>Открой сайт в Safari на iPhone или в браузере Android. Установку PWA ищи в категории iOS или в настройках профиля.</span></div><button type="button" class="vg-secondary" id="vgAppsOpenWebBtn">Открыть веб-версию</button></div>
       </div>
     </section>
   </div>
@@ -2019,8 +2030,11 @@
   <div class="vg-modal" id="vgScheduledListModal" role="dialog" aria-modal="true" aria-labelledby="vgScheduledListTitle">
     <section class="vg-modal-card"><header class="vg-modal-head"><span id="vgScheduledListTitle">Отложенные сообщения</span><button type="button" data-vg-close="vgScheduledListModal" aria-label="Закрыть">×</button></header><div class="vg-modal-body"><div class="vg-search-results" id="vgScheduledList"></div><div class="vg-helper" style="margin-top:12px;">Отмена доступна до момента отправки.</div></div></section>
   </div>
+  <div class="vg-modal" id="vgEditMessageModal" role="dialog" aria-modal="true" aria-labelledby="vgEditMessageTitle">
+    <section class="vg-modal-card" style="max-width:540px;"><header class="vg-modal-head"><span id="vgEditMessageTitle">Редактировать сообщение</span><button type="button" data-vg-close="vgEditMessageModal" aria-label="Закрыть">×</button></header><form class="vg-modal-body" id="vgEditMessageForm"><textarea class="vg-textarea" id="vgEditMessageText" rows="5" maxlength="12000" placeholder="Текст сообщения" required></textarea><div class="vg-helper">Сообщение будет помечено как изменённое. Медиафайлы здесь не редактируются.</div><div class="vg-action-row"><button type="submit" class="vg-primary" id="vgEditMessageSaveBtn">Сохранить</button><button type="button" class="vg-secondary" data-vg-close="vgEditMessageModal">Отмена</button></div></form></section>
+  </div>
   <div class="vg-modal" id="vgPollModal" role="dialog" aria-modal="true" aria-labelledby="vgPollTitle">
-    <section class="vg-modal-card" style="max-width:480px;"><header class="vg-modal-head"><span id="vgPollTitle">Создать опрос</span><button type="button" data-vg-close="vgPollModal" aria-label="Закрыть">×</button></header><form class="vg-modal-body" id="vgPollForm"><input class="vg-input" id="vgPollQuestion" maxlength="300" placeholder="Вопрос" required><textarea class="vg-textarea" id="vgPollOptions" placeholder="Вариант 1&#10;Вариант 2&#10;Вариант 3" required></textarea><div class="vg-helper">Укажи от 2 до 10 вариантов — каждый с новой строки. Один ответ от пользователя.</div><div class="vg-action-row"><button type="submit" class="vg-primary">Опубликовать опрос</button><button type="button" class="vg-secondary" data-vg-close="vgPollModal">Отмена</button></div></form></section>
+    <section class="vg-modal-card" style="max-width:480px;"><header class="vg-modal-head"><span id="vgPollTitle">Создать опрос</span><button type="button" data-vg-close="vgPollModal" aria-label="Закрыть">×</button></header><form class="vg-modal-body" id="vgPollForm"><label class="vg-field-label" for="vgPollQuestion">Вопрос</label><input class="vg-input" id="vgPollQuestion" maxlength="300" placeholder="Например: Куда идём вечером?" required><label class="vg-field-label" for="vgPollOptions">Варианты ответа</label><textarea class="vg-textarea" id="vgPollOptions" placeholder="Вариант 1&#10;Вариант 2&#10;Вариант 3" required></textarea><div class="vg-helper">От 2 до 10 вариантов, каждый с новой строки.</div><label class="vg-poll-create-option"><input type="checkbox" id="vgPollMultiple"> Разрешить несколько ответов</label><label class="vg-poll-create-option"><input type="checkbox" id="vgPollQuiz"> Режим викторины с правильным ответом</label><div id="vgPollCorrectWrap" hidden><label class="vg-field-label" for="vgPollCorrectOption">Правильный ответ</label><select class="vg-input" id="vgPollCorrectOption"></select></div><div class="vg-action-row"><button type="submit" class="vg-primary">Опубликовать опрос</button><button type="button" class="vg-secondary" data-vg-close="vgPollModal">Отмена</button></div></form></section>
   </div>
   <div class="vg-modal vg-call-overlay" id="vgCallModal" role="dialog" aria-modal="true" aria-labelledby="vgCallTitle">
     <section class="vg-modal-card vg-call-card">
@@ -2112,10 +2126,12 @@
       <div class="chat-view" id="chatView">
         <header class="chat-header">
           <button class="icon-btn back-btn" id="backToChatsBtn">‹</button>
-          <div class="avatar" id="activeChatAvatar" style="width:38px;height:38px;font-size:15px;cursor:pointer;"></div>
-          <div class="chat-header-info" id="openPeerProfileBtn">
-            <div class="chat-header-title" id="activeChatName"></div>
-            <div class="chat-header-status" id="activeChatStatus"></div>
+          <div class="chat-header-identity" id="chatHeaderIdentity">
+            <div class="avatar" id="activeChatAvatar" style="width:38px;height:38px;font-size:15px;cursor:pointer;"></div>
+            <div class="chat-header-info" id="openPeerProfileBtn">
+              <div class="chat-header-title" id="activeChatName"></div>
+              <div class="chat-header-status" id="activeChatStatus"></div>
+            </div>
           </div>
           <div class="vg-header-tools">
             <button type="button" class="vg-header-tool" id="vgSearchMessagesBtn" title="Поиск по сообщениям" aria-label="Поиск по сообщениям"><svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="10.5" cy="10.5" r="6.5"/><path d="m16 16 5 5"/></svg></button>
@@ -2212,7 +2228,7 @@
                 <input type="text" id="myUsernameInput" class="tg-inline-input" placeholder="@username" style="flex:1;">
                 <button type="button" class="tool-chip vg-inline-action" id="copyMyUsernameBtn" style="padding:3px 8px;font-size:11px;"><svg viewBox="0 0 24 24" aria-hidden="true"><rect x="8" y="8" width="12" height="12" rx="2"/><path d="M16 8V5a2 2 0 0 0-2-2H5a2 2 0 0 0-2 2v9a2 2 0 0 0 2 2h3"/></svg>Копировать</button>
               </div>
-              <div class="tg-row-hint">Уникальный юзернейм (@paveldurov всегда имеет ID: 1)</div>
+              <div class="tg-row-hint">Уникальный юзернейм. ID назначается сервером.</div>
             </div>
           </div>
           <div class="tg-row-item">
@@ -2237,6 +2253,12 @@
           <div style="padding:4px 16px 8px;">
             <button type="button" class="btn-primary" id="buyPremiumBtn">Включить / Выключить Premium</button>
           </div>
+        </div>
+
+        <div class="tg-section-box" data-profile-panel="status" id="rainbowNickSettingsBox">
+          <div class="tg-section-header">Радужный ник Vibegram</div>
+          <div style="padding:4px 16px 9px;font-size:12px;line-height:1.5;color:var(--text-secondary);">Радужное оформление выдаёт только создатель Vibegram (ID 1). Отправь заявку в отдельного бота — обычные настройки профиля не могут включить эффект.</div>
+          <div style="padding:0 16px 12px;display:flex;align-items:center;gap:10px;flex-wrap:wrap;"><span id="rainbowNickState" class="vg-rainbow-state">Статус: не выдан</span><button type="button" class="btn-primary" id="requestRainbowNickBtn" style="width:auto;padding:10px 14px;">Запросить радужный ник</button></div>
         </div>
 
         <div class="tg-section-box" data-profile-panel="status">
@@ -2317,6 +2339,7 @@
           <button type="button" class="ios-action-btn" id="iosMuteQuickBtn"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M18 8a6 6 0 0 0-12 0c0 7-3 7-3 9h18c0-2-3-2-3-9M10 21h4"/></svg><span id="iosMuteLabel">звук</span></button>
           <button type="button" class="ios-action-btn" id="iosCopyPeerUsernameBtn"><svg viewBox="0 0 24 24" aria-hidden="true"><rect x="8" y="8" width="12" height="12" rx="2"/><path d="M16 8V5a2 2 0 0 0-2-2H5a2 2 0 0 0-2 2v9a2 2 0 0 0 2 2h3"/></svg><span>скопировать @</span></button>
           <button type="button" class="ios-action-btn" id="iosEditChannelQuickBtn" style="display:none;"><svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="3"/><path d="m19 13 2 1-2 4-2-1a8 8 0 0 1-2 1l-.3 2h-4L10 18a8 8 0 0 1-2-1l-2 1-2-4 2-1a8 8 0 0 1 0-2l-2-1 2-4 2 1a8 8 0 0 1 2-1l.3-2h4L15 6a8 8 0 0 1 2 1l2-1 2 4-2 1a8 8 0 0 1 0 2Z"/></svg><span>управление каналом</span></button>
+          <button type="button" class="ios-action-btn" id="iosRainbowQuickBtn" style="display:none;"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 19a8 8 0 0 1 16 0M7 15a5 5 0 0 1 10 0M10 11a2 2 0 0 1 4 0"/><path d="M3 5h18"/></svg><span>радужный ник</span></button>
           <button type="button" class="ios-action-btn" id="iosManageGroupQuickBtn" style="display:none;"><svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="9" cy="8" r="3"/><circle cx="17" cy="9" r="2.3"/><path d="M3 20v-1a6 6 0 0 1 12 0v1M16 15a4 4 0 0 1 5 4v1"/></svg><span>управление группой</span></button>
           <button type="button" class="ios-action-btn" id="iosJoinGroupQuickBtn" style="display:none;"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 5v14M5 12h14"/></svg><span>вступить</span></button>
           <button type="button" class="ios-action-btn" id="iosSendMediaQuickBtn"><svg viewBox="0 0 24 24" aria-hidden="true"><rect x="3" y="3" width="18" height="18" rx="3"/><circle cx="8.5" cy="8.5" r="1.5"/><path d="m21 15-5-5L5 21"/></svg><span>медиа</span></button>
@@ -2348,11 +2371,9 @@
         </div>
 
         <div class="profile-linked-channels" id="profileLinkedChannelsSection" style="display:none;">
-          <div class="profile-linked-channels-title">Каналы профиля</div>
           <div id="profileLinkedChannelsList" style="display:flex;flex-direction:column;gap:9px;"></div>
         </div>
         <div class="vg-created-entities" id="profileCreatedEntitiesSection" style="display:none;">
-          <div class="profile-linked-channels-title">Проекты и сообщества</div>
           <div class="vg-created-entities-list" id="profileCreatedEntitiesList"></div>
         </div>
 
@@ -2465,21 +2486,25 @@
       }
     }
 
-    function getUserIdNumber(username, metaUid) {
-      const u = (username || '').toLowerCase().replace(/^@+/, '');
-      if (u === 'paveldurov') return 1;
-      if (u === 'verify_bot') return 0;
-      if (metaUid && Number(metaUid) > 1) return Number(metaUid);
-      const nonChannelUsers = Object.keys(usersMap).filter(k => k !== 'verify_bot' && k !== 'paveldurov' && !usersMap[k]?.is_channel).sort();
-      const idx = nonChannelUsers.indexOf(u);
-      return idx >= 0 ? idx + 2 : Math.floor(100 + Math.random() * 899);
+    function getUserIdNumber(username, metaUid, serverId) {
+      const u = String(username || '').toLowerCase().replace(/^@+/, '');
+      if (u === 'verify_bot' || u === 'rainbow_bot') return 0;
+      const candidates = [serverId, usersMap[u]?.id, metaUid, usersMap[u]?.uid];
+      for (const candidate of candidates) {
+        if (candidate === null || candidate === undefined || candidate === '') continue;
+        const n = Number(candidate);
+        if (Number.isSafeInteger(n) && n > 0) return n;
+      }
+      // Stable visual fallback for legacy entities without numeric IDs; never grants permissions.
+      let hash = 0; for (let i = 0; i < u.length; i++) hash = ((hash * 31) + u.charCodeAt(i)) >>> 0;
+      return 100 + (hash % 900);
     }
 
     function enrichEntity(obj) {
       if (!obj) return obj;
       const { cleanBio, meta } = unpackBioAndMeta(obj.bio);
       const u = (obj.username || '').toLowerCase();
-      const uid = u === 'paveldurov' ? 1 : getUserIdNumber(u, meta.uid || obj.uid);
+      const uid = getUserIdNumber(u, meta.uid || obj.uid, obj.id);
       return {
         ...obj,
         uid: uid,
@@ -2499,7 +2524,7 @@
        ========================================================================= */
     let accountsList = JSON.parse(localStorage.getItem(ACCOUNTS_LIST_KEY)) || [];
     let myProfile = JSON.parse(localStorage.getItem(PROFILE_STORAGE_KEY)) || (accountsList[0] || null);
-    let isModeratorUnlocked = localStorage.getItem(MODERATOR_UNLOCKED_KEY) === '1';
+    let isModeratorUnlocked = false; // populated only after server confirms Admin ID 1
     let isAddingSecondAccount = false;
 
     let usersMap = {};
@@ -2553,13 +2578,13 @@
       try {
         const raw = localStorage.getItem(CHATS_CACHE_PREFIX + u);
         if (!raw) {
-          openedPeers = ['verify_bot'];
+          openedPeers = ['verify_bot','rainbow_bot'];
           messagesList = [];
           return;
         }
         const parsed = JSON.parse(raw);
         if (Array.isArray(parsed.openedPeers)) {
-          openedPeers = parsed.openedPeers.includes('verify_bot') ? parsed.openedPeers : ['verify_bot', ...parsed.openedPeers];
+          openedPeers = (parsed.openedPeers.includes('verify_bot') && parsed.openedPeers.includes('rainbow_bot')) ? parsed.openedPeers : [...new Set(['verify_bot','rainbow_bot', ...parsed.openedPeers])];
         }
         if (Array.isArray(parsed.messagesList) && messagesList.length === 0) {
           messagesList = parsed.messagesList;
@@ -2639,6 +2664,10 @@
       const isVer = Boolean(serverObj && serverObj.is_verified);
       const isPremium = Boolean(serverObj && serverObj.is_premium && serverObj.premium_grant_version === 1);
       const isTeam = Boolean(serverObj && serverObj.is_team && serverObj.team_grant_version === 1);
+      const isDeveloper = Boolean(serverObj && Number(serverObj.id || serverObj.uid || 0) === 1 && !serverObj.is_channel && !serverObj.is_group && !serverObj.is_bot);
+      const developerHtml = isDeveloper
+        ? `<span class="dev-svg-badge" data-ver-user="${escapeHtml(username)}" data-badge-type="dev" title="Разработчик Vibegram">${getStickerSvg('dev')}</span>`
+        : '';
       const teamHtml = isTeam
         ? `<span class="team-svg-badge" data-ver-user="${escapeHtml(username)}" data-badge-type="team" title="Официальная команда Vibegram">${getTeamStarSvg()}</span>`
         : '';
@@ -2648,7 +2677,7 @@
       const premHtml = isPremium
         ? `<span class="prem-svg-badge" data-ver-user="${escapeHtml(username)}" data-badge-type="premium" title="Vibegram Premium">${getStickerSvg(serverObj.sticker || serverObj.sticker_id || obj.sticker)}</span>`
         : '';
-      return `${teamHtml}${verHtml}${premHtml}`;
+      return `${developerHtml}${teamHtml}${verHtml}${premHtml}`;
     }
 
     function openBadgeExplanationModal(username, badgeType = '') {
@@ -2665,7 +2694,12 @@
       const catEl = document.getElementById('badgeInfoCategory');
       const reasonEl = document.getElementById('badgeInfoReason');
 
-      if (badgeType === 'team' && target.is_team) {
+      if (badgeType === 'dev' && Number(serverObj.id || serverObj.uid || 0) === 1 && !serverObj.is_channel && !serverObj.is_group && !serverObj.is_bot) {
+        iconBox.innerHTML = getStickerSvg('dev').replace('width="18" height="18"','width="36" height="36"');
+        titleEl.textContent = 'Разработчик Vibegram';
+        catEl.textContent = 'Системный знак разработчика';
+        reasonEl.textContent = 'Знак отображается для аккаунта с числовым ID 1, подтверждённым сервером.';
+      } else if (badgeType === 'team' && target.is_team) {
         iconBox.innerHTML = getTeamStarSvg().replace('<svg ', '<svg width="36" height="36" ');
         titleEl.textContent = `Команда Vibegram — ${target.name}`;
         catEl.textContent = 'Официальная команда Vibegram';
@@ -2768,11 +2802,6 @@
         authScreen.classList.add('active');
         return false;
       }
-      if (myProfile.username.toLowerCase() === 'paveldurov') {
-        myProfile.uid = 1;
-        isModeratorUnlocked = true;
-        localStorage.setItem(MODERATOR_UNLOCKED_KEY, '1');
-      }
       upsertAccountInList(myProfile);
       authScreen.classList.remove('active');
       return true;
@@ -2797,7 +2826,7 @@
         alert('Заполните имя, @username и корректный Email. Подтверждать Email не нужно.');
         return;
       }
-      if (!/^[a-z0-9_]{3,32}$/.test(username) || username === 'verify_bot') {
+      if (!/^[a-z0-9_]{3,32}$/.test(username) || ['verify_bot','rainbow_bot'].includes(username)) {
         alert('Username: 3–32 символа, только латиница, цифры и _.');
         return;
       }
@@ -2832,7 +2861,7 @@
           // Server sync is retried after the local profile is prepared.
         }
 
-        const assignedUid = username === 'paveldurov' ? 1 : (Object.keys(usersMap).length + 1);
+        const assignedUid = getUserIdNumber(username, 0, usersMap[username]?.id);
         saveChatsCacheForCurrentAccount();
         myProfile = {
           uid: assignedUid,
@@ -2850,10 +2879,6 @@
           verify_category: 'Популярный блогер',
           verify_reason: ''
         };
-        if (myProfile.username === 'paveldurov') {
-          isModeratorUnlocked = true;
-          localStorage.setItem(MODERATOR_UNLOCKED_KEY, '1');
-        }
         upsertAccountInList(myProfile);
         currentCommentSendAsUsername = myProfile.username;
         isAddingSecondAccount = false;
@@ -2996,12 +3021,17 @@
     document.getElementById('drawerAvatar').addEventListener('click', () => { closeDrawer(); openMyProfileModal(); });
     document.getElementById('drawerMyProfileBtn').addEventListener('click', () => { closeDrawer(); openMyProfileModal(); });
     document.getElementById('drawerCreateGroupBtn').addEventListener('click', () => { closeDrawer(); vgOpenCreateGroupModal(); });
+    document.getElementById('drawerCreateFolderBtn').addEventListener('click', async () => { closeDrawer(); const name=prompt('Название папки чатов (например: Друзья, Работа):'); if(!name||!name.trim())return; const clean=name.trim().slice(0,32); if(!vgPrefs.custom_folders.includes(clean))vgPrefs.custom_folders.push(clean); vgActiveFilter='folder:'+clean; await vgSavePrefs(); renderSidebar(); });
     document.getElementById('drawerCreateChannelBtn').addEventListener('click', () => { closeDrawer(); openChannelModal(null); });
     document.getElementById('drawerAppsBtn').addEventListener('click', () => { closeDrawer(); vgOpenModal('vgApplicationsModal'); });
     document.getElementById('drawerBrowseCommunitiesBtn').addEventListener('click', () => { closeDrawer(); vgOpenDirectory('all'); });
-    document.getElementById('vgAppsInstallBtn').addEventListener('click', () => { vgCloseModal('vgApplicationsModal'); const installBtn=document.getElementById('installPwaBtn'); if(installBtn) installBtn.click(); else vgToast('Установка','Открой меню браузера и выбери «Установить приложение» или «Добавить на экран Домой».'); });
+    document.getElementById('vgAppsInstallBtn')?.addEventListener('click', () => { vgCloseModal('vgApplicationsModal'); const installBtn=document.getElementById('installPwaBtn'); if(installBtn) installBtn.click(); else vgToast('Установка','Открой меню браузера и выбери «Установить приложение» или «Добавить на экран Домой».'); });
+    document.getElementById('vgAppsInstallIOSBtn').addEventListener('click', () => { vgCloseModal('vgApplicationsModal'); const installBtn=document.getElementById('installPwaBtn'); if(installBtn) installBtn.click(); else vgToast('Установка на iPhone','В Safari нажми «Поделиться» → «На экран Домой».'); });
+    document.getElementById('vgAppsOpenWebBtn').addEventListener('click', () => { vgCloseModal('vgApplicationsModal'); window.open(location.origin + location.pathname, '_self'); });
     document.getElementById('drawerSavedMsgsBtn').addEventListener('click', () => { closeDrawer(); if (myProfile) openChatWith(myProfile.username); });
     document.getElementById('drawerOpenVerifyBotBtn').addEventListener('click', () => { closeDrawer(); openChatWith('verify_bot'); });
+    document.getElementById('drawerOpenRainbowBotBtn').addEventListener('click', () => { closeDrawer(); openChatWith('rainbow_bot'); });
+    document.getElementById('drawerNotificationsBtn').addEventListener('click', () => { closeDrawer(); document.getElementById('enableNotificationsBtn')?.click(); });
     document.getElementById('drawerPremiumBtn').addEventListener('click', () => { closeDrawer(); vgSetProfileSettingsTab('status'); openMyProfileModal(); vgSetProfileSettingsTab('status'); });
     document.getElementById('vgProfileTabs')?.addEventListener('click', ev => {
       const tab = ev.target.closest('[data-profile-tab]'); if (!tab) return;
@@ -3240,12 +3270,15 @@
     function getPeerObject(username) {
       const u = (username || '').toLowerCase();
       const me = myProfile ? myProfile.username.toLowerCase() : '';
+      if (u === 'rainbow_bot') {
+        return enrichEntity({ uid: 0, id: 0, username: 'rainbow_bot', name: 'Rainbow Nick Bot', bio: 'Отдельный бот заявок на радужное оформление профилей и каналов. Выдача доступна только создателю с ID 1.', color: '#a970ff', avatar: '', is_bot: true, is_verified: true, verify_category: 'Официальный бот Vibegram', verify_reason: 'Системный бот запросов радужного ника.', last_seen: serverTime });
+      }
       if (u === 'verify_bot') {
         return enrichEntity({
           uid: 0,
           username: 'verify_bot',
           name: 'Бот Верификации',
-          bio: 'Общедоступный бот верификации каналов и аккаунтов. Пароль создателя: ID 1 (@paveldurov)',
+          bio: 'Общедоступный бот верификации каналов и аккаунтов. Доступ к выдаче только у подтверждённого аккаунта с ID 1.',
           color: '#30d158',
           avatar: '',
           is_bot: true,
@@ -3279,7 +3312,6 @@
 
     async function syncMyProfileToServer(oldUsername = '') {
       if (!myProfile) return;
-      if (myProfile.username.toLowerCase() === 'paveldurov') myProfile.uid = 1;
       upsertAccountInList(myProfile);
 
       const packedBio = packBioWithMeta(myProfile.bio, {
@@ -3668,7 +3700,7 @@
         if (usersMap[me] && !usersMap[me].is_channel) {
           const serverSelf = usersMap[me];
           const enrichedMe = enrichEntity(serverSelf);
-          myProfile.uid = me === 'paveldurov' ? 1 : enrichedMe.uid;
+          myProfile.uid = enrichedMe.uid;
           myProfile.is_verified = Boolean(serverSelf.is_verified);
           myProfile.is_premium = Boolean(serverSelf.is_premium && serverSelf.premium_grant_version === 1);
           myProfile.is_team = Boolean(serverSelf.is_team && serverSelf.team_grant_version === 1);
@@ -3737,6 +3769,7 @@
       const convMap = new Map();
 
       convMap.set('verify_bot', { peer: getPeerObject('verify_bot'), lastMsg: null, unreadCount: 0 });
+      convMap.set('rainbow_bot', { peer: getPeerObject('rainbow_bot'), lastMsg: null, unreadCount: 0 });
 
       openedPeers.forEach(u => {
         if (!convMap.has(u)) convMap.set(u, { peer: getPeerObject(u), lastMsg: null, unreadCount: 0 });
@@ -3772,8 +3805,10 @@
 
       const pinnedChatNames = (pinsMap[`chatlist:${me}`] || []);
       return Array.from(convMap.values()).sort((a, b) => {
-        if (a.peer.username === 'verify_bot') return -1;
-        if (b.peer.username === 'verify_bot') return 1;
+        if (a.peer.username === 'verify_bot') return -2;
+        if (b.peer.username === 'verify_bot') return 2;
+        if (a.peer.username === 'rainbow_bot') return -1;
+        if (b.peer.username === 'rainbow_bot') return 1;
         const ap = pinnedChatNames.includes(a.peer.username) ? 1 : 0;
         const bp = pinnedChatNames.includes(b.peer.username) ? 1 : 0;
         if (ap !== bp) return bp - ap;
@@ -3887,7 +3922,7 @@
       const targetEntity=usersMap[u];
       const viewer=String(myProfile?.username||'').toLowerCase();
       if(targetEntity?.is_group && !(targetEntity.owner===viewer || (targetEntity.members||[]).includes(viewer))){openUserProfile(u);return;}
-      if (u !== 'verify_bot' && (!usersMap[u] && u !== (myProfile?.username || '').toLowerCase())) {
+      if (!['verify_bot','rainbow_bot'].includes(u) && (!usersMap[u] && u !== (myProfile?.username || '').toLowerCase())) {
         showCustomIosBanner('Не найдено', `Пользователь, группа или канал @${u} не найден`);
         return;
       }
@@ -3914,7 +3949,7 @@
 
       const me = myProfile.username.toLowerCase();
       const peer = getPeerObject(activePeer);
-      const isBotChat = activePeer === 'verify_bot';
+      const isBotChat = activePeer === 'verify_bot' || activePeer === 'rainbow_bot';
 
       const avatarBg = peer.avatar ? `background-image:url('${peer.avatar}')` : `background-color:${peer.color}`;
       activeChatAvatar.style.cssText = `width:38px;height:38px;font-size:15px;cursor:pointer;${avatarBg}`;
@@ -3924,15 +3959,15 @@
       const peerTypingNow = !peer.is_channel && !isBotChat && peer.typing_to === me && (Date.now() - Number(peer.typing_time || 0) < 5000);
       activeChatStatus.textContent = peerTypingNow
         ? 'печатает…'
-        : (isBotChat ? 'общедоступный бот верификации' : (peer.is_group ? `${(peer.members || []).length} участников · групповая переписка` : getPresenceLabel(peer, me)));
+        : (isBotChat ? (activePeer === 'rainbow_bot' ? 'заявки на радужный ник' : 'общедоступный бот верификации') : (peer.is_group ? `${(peer.members || []).length} участников · групповая переписка` : getPresenceLabel(peer, me)));
       activeChatStatus.classList.toggle('online', peerTypingNow || activeChatStatus.textContent === 'в сети');
 
       if (isBotChat) {
         verifyBotPanel.classList.add('active');
-        if (isModeratorUnlocked || me === 'paveldurov') {
+        if (isModeratorUnlocked) {
           verifyBotStatusText.innerHTML = `✅ <b>Режим Создателя (ID: 1) привязан к @${escapeHtml(me)}!</b> Вы можете выдавать или отклонять галочки ниже.`;
         } else {
-          verifyBotStatusText.innerHTML = `🤖 Отправьте в чат цифру <b>1</b> (ID создателя @paveldurov), чтобы привязать панель модерации заявок к вашему аккаунту.`;
+          verifyBotStatusText.innerHTML = `🤖 Панель выдачи доступна только аккаунту, которому сервер назначил ID 1. Если это твой аккаунт, отправь цифру <b>1</b>, чтобы привязать бота.`;
         }
       } else {
         verifyBotPanel.classList.remove('active');
@@ -3964,17 +3999,18 @@
         headerSubBtn.style.display = 'none';
         messageForm.style.display = 'flex';
         channelReadonlyBar.style.display = 'none';
-        messageInput.placeholder = isBotChat ? 'Введите 1 (ID создателя) или нажмите Подать заявку...' : 'Сообщение...';
+        messageInput.placeholder = isBotChat ? (activePeer === 'rainbow_bot' ? 'Чтобы запросить радужный ник, нажми кнопку выше…' : 'Сообщение боту верификации…') : 'Сообщение...';
       }
 
       let chatMessages = [];
       if (peer.is_channel) {
         chatMessages = messagesList.filter(m => m.is_channel_post && m.to === activePeer);
       } else if (isBotChat) {
-        const myBotMsgs = messagesList.filter(m => (m.sender === me && m.to === 'verify_bot') || (m.sender === 'verify_bot' && m.to === me));
+        const botHandle = activePeer;
+        const myBotMsgs = messagesList.filter(m => (m.sender === me && m.to === botHandle) || (m.sender === botHandle && m.to === me));
         const combined = new Map();
         myBotMsgs.forEach(m => combined.set(m.id, m));
-        if (isModeratorUnlocked || me === 'paveldurov') {
+        if (isModeratorUnlocked && activePeer === 'verify_bot') {
           modQueueMessages.forEach(m => combined.set(m.id, m));
         }
         chatMessages = Array.from(combined.values()).sort((a, b) => a.time - b.time);
@@ -3995,7 +4031,7 @@
         messagesContainer.innerHTML = `
           <div class="msg-empty">
             ${isBotChat
-              ? `Это общедоступный <b>@verify_bot</b>.<br><br>Галочки каналам и профилям выдаются <b>только через заявки</b>!<br>Нажмите <b>«Подать заявку ✓»</b> сверху или введите пароль <b>1</b> (ID создателя) для рассмотрения заявок.`
+              ? (activePeer === 'rainbow_bot' ? `Это <b>@rainbow_bot</b>. Радужное оформление профиля или канала можно запросить через кнопку заявки. Решение принимает только серверный Admin ID 1.` : `Это общедоступный <b>@verify_bot</b>. Галочки каналам и профилям выдаются <b>только через заявки</b>. Решение принимает только серверный Admin ID 1.`)
               : `Сообщений пока нет.`}
           </div>
         `;
@@ -4020,6 +4056,9 @@
           groupHeaderHtml = `<div class="vg-group-sender"><span class="avatar" data-avatar-user="${escapeHtml(senderProfile.username)}" style="${senderBg};width:21px;height:21px;font-size:9px;display:inline-flex;vertical-align:middle;margin-right:5px;cursor:pointer;">${senderProfile.avatar ? '' : escapeHtml(getInitials(senderProfile.name || senderProfile.username))}</span><span data-open-user="${escapeHtml(senderProfile.username)}" class="user-nav-link">${escapeHtml(senderProfile.name)}</span>${(peer.admins||{})[msg.sender] ? '<span class="vg-group-admin-tag">админ</span>' : ''}</div>`;
         }
 
+        let forwardedHtml='';
+        if(msg.forwarded_from&&msg.forwarded_from.username){const forwardHandle=String(msg.forwarded_from.username).toLowerCase().replace(/^@+/,'');const forwardPeer=getPeerObject(forwardHandle);const forwardBg=forwardPeer.avatar?`background-image:url(\"${String(forwardPeer.avatar).replace(/\"/g,'&quot;')}\")`:`background-color:${forwardPeer.color||'#2aabee'}`;const forwardInitial=forwardPeer.avatar?'':escapeHtml(getInitials(forwardPeer.name||forwardHandle));const rainbow=Boolean(usersMap[forwardHandle]?.rainbow_nick&&usersMap[forwardHandle]?.rainbow_grant_version===1);forwardedHtml=`<div class=\"vg-forwarded-source\"><div class=\"vg-forwarded-avatar\" data-avatar-user=\"${escapeHtml(forwardHandle)}\" style=\"${forwardBg}\">${forwardInitial}</div><div class=\"vg-forwarded-meta\"><span>Переслано от</span><button type=\"button\" class=\"vg-forwarded-name ${rainbow?'vg-rainbow-name':''}\" data-open-user=\"${escapeHtml(forwardHandle)}\">${escapeHtml(forwardPeer.name||msg.forwarded_from.name||forwardHandle)} ${renderBadgesHtml(forwardPeer)}</button></div></div>`;}
+
         let replyQuoteHtml = '';
         if (msg.reply_to && msg.reply_to.text) {
           replyQuoteHtml = `<div class="msg-reply-quote"><div class="msg-reply-author">${escapeHtml(msg.reply_to.name || '@' + msg.reply_to.sender)}</div><div>${renderMessageText(msg.reply_to.text)}</div></div>`;
@@ -4041,16 +4080,14 @@
         }
         let pollHtml = '';
         if (msg.media && msg.media.type === 'poll' && Array.isArray(msg.media.options)) {
-          const pollVotes = msg.media.votes || {};
-          const totalVotes = Object.values(pollVotes).reduce((sum, arr) => sum + (Array.isArray(arr) ? arr.length : 0), 0);
-          const ownVote = Object.keys(pollVotes).find(k => (pollVotes[k] || []).includes(me));
-          pollHtml = `<div class="vg-poll"><div class="vg-poll-title">📊 ${escapeHtml(msg.media.question || msg.text || 'Опрос')}</div>${msg.media.options.map((option, idx) => { const votes = Array.isArray(pollVotes[String(idx)]) ? pollVotes[String(idx)] : []; const pct = totalVotes ? Math.round(votes.length / totalVotes * 100) : 0; return `<button class="vg-poll-option" type="button" data-vg-poll-option="${idx}" style="--vg-vote-pct:${pct}%"><span>${ownVote === String(idx) ? '🔘 ' : '◯ '}${escapeHtml(option)}</span><span class="vg-poll-count">${pct}% · ${votes.length}</span></button>`; }).join('')}<div class="vg-helper">${totalVotes} голос(ов) · нажми на вариант, чтобы проголосовать</div></div>`;
+          const pollMedia=msg.media;const pollVotes=pollMedia.votes&&typeof pollMedia.votes==='object'?pollMedia.votes:{};const selectedOptions=Object.keys(pollVotes).filter(k=>Array.isArray(pollVotes[k])&&pollVotes[k].includes(me));const voters=new Set(Object.values(pollVotes).flatMap(v=>Array.isArray(v)?v:[]));const voterCount=voters.size;const totalMarks=Object.values(pollVotes).reduce((n,v)=>n+(Array.isArray(v)?v.length:0),0);const isClosed=Boolean(pollMedia.closed);const isQuiz=Boolean(pollMedia.is_quiz);const canManagePoll=msg.sender===me||(peer.is_channel&&(peer.owner===me||Boolean((peer.admins||{})[me]?.can_post)))||(isModeratorUnlocked&&Number(usersMap[me]?.id||0)===1);const pollOptionsHtml=pollMedia.options.map((option,idx)=>{const votes=Array.isArray(pollVotes[String(idx)])?pollVotes[String(idx)]:[];const pct=voterCount?Math.round(votes.length/voterCount*100):0;const selected=selectedOptions.includes(String(idx));const correctShown=isQuiz&&selectedOptions.length>0&&Number(pollMedia.correct_option)===idx;const wrongShown=isQuiz&&selected&&Number(pollMedia.correct_option)!==idx;return `<button class="vg-poll-option ${selected?'selected':''} ${correctShown?'correct':''} ${wrongShown?'wrong':''}" type="button" data-vg-poll-option="${idx}" ${isClosed?'disabled':''} style="--vg-vote-pct:${pct}%"><span class="vg-poll-option-label"><span class="vg-poll-choice-icon">${selected?'✓':(pollMedia.multiple?'□':'○')}</span>${escapeHtml(option)}${correctShown?'<b class="vg-poll-correct-mark">✓</b>':''}</span><span class="vg-poll-count">${pct}% · ${votes.length}</span></button>`;}).join('');const withdrawHtml=selectedOptions.length&&!isClosed?'<button type="button" class="vg-poll-withdraw" data-vg-poll-withdraw>Отменить мой голос</button>':'';const manageHtml=canManagePoll?`<button type="button" class="vg-poll-manage" data-vg-poll-manage="${isClosed?'open':'close'}">${isClosed?'Открыть опрос':'Закрыть опрос'}</button>`:'';const quizText=isQuiz&&selectedOptions.length?`<div class="vg-poll-quiz-result">${selectedOptions.some(k=>Number(k)===Number(pollMedia.correct_option))?'✅ Правильный ответ':'Ответ принят. Правильный вариант подсвечен.'}</div>`:'';pollHtml=`<div class="vg-poll"><div class="vg-poll-title">${isQuiz?'🧠':'📊'} ${escapeHtml(pollMedia.question||msg.text||'Опрос')}</div><div class="vg-poll-kind">${isQuiz?'Викторина':pollMedia.multiple?'Можно выбрать несколько вариантов':'Один вариант ответа'}${isClosed?' · Опрос закрыт':''}</div>${pollOptionsHtml}${quizText}${withdrawHtml}<div class="vg-poll-footer"><span>${voterCount} участник(ов) · ${totalMarks} выбор(ов)</span>${manageHtml}</div></div>`;
         }
 
         let botVerifyHtml = '';
+        if(msg.rainbow_request){const rr=msg.rainbow_request;const pending=rr.status==='pending';const isAdmin=Boolean(isModeratorUnlocked&&Number(usersMap[me]?.id||0)===1);botVerifyHtml=`<div class=\"vg-rainbow-request-card\"><div class=\"vg-rainbow-request-title\">🌈 Заявка на радужный ник</div><div class=\"vg-rainbow-request-info\">Объект: <b>@${escapeHtml(rr.target||'')}</b> · ${rr.target_type==='channel'?'канал':'профиль'}<br>Заявитель: @${escapeHtml(rr.applicant||'')}</div>${pending&&isAdmin?'<div class=\"bot-verify-actions\"><button class=\"bot-verify-btn approve\" data-rainbow-decide=\"approve\">🌈 Выдать</button><button class=\"bot-verify-btn reject\" data-rainbow-decide=\"reject\">Отказать</button></div>':`<div class=\"bot-status-stamp\">${pending?'⏳ Ожидает решения создателя':rr.status==='approved'?'✅ Радужный ник выдан':'❌ Заявка отклонена'}</div>`}</div>`;}
         if (msg.verification_request) {
           const req = msg.verification_request;
-          if (req.status === 'pending' && (isModeratorUnlocked || me === 'paveldurov')) {
+          if (req.status === 'pending' && isModeratorUnlocked) {
             botVerifyHtml = `
               <div class="bot-verify-actions">
                 <button type="button" class="bot-verify-btn approve" data-decide="approve">✅ Выдать галочку</button>
@@ -4082,6 +4119,7 @@
         el.innerHTML = `
           ${channelHeaderHtml}
           ${groupHeaderHtml}
+          ${forwardedHtml}
           ${replyQuoteHtml}
           ${mediaHtml}
           ${pollHtml}
@@ -4117,13 +4155,12 @@
         });
 
         el.querySelectorAll('[data-vg-poll-option]').forEach(pollBtn => pollBtn.addEventListener('click', async (ev) => {
-          ev.stopPropagation();
-          if (!myProfile) return;
+          ev.stopPropagation(); if (!myProfile) return;
           const response = await fetch('/api/poll/vote', { method:'POST', headers:{'Content-Type':'application/json'}, body:JSON.stringify({ id:msg.id, user:myProfile.username, option:Number(pollBtn.dataset.vgPollOption) }) });
-          const result = await response.json().catch(() => ({}));
-          if (!response.ok) showCustomIosBanner('Не удалось проголосовать', result.error || 'Попробуйте ещё раз');
-          await pollServer();
+          const result = await response.json().catch(() => ({})); if (!response.ok) showCustomIosBanner('Не удалось проголосовать', result.error || 'Попробуйте ещё раз'); else if(result.correct===true) showCustomIosBanner('Правильно!','Верный ответ.'); else if(result.correct===false) showCustomIosBanner('Ответ записан','Это не правильный вариант.'); await pollServer();
         }));
+        const withdrawPollBtn=el.querySelector('[data-vg-poll-withdraw]');if(withdrawPollBtn)withdrawPollBtn.addEventListener('click',async ev=>{ev.stopPropagation();const r=await fetch('/api/poll/vote',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({id:msg.id,user:myProfile.username,option:-1})});const d=await r.json().catch(()=>({}));if(!r.ok)vgToast('Не удалось отменить голос',d.error||'');await pollServer();});
+        const pollManageBtn=el.querySelector('[data-vg-poll-manage]');if(pollManageBtn)pollManageBtn.addEventListener('click',async ev=>{ev.stopPropagation();const operation=pollManageBtn.dataset.vgPollManage;const r=await fetch('/api/poll/manage',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({id:msg.id,actor:myProfile.username,operation})});const d=await r.json().catch(()=>({}));if(!r.ok)vgToast('Не удалось изменить опрос',d.error||'');await pollServer();});
 
         const commBtn = el.querySelector('[data-open-comments]');
         if (commBtn) commBtn.addEventListener('click', (ev) => { ev.stopPropagation(); openCommentsSheet(msg.id); });
@@ -5211,7 +5248,7 @@
       myProfile = {
         ...myProfile,
         profile_channels: selectedProfileChannels,
-        uid: newUsername === 'paveldurov' ? 1 : myProfile.uid,
+        uid: myProfile.uid,
         name: myNameInput.value.trim() || 'User',
         username: newUsername,
         phone: myPhoneInput.value.trim(),
@@ -5298,7 +5335,7 @@
       if (handle === me) { peerProfileModal.classList.remove('open'); vgSetProfileSettingsTab('profile'); openMyProfileModal(); return; }
       if (!usersMap[handle]) await pollServer();
       const entity=usersMap[handle];
-      if (!entity && handle !== 'verify_bot') { showCustomIosBanner('Профиль не найден', `Аккаунт, группа или канал @${handle} не найден на сервере.`); return; }
+      if (!entity && !['verify_bot','rainbow_bot'].includes(handle)) { showCustomIosBanner('Профиль не найден', `Аккаунт, группа или канал @${handle} не найден на сервере.`); return; }
       const commentsOverlay = document.getElementById('commentsModal'); commentsOverlay?.classList.remove('open');
       const isNonMemberPublicGroup=Boolean(entity?.is_group && !(entity.members||[]).includes(me) && entity.owner!==me);
       if(isNonMemberPublicGroup){vgProfilePreviewOnly=true;vgPreviewPreviousPeer=activePeer;activePeer=handle;openPeerProfile();return;}
@@ -5782,12 +5819,9 @@
     messageForm.addEventListener('submit', ev=>{if(activePeer&&vgPrefs.blocked_users.includes(activePeer)){ev.preventDefault();ev.stopImmediatePropagation();vgToast('Отправка заблокирована','Сначала разблокируй пользователя.');}},true);
 
     // Chat-specific message actions: edit, translate, hide for self, multi-select, report.
-    document.getElementById('vgCtxEditBtn').addEventListener('click',async()=>{
-      const m=selectedContextMsg;msgContextWrap.classList.remove('open');if(!m||!myProfile)return;
-      if(m.sender!==myProfile.username.toLowerCase()||m.is_channel_post){vgToast('Нельзя редактировать','Редактировать можно только своё личное сообщение.');return;}
-      const text=prompt('Изменить текст сообщения:',m.text||'');if(text===null||!text.trim())return;
-      const r=await fetch('/api/edit_msg',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({id:m.id,user:myProfile.username,text:text.trim()})});const d=await r.json().catch(()=>({}));if(!r.ok){vgToast('Не удалось изменить сообщение',d.error||'Ошибка сервера');return;}lastRenderedSignature='';await pollServer();vgToast('Сообщение изменено','');
-    });
+    let vgEditingMessageId='';
+    document.getElementById('vgCtxEditBtn').addEventListener('click',()=>{const m=selectedContextMsg;msgContextWrap.classList.remove('open');if(!m||!myProfile)return;if(m.sender!==myProfile.username.toLowerCase()||m.is_channel_post||m.is_group_message&&m.sender!==myProfile.username.toLowerCase()){vgToast('Нельзя редактировать','Редактировать можно только своё сообщение.');return;}vgEditingMessageId=String(m.id);document.getElementById('vgEditMessageText').value=m.text||'';vgOpenModal('vgEditMessageModal');setTimeout(()=>{const el=document.getElementById('vgEditMessageText');el.focus();el.setSelectionRange(el.value.length,el.value.length);},60);});
+    document.getElementById('vgEditMessageForm').addEventListener('submit',async ev=>{ev.preventDefault();const text=document.getElementById('vgEditMessageText').value.trim();if(!vgEditingMessageId||!text||!myProfile)return;const btn=document.getElementById('vgEditMessageSaveBtn');btn.disabled=true;try{const r=await fetch('/api/edit_msg',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({id:vgEditingMessageId,user:myProfile.username,text})});const d=await r.json().catch(()=>({}));if(!r.ok)throw new Error(d.error||'Ошибка сервера');vgCloseModal('vgEditMessageModal');vgEditingMessageId='';lastRenderedSignature='';await pollServer();vgToast('Сообщение изменено','');}catch(e){vgToast('Не удалось изменить сообщение',e.message);}finally{btn.disabled=false;}});
     document.getElementById('vgCtxTranslateBtn').addEventListener('click',()=>{const text=selectedContextMsg?.text||'';msgContextWrap.classList.remove('open');if(!text)return;window.open('https://translate.google.com/?sl=auto&tl=ru&text='+encodeURIComponent(text)+'&op=translate','_blank','noopener,noreferrer');});
     document.getElementById('vgCtxDeleteMeBtn').addEventListener('click',async()=>{const m=selectedContextMsg;msgContextWrap.classList.remove('open');if(!m)return;vgPrefs.hidden_messages=[...new Set([...vgPrefs.hidden_messages,String(m.id)])].slice(-5000);await vgSavePrefs();lastRenderedSignature='';renderSidebar();renderActiveChat(true);vgToast('Сообщение скрыто','Оно скрыто только в твоём аккаунте.');});
     document.getElementById('ctxDeleteBtn').addEventListener('click',async()=>{
@@ -5811,8 +5845,8 @@
       const original=messagesList;const hidden=new Set((vgPrefs.hidden_messages||[]).map(String));
       messagesList=original.filter(m=>!hidden.has(String(m.id)) && !(usersMap[activePeer]?.is_group && (vgPrefs.blocked_users||[]).includes(String(m.sender||''))));
       try{vgOriginalRenderActiveChat(forceScroll);}finally{messagesList=original;}
-      const isGroup = Boolean(activePeer && usersMap[activePeer]?.is_group);
-      ['vgVoiceCallBtn','vgVideoCallBtn'].forEach(id=>{const b=document.getElementById(id);if(b)b.style.display=isGroup?'none':'';});
+      const callPeer=usersMap[activePeer]||{};const callsUnavailable=Boolean(callPeer.is_group||callPeer.is_channel||callPeer.is_bot||['verify_bot','rainbow_bot'].includes(activePeer));
+      ['vgVoiceCallBtn','vgVideoCallBtn'].forEach(id=>{const b=document.getElementById(id);if(b)b.style.display=callsUnavailable?'none':'';});
       if(vgSelectionMode)vgRefreshSelection();
     };
     document.getElementById('vgCtxReportBtn').addEventListener('click',async()=>{const m=selectedContextMsg;msgContextWrap.classList.remove('open');if(!m||!myProfile)return;const target=vgPeerForMessage(m);if(!target||target===myProfile.username.toLowerCase())return;const reason=prompt('Причина жалобы: спам / оскорбления / мошенничество / другое','Спам');if(!reason)return;const r=await fetch('/api/report',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({reporter:myProfile.username,target,reason,message_id:m.id,details:String(m.text||'').slice(0,500)})});const d=await r.json().catch(()=>({}));vgToast(r.ok?'Жалоба отправлена':'Не удалось отправить жалобу',d.error||'Спасибо, мы сохранили обращение.');});
@@ -5825,8 +5859,15 @@
     document.getElementById('vgScheduledBtn').addEventListener('click',async()=>{await vgRenderScheduled();vgOpenModal('vgScheduledListModal');});
 
     // Poll creation, voting is handled alongside message rendering.
-    document.getElementById('vgPollBtn').addEventListener('click',()=>{if(!activePeer){vgToast('Сначала открой чат','');return;}document.getElementById('vgPollQuestion').value='';document.getElementById('vgPollOptions').value='';vgOpenModal('vgPollModal');});
-    document.getElementById('vgPollForm').addEventListener('submit',async ev=>{ev.preventDefault();if(!activePeer||!myProfile)return;const question=document.getElementById('vgPollQuestion').value.trim();const options=document.getElementById('vgPollOptions').value.split(/\r?\n/).map(x=>x.trim()).filter(Boolean).slice(0,10);if(options.length<2){vgToast('Добавь варианты','Для опроса нужно минимум 2 варианта.');return;}const p=getPeerObject(activePeer);const from=p.is_channel?(p.owner||myProfile.username):myProfile.username;const r=await fetch('/api/send',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({from,to:activePeer,text:'',media:{type:'poll',question,options,votes:{}}})});const d=await r.json().catch(()=>({}));if(!r.ok){vgToast('Не удалось отправить опрос',d.error||'');return;}vgCloseModal('vgPollModal');await pollServer();});
+    const vgPollOptionsInput=document.getElementById('vgPollOptions');
+    const vgPollQuizToggle=document.getElementById('vgPollQuiz');
+    const vgPollCorrectWrap=document.getElementById('vgPollCorrectWrap');
+    const vgPollCorrectSelect=document.getElementById('vgPollCorrectOption');
+    function vgRefreshPollCorrectChoices(){const values=vgPollOptionsInput.value.split(/\r?\n/).map(x=>x.trim()).filter(Boolean).slice(0,10);const old=vgPollCorrectSelect.value;vgPollCorrectSelect.innerHTML=values.map((v,i)=>`<option value="${i}">${escapeHtml(v)}</option>`).join('');if([...vgPollCorrectSelect.options].some(o=>o.value===old))vgPollCorrectSelect.value=old;vgPollCorrectWrap.hidden=!vgPollQuizToggle.checked;}
+    vgPollOptionsInput.addEventListener('input',vgRefreshPollCorrectChoices);vgPollQuizToggle.addEventListener('change',()=>{if(vgPollQuizToggle.checked)document.getElementById('vgPollMultiple').checked=false;vgRefreshPollCorrectChoices();});
+    document.getElementById('vgPollMultiple').addEventListener('change',()=>{if(document.getElementById('vgPollMultiple').checked){vgPollQuizToggle.checked=false;vgRefreshPollCorrectChoices();}});
+    document.getElementById('vgPollBtn').addEventListener('click',()=>{if(!activePeer){vgToast('Сначала открой чат','');return;}document.getElementById('vgPollQuestion').value='';vgPollOptionsInput.value='';document.getElementById('vgPollMultiple').checked=false;vgPollQuizToggle.checked=false;vgRefreshPollCorrectChoices();vgOpenModal('vgPollModal');});
+    document.getElementById('vgPollForm').addEventListener('submit',async ev=>{ev.preventDefault();if(!activePeer||!myProfile)return;const question=document.getElementById('vgPollQuestion').value.trim();const options=vgPollOptionsInput.value.split(/\r?\n/).map(x=>x.trim()).filter(Boolean).slice(0,10);if(options.length<2){vgToast('Добавь варианты','Для опроса нужно минимум 2 варианта.');return;}const p=getPeerObject(activePeer);if(p.is_group===false&&p.is_channel===false&&p.is_bot){vgToast('Опрос недоступен','Нельзя публиковать опросы системным ботам.');return;}const from=p.is_channel?(p.owner||myProfile.username):myProfile.username;const media={type:'poll',question,options,votes:{},multiple:Boolean(document.getElementById('vgPollMultiple').checked&&!vgPollQuizToggle.checked),is_quiz:Boolean(vgPollQuizToggle.checked),correct_option:vgPollQuizToggle.checked?Number(vgPollCorrectSelect.value||0):null,closed:false};const r=await fetch('/api/send',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({from,to:activePeer,text:'',media})});const d=await r.json().catch(()=>({}));if(!r.ok){vgToast('Не удалось отправить опрос',d.error||'');return;}vgCloseModal('vgPollModal');await pollServer();});
 
     // Voice-capture settings for messenger speech: mono Opus, echo cancellation and
     // noise suppression, with automatic gain disabled by preference to reduce feedback.
@@ -6443,6 +6484,54 @@
     setInterval(()=>{if(myProfile&&document.visibilityState==='visible')vgPollCallSignals();},4000);
     document.addEventListener('click', ev=>{if(vgContextPopover&&!vgContextPopover.contains(ev.target)&&!ev.target.closest('.vg-chat-actions-btn')){vgContextPopover.remove();vgContextPopover=null;}},true);
 
+    // Rainbow nickname request workflow. Grants are server-owned; localStorage never activates the effect.
+    async function vgSubmitRainbowRequest(targetHandle){
+      if(!myProfile)return;const target=String(targetHandle||myProfile.username).trim().toLowerCase().replace(/^@+/, '');
+      const button=document.getElementById(target===myProfile.username.toLowerCase()?'requestRainbowNickBtn':'iosRainbowQuickBtn');if(button)button.disabled=true;
+      try{const response=await fetch('/api/rainbow/request',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({applicant:myProfile.username,target})});const data=await response.json().catch(()=>({}));if(!response.ok)throw new Error(data.error||'Заявка не отправлена');vgToast('Заявка отправлена','Решение доступно только создателю с ID 1.');await pollServer();openChatWith('rainbow_bot');}
+      catch(error){vgToast('Не удалось отправить заявку',error.message||'');}
+      finally{if(button)button.disabled=false;}
+    }
+    document.getElementById('requestRainbowNickBtn')?.addEventListener('click',()=>vgSubmitRainbowRequest(myProfile?.username));
+    document.getElementById('iosRainbowQuickBtn')?.addEventListener('click',()=>{const peer=usersMap[activePeer]||{};if(peer.is_channel)vgSubmitRainbowRequest(activePeer);});
+
+    // Keep unread totals per local account badge fresh using each account's cached sync state.
+    function vgUnreadForAccount(handle){
+      const username=String(handle||'').toLowerCase();let data=null;
+      if(myProfile&&myProfile.username.toLowerCase()===username)data={messagesList,usersMap};
+      else{try{data=JSON.parse(localStorage.getItem(CHATS_CACHE_PREFIX+username)||'null');}catch(_){data=null;}}
+      if(!data||!Array.isArray(data.messagesList))return 0;const rows=data.messagesList;const map=data.usersMap||{};let count=0;
+      for(const m of rows){if(!m||m.sender===username)continue;
+        if(m.is_channel_post){const ch=map[m.to]||{};if((ch.owner===username||(ch.subscribers||[]).includes(username))&&!(m.views||[]).includes(username))count++;continue;}
+        if(m.is_group_message){const g=map[m.to]||{};if(((g.members||[]).includes(username)||g.owner===username)&&!(m.read_by||[]).includes(username))count++;continue;}
+        if(m.to===username&&!m.read)count++;
+      }
+      return count;
+    }
+    const vgOriginalUpdateDrawerInfo=updateDrawerInfo;
+    updateDrawerInfo=function(){vgOriginalUpdateDrawerInfo();const root=document.getElementById('drawerAccountsList');if(!root||!myProfile)return;const rows=root.querySelectorAll('.account-switch-row');rows.forEach((row)=>{const line=row.querySelector('div[style*="font-size:11.5px"]');if(!line)return;const username=(line.textContent.match(/@([a-z0-9_]+)/i)||[])[1]?.toLowerCase();if(!username)return;let badge=row.querySelector('.vg-account-unread');if(!badge){badge=document.createElement('span');badge.className='vg-account-unread';row.appendChild(badge);}const n=vgUnreadForAccount(username);badge.textContent=n>99?'99+':String(n);badge.hidden=!n;});};
+    const vgOriginalPollServerForAccountBadges=pollServer;
+    pollServer=async function(){const result=await vgOriginalPollServerForAccountBadges();if(myProfile)updateDrawerInfo();return result;};
+
+    // Rainbow requests are visible only to the server-bound ID 1 account; every grant is validated again by the API.
+    const vgOriginalRenderActiveChatForRainbow=renderActiveChat;
+    renderActiveChat=function(forceScroll=false){vgOriginalRenderActiveChatForRainbow(forceScroll);const handle=String(activePeer||'');const isRainbow=handle==='rainbow_bot';if(isRainbow){verifyBotPanel.classList.add('active');verifyBotStatusText.innerHTML='🌈 <b>Rainbow Nick Bot</b><br>Отправь заявку на радужное оформление личного профиля или канала. Выдаёт его только создатель Vibegram с ID 1.';const apply=document.getElementById('botQuickApplyBtn');if(apply){apply.textContent='Запросить для профиля';apply.style.display='inline-flex';apply.onclick=()=>vgSubmitRainbowRequest(myProfile?.username);}}else if(handle==='verify_bot'){const apply=document.getElementById('botQuickApplyBtn');if(apply){apply.textContent='Подать заявку ✓';apply.style.display='inline-flex';apply.onclick=()=>{openMyProfileModal();vgSetProfileSettingsTab('status');};}}
+      {const rainbowSelf=usersMap[myProfile?.username?.toLowerCase()]||{};document.getElementById('rainbowNickState')?.replaceChildren(document.createTextNode(rainbowSelf.rainbow_nick&&rainbowSelf.rainbow_grant_version===1?'Статус: радужный ник активен':rainbowSelf.rainbow_pending?'Статус: заявка рассматривается':'Статус: не выдан'));}
+    };
+    document.getElementById('messagesContainer').addEventListener('click',async ev=>{const btn=ev.target.closest('[data-rainbow-decide]');if(!btn)return;ev.preventDefault();const msgEl=btn.closest('.message');const msgId=msgEl?.id?.replace(/^dom_/,'');const req=messagesList.find(m=>String(m.id)===String(msgId))?.rainbow_request;if(!req||!myProfile)return;btn.disabled=true;try{const response=await fetch('/api/rainbow/decide',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({msg_id:msgId,actor:myProfile.username,decision:btn.dataset.rainbowDecide})});const data=await response.json().catch(()=>({}));if(!response.ok)throw new Error(data.error||'Недостаточно прав');vgToast(data.decision==='approve'?'Радужный ник выдан':'Заявка отклонена','@'+req.target);await pollServer();}catch(error){vgToast('Решение не сохранено',error.message||'');}finally{btn.disabled=false;}});
+    const vgOriginalRenderPeerProfileForRainbow=openPeerProfile;
+    openPeerProfile=function(){vgOriginalRenderPeerProfileForRainbow();const peer=usersMap[activePeer]||{};const profileName=document.querySelector('#peerProfileName span');if(profileName)profileName.classList.toggle('vg-rainbow-name',Boolean(peer.rainbow_nick&&peer.rainbow_grant_version===1));const action=document.getElementById('iosRainbowQuickBtn');if(action){const me=String(myProfile?.username||'').toLowerCase();const perms=(peer.admins||{})[me]||{};action.style.display=Boolean(peer.is_channel&&(peer.owner===me||perms.can_promote))?'flex':'none';}const state=document.getElementById('rainbowNickState');const self=usersMap[myProfile?.username?.toLowerCase()]||{};if(state)state.textContent=self.rainbow_nick&&self.rainbow_grant_version===1?'Статус: радужный ник активен':self.rainbow_pending?'Статус: заявка рассматривается':'Статус: не выдан';const requestBtn=document.getElementById('requestRainbowNickBtn');if(requestBtn)requestBtn.disabled=Boolean(self.rainbow_pending||self.rainbow_nick&&self.rainbow_grant_version===1);};
+
+    // Add server-controlled rainbow styling to the main chat title, current account title and forwarded sender names.
+    const vgOriginalGetPeerObjectRainbow=getPeerObject;
+    getPeerObject=function(username){const peer=vgOriginalGetPeerObjectRainbow(username);const serverObj=usersMap[String(username||'').toLowerCase().replace(/^@+/,'')];peer.rainbow_nick=Boolean(serverObj?.rainbow_nick&&serverObj?.rainbow_grant_version===1);peer.rainbow_grant_version=serverObj?.rainbow_grant_version;return peer;};
+    const vgOriginalRenderActiveChatRainbowTitle=renderActiveChat;
+    renderActiveChat=function(forceScroll=false){vgOriginalRenderActiveChatRainbowTitle(forceScroll);const peer=usersMap[activePeer]||{};const link=document.querySelector('#activeChatName [data-open-user]');if(link)link.classList.toggle('vg-rainbow-name',Boolean(peer.rainbow_nick&&peer.rainbow_grant_version===1));const badges=messagesContainer.querySelectorAll('.vg-forwarded-name');badges.forEach(el=>{const handle=el.dataset.openUser;const u=usersMap[handle]||{};el.classList.toggle('vg-rainbow-name',Boolean(u.rainbow_nick&&u.rainbow_grant_version===1));});};
+
+    // A dedicated rainbow request card uses only server-provided metadata and a strict ID=1 action API.
+    const vgOriginalPollServerForRainbow=pollServer;
+    pollServer=async function(){const result=await vgOriginalPollServerForRainbow();if(myProfile){const me=myProfile.username.toLowerCase();const serverSelf=usersMap[me]||{};if(serverSelf.rainbow_nick&&serverSelf.rainbow_grant_version===1){myProfile.rainbow_nick=true;myProfile.rainbow_grant_version=1;}else{delete myProfile.rainbow_nick;delete myProfile.rainbow_grant_version;}upsertAccountInList(myProfile);if(activePeer==='rainbow_bot'||activePeer==='verify_bot')renderActiveChat();}return result;};
+
   </script>
 
 <style id="vibegram-full-interface-polish">
@@ -6564,6 +6653,123 @@ button:disabled {cursor:not-allowed;}
 
 .vg-avatar-type-glyph{width:21px;height:21px;display:block;margin:auto;fill:none;stroke:currentColor;stroke-width:1.8;stroke-linecap:round;stroke-linejoin:round;}
 .react-emoji-btn{font-family:system-ui,-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;}
+</style>
+
+
+<style id="vibegram-ultimate-polish">
+:root{--vg-smooth:cubic-bezier(.2,.75,.22,1)}
+/* Put all entity creation in the drawer; folder filters remain visible. */
+#vgCreateGroupBtn,#vgAddFolderBtn{display:none!important}
+#enableNotificationsBtn{display:none!important}
+#drawerNotificationsBtn{display:flex!important}
+/* Make the three-dot chat menu visible on touch and desktop, not just hover. */
+.chat-item{position:relative;padding-right:38px!important}
+.vg-chat-actions-btn{opacity:1!important;visibility:visible!important;display:inline-grid!important;place-items:center;position:absolute;right:8px;top:50%;transform:translateY(-50%);z-index:5;width:30px!important;height:30px!important;border-radius:9px!important;color:#91aabe!important;background:rgba(255,255,255,.035)!important;font-size:23px!important;line-height:1}
+.vg-chat-actions-btn:hover{background:rgba(42,171,238,.16)!important;color:#fff!important}
+.chat-item:focus-within .vg-chat-actions-btn{opacity:1!important}
+/* Centered iPhone-like chat identity with safe space for back and actions. */
+.chat-header{position:relative!important;isolation:isolate}
+.chat-header-identity{position:absolute;left:50%;top:50%;transform:translate(-50%,-50%);display:flex;align-items:center;gap:9px;min-width:0;width:max-content;max-width:calc(100% - 300px);z-index:1}
+.chat-header-identity .avatar{flex:0 0 38px}
+.chat-header-identity .chat-header-info{min-width:0;max-width:100%;text-align:left;cursor:pointer;overflow:hidden}
+.chat-header-identity .chat-header-title{justify-content:flex-start;max-width:100%;overflow:hidden;text-overflow:ellipsis}
+.chat-header-identity .chat-header-status{white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.chat-header>.back-btn,.chat-header>.vg-header-tools,.chat-header>#headerSubBtn{position:relative;z-index:2;flex-shrink:0}
+#stickerSendBtn,#stickerSendPanel{display:none!important}
+/* Unread count on each account selector. */
+.account-switch-row{position:relative;padding-right:42px!important}
+.vg-account-unread{min-width:21px;height:21px;padding:0 6px;border-radius:999px;display:inline-flex;align-items:center;justify-content:center;background:#2aabee;color:#fff;font-size:10px;font-weight:850;box-shadow:0 2px 8px #0004;margin-left:auto;flex:0 0 auto;animation:vgBadgeIn .22s var(--vg-smooth)}
+.vg-account-unread[hidden]{display:none!important}
+/* Server-authorized rainbow nick, gently animated at compositor-friendly cadence. */
+.vg-rainbow-name{background:linear-gradient(100deg,#ff5e7e 0%,#ffb84d 18%,#f9f871 34%,#55e6a5 50%,#57c7ff 68%,#b58cff 84%,#ff5e7e 100%);background-size:260% 100%;color:transparent!important;-webkit-background-clip:text;background-clip:text;font-weight:850!important;animation:vgRainbowFlow 3.2s linear infinite}
+@keyframes vgRainbowFlow{to{background-position:260% 0}}
+@keyframes vgBadgeIn{0%{transform:scale(.6);opacity:.15}100%{transform:scale(1);opacity:1}}
+/* Forwarded message source: profile avatar and current server badge row. */
+.vg-forwarded-source{display:flex;align-items:center;gap:8px;padding:7px 9px;margin:0 0 6px;border-left:3px solid #2aabee;border-radius:8px;background:rgba(42,171,238,.075);min-width:0}
+.vg-forwarded-avatar{width:28px;height:28px;border-radius:50%;background-size:cover;background-position:center;display:grid;place-items:center;color:white;font-size:10px;font-weight:800;flex:0 0 28px;cursor:pointer}
+.vg-forwarded-meta{min-width:0;display:flex;flex-direction:column;gap:2px}
+.vg-forwarded-meta>span{font-size:10px;color:#7f9caf}
+.vg-forwarded-name{display:inline-flex;align-items:center;gap:4px;max-width:100%;border:0;background:none;color:#56c6ff;font:inherit;font-size:12px;font-weight:800;cursor:pointer;padding:0;text-align:left;overflow-wrap:anywhere}
+.vg-forwarded-name:hover{text-decoration:underline}
+/* Proper Telegram-style poll states and animated vote bars. */
+.vg-poll{min-width:min(300px,72vw);max-width:min(430px,78vw);padding:13px;border:1px solid rgba(113,155,187,.18);border-radius:16px;background:linear-gradient(155deg,rgba(33,53,71,.92),rgba(22,35,48,.95));box-shadow:0 8px 24px rgba(0,0,0,.12)}
+.vg-poll-title{font-weight:800;font-size:14px;line-height:1.4;margin-bottom:4px;overflow-wrap:anywhere}
+.vg-poll-kind{font-size:10.5px;color:#91aabe;margin-bottom:10px}
+.vg-poll-option{position:relative;isolation:isolate;display:flex;align-items:center;justify-content:space-between;gap:10px;width:100%;overflow:hidden;border:1px solid rgba(143,173,196,.15);border-radius:10px;background:rgba(255,255,255,.025);color:#eaf4fa;padding:10px 11px;margin:6px 0;text-align:left;cursor:pointer;transition:transform .18s var(--vg-smooth),border-color .18s ease,background .18s ease}
+.vg-poll-option:before{content:"";position:absolute;inset:0 auto 0 0;width:var(--vg-vote-pct,0%);background:rgba(42,171,238,.16);z-index:-1;transition:width .24s var(--vg-smooth)}
+.vg-poll-option-label{display:flex;align-items:center;gap:8px;min-width:0;overflow-wrap:anywhere}
+.vg-poll-choice-icon{display:inline-grid;place-items:center;width:17px;height:17px;flex:0 0 17px;border:1.5px solid #86a4b8;border-radius:50%;font-size:11px;color:#fff}
+.vg-poll-option.selected .vg-poll-choice-icon{border-color:#2aabee;background:#2aabee}
+.vg-poll-option.selected{border-color:rgba(42,171,238,.65)}
+.vg-poll-option.correct{border-color:#39d98a;background-color:rgba(57,217,138,.08)}
+.vg-poll-option.wrong{border-color:#ff6b81;background-color:rgba(255,107,129,.08)}
+.vg-poll-correct-mark{color:#44e09a}
+.vg-poll-option:active{transform:scale(.985)}
+.vg-poll-option:disabled{cursor:default;opacity:1}
+.vg-poll-count{font-size:10.5px;color:#a9c3d5;white-space:nowrap}
+.vg-poll-footer{display:flex;align-items:center;justify-content:space-between;gap:8px;flex-wrap:wrap;margin-top:8px;font-size:10px;color:#8ea9bd}
+.vg-poll-withdraw,.vg-poll-manage{border:0;border-radius:8px;padding:6px 9px;font-size:10.5px;font-weight:800;cursor:pointer;background:rgba(42,171,238,.12);color:#68d1ff;margin-top:4px}
+.vg-poll-manage{background:rgba(148,178,202,.1);color:#b6c7d5}
+.vg-poll-quiz-result{font-size:11px;font-weight:700;color:#bcebd3;padding:8px 2px 0}
+.vg-poll-create-option{display:flex;align-items:center;gap:9px;padding:8px 0;color:#c5d7e5;font-size:12px}
+.vg-poll-create-option input{accent-color:#2aabee;width:16px;height:16px}
+.vg-field-label{display:block;color:#9eb3c4;font-size:11px;font-weight:800;margin:5px 0 6px}
+.vg-rainbow-state{display:inline-flex;align-items:center;border:1px solid rgba(42,171,238,.2);background:rgba(42,171,238,.08);color:#b5d8ec;border-radius:999px;padding:7px 10px;font-size:11px;font-weight:750}
+.vg-rainbow-request-card{margin:10px 0;padding:12px;border:1px solid rgba(178,129,255,.24);border-radius:14px;background:rgba(131,86,225,.09)}
+.vg-rainbow-request-title{font-size:13px;font-weight:850;color:#d6c1ff;margin-bottom:6px}
+.vg-rainbow-request-info{font-size:12px;color:#b4c7d7;line-height:1.6;overflow-wrap:anywhere}
+.vg-platform-download{display:inline-flex;align-items:center;justify-content:center;gap:6px;margin-top:7px;width:100%;box-sizing:border-box;border:0;border-radius:10px;background:#2aabee;color:#fff!important;text-decoration:none;padding:9px 8px;font-size:11px;font-weight:850;cursor:pointer;transition:transform .18s var(--vg-smooth),filter .18s ease}
+.vg-platform-download:hover{filter:brightness(1.1);transform:translateY(-1px)}
+.vg-platform-download:active{transform:scale(.98)}
+.vg-app-platform{display:flex;flex-direction:column;align-items:center;text-align:center;min-width:0}
+.vg-app-platform span{line-height:1.4;min-height:29px}
+/* Mobile profile settings and modals use safe areas and a stable full-height sheet. */
+.tg-settings-modal,.ios-sheet-modal,.vg-modal-card{box-sizing:border-box;max-width:calc(100vw - 24px)}
+.tg-settings-modal{max-height:calc(100dvh - env(safe-area-inset-top) - env(safe-area-inset-bottom) - 18px);overflow:hidden}
+.tg-settings-scroll{overflow:auto;overscroll-behavior:contain;-webkit-overflow-scrolling:touch}
+.tg-save-footer{padding-bottom:calc(12px + env(safe-area-inset-bottom))}
+.vg-modal{padding:calc(12px + env(safe-area-inset-top)) 10px calc(12px + env(safe-area-inset-bottom));}
+.vg-modal-card{max-height:calc(100dvh - env(safe-area-inset-top) - env(safe-area-inset-bottom) - 24px);overflow:auto;overscroll-behavior:contain;-webkit-overflow-scrolling:touch}
+/* Micro-interactions avoid layout work and honor reduced-motion preferences. */
+.chat-item,.drawer-btn,.vg-folder-chip,.vg-header-tool,.vg-composer-tool,.reaction-pill,.ios-action-btn,.vg-created-entity-row{transition:background-color .16s ease,border-color .16s ease,transform .18s var(--vg-smooth),color .16s ease}
+.reaction-pill{transform-origin:center;will-change:transform}
+.reaction-pill:active{animation:vgReactionPop .24s var(--vg-smooth)}
+@keyframes vgReactionPop{0%{transform:scale(1)}40%{transform:scale(1.22)}75%{transform:scale(.94)}100%{transform:scale(1)}}
+@media(max-width:768px){
+  .side-drawer{width:min(360px,92vw);padding-bottom:env(safe-area-inset-bottom)}
+  .chat-header{padding-left:7px!important;padding-right:7px!important;gap:6px!important}
+  .chat-header-identity{max-width:calc(100% - 178px);gap:7px}
+  .chat-header-identity .avatar{width:34px!important;height:34px!important;flex-basis:34px;font-size:13px!important}
+  .chat-header-identity .chat-header-title{font-size:13px!important;gap:3px!important}
+  .chat-header-identity .chat-header-status{font-size:10px!important;max-width:42vw}
+  .vg-header-tools{gap:2px!important}
+  #vgScheduledBtn{display:none!important}
+  .vg-chat-actions-btn{right:5px;width:30px!important;height:30px!important;background:rgba(255,255,255,.08)!important}
+  .vg-apps-grid{grid-template-columns:repeat(2,minmax(0,1fr))!important}
+  .vg-app-platform{min-height:148px}
+  .vg-apps-web{display:none!important}
+  .tg-settings-modal{width:100vw!important;max-width:100vw!important;max-height:calc(100dvh - env(safe-area-inset-top))!important;border-radius:21px 21px 0 0!important;margin-top:auto!important}
+  .ios-sheet-modal{width:100vw!important;max-width:100vw!important;max-height:calc(100dvh - env(safe-area-inset-top) - 8px)!important;border-radius:22px 22px 0 0!important;margin-top:auto!important}
+  .vg-modal{align-items:flex-end!important}
+  .vg-modal-card{width:100%!important;max-width:100%!important;border-radius:20px 20px 0 0!important;max-height:calc(100dvh - env(safe-area-inset-top) - 8px)!important}
+  .vg-poll{max-width:min(78vw,350px);min-width:min(245px,70vw)}
+}
+@media(min-width:769px){.vg-apps-grid{grid-template-columns:repeat(3,minmax(0,1fr))}.vg-apps-web{display:none!important}}
+@media(prefers-reduced-motion:reduce){.vg-rainbow-name,.vg-account-unread,.reaction-pill:active{animation:none!important}.chat-item,.drawer-btn,.vg-folder-chip,.vg-header-tool,.vg-composer-tool,.reaction-pill,.ios-action-btn,.vg-created-entity-row{transition:none!important}}
+</style>
+
+
+<style id="vibegram-ultimate-last-mile">
+.vg-app-platform b{display:inline-flex;align-items:center;justify-content:center;margin-top:7px;padding:8px 10px;border-radius:10px;background:rgba(148,178,202,.10);color:#91aabe;font-size:10px}
+.drawer-soon-dot{display:none!important}
+.chat-item{touch-action:pan-y}.vg-chat-actions-btn{touch-action:manipulation}
+#peerProfileName{display:flex;align-items:center;justify-content:center;gap:6px;flex-wrap:wrap;text-align:center;max-width:100%;overflow-wrap:anywhere}
+#peerProfileName .vg-rainbow-name{display:inline-block}.profile-linked-channels,#profileCreatedEntitiesList{max-width:100%;min-width:0}.vg-created-entity-row,.vg-drawer-entity{min-width:0;max-width:100%}
+.vg-apps-grid{align-items:stretch;gap:12px}.vg-app-platform{box-sizing:border-box;min-width:0;overflow-wrap:anywhere}.vg-platform-download{min-height:36px}
+@media(max-width:768px){.chat-header-identity{pointer-events:none;max-width:calc(100% - 130px)!important}.chat-header-identity .avatar,#openPeerProfileBtn{pointer-events:auto}.chat-header-identity .chat-header-title{font-size:12px!important}#activeChatName .user-nav-link{max-width:48vw;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}.chat-item{min-height:68px}.account-switch-row{min-height:58px}.vg-chat-actions-btn{min-width:32px!important;min-height:32px!important}}
+@media(prefers-reduced-motion:reduce){.vg-rainbow-name,.vg-account-unread,.reaction-pill:active{animation:none!important}}
+
+.dev-svg-badge{display:inline-flex;align-items:center;justify-content:center;vertical-align:middle;width:18px;height:18px;flex:0 0 auto;filter:drop-shadow(0 1px 4px rgba(42,171,238,.26));transition:transform .18s ease,filter .18s ease}.dev-svg-badge svg{width:18px!important;height:18px!important;display:block}.dev-svg-badge:hover{transform:translateY(-1px) scale(1.08);filter:drop-shadow(0 2px 7px rgba(42,171,238,.4))}
 </style>
 
 </body>

@@ -71,17 +71,49 @@ def ensure_system_bot():
             'is_channel': False,
             'last_seen': int(time.time() * 1000)
         }
+    if 'rainbow_bot' not in USERS:
+        USERS['rainbow_bot'] = {
+            'id': 0, 'username': 'rainbow_bot', 'name': 'Rainbow Nick Bot',
+            'bio': 'Общедоступный бот запросов на радужное оформление профилей и каналов. Выдача доступна только создателю Vibegram с ID 1.',
+            'color': '#a970ff', 'avatar': '', 'privacy': 'everyone', 'is_premium': False,
+            'is_team': False, 'sticker_id': 'star', 'is_verified': True,
+            'verify_category': 'Официальный бот Vibegram',
+            'verify_reason': 'Системный бот запросов радужного ника.', 'is_bot': True,
+            'is_channel': False, 'last_seen': int(time.time() * 1000)
+        }
+
+def _numeric_user_id(obj):
+    try:
+        return int((obj or {}).get('id') or (obj or {}).get('uid') or 0)
+    except (TypeError, ValueError, OverflowError):
+        return 0
+
+def _creator_username():
+    if VERIFY_BOT_ADMIN:
+        obj = USERS.get(str(VERIFY_BOT_ADMIN).lower().lstrip('@'), {})
+        if _numeric_user_id(obj) == 1 and not any(obj.get(k) for k in ('is_channel','is_group','is_bot')):
+            return str(VERIFY_BOT_ADMIN).lower().lstrip('@')
+    candidates = [name for name, obj in USERS.items()
+        if _numeric_user_id(obj) == 1 and not any(obj.get(k) for k in ('is_channel','is_group','is_bot'))]
+    return candidates[0] if len(candidates) == 1 else None
+
+def _is_admin_id_one(actor):
+    handle = str(actor or '').strip().lower().lstrip('@')
+    creator = _creator_username()
+    return bool(creator and handle == creator and _numeric_user_id(USERS.get(handle, {})) == 1)
 
 def assign_user_id(username):
-    u = username.strip().lower().lstrip('@')
-    # ID 1 is reserved for creator identities; ordinary first-time users do not
-    # become moderators only because they happened to register first.
-    if u in ('paveldurov', 'vibegram'):
-        return 1
-    real_users = [obj for obj in USERS.values() if not obj.get('is_channel') and not obj.get('is_bot')]
+    u = str(username or '').strip().lower().lstrip('@')
+    # String IDs such as group_... are normal for groups/channels and must never
+    # be passed to int(). Only ordinary user accounts receive numeric IDs.
+    existing = USERS.get(u, {})
+    if existing and not any(existing.get(k) for k in ('is_channel','is_group','is_bot')) and _numeric_user_id(existing) > 0:
+        return _numeric_user_id(existing)
     max_id = 1000
-    for obj in real_users:
-        uid = int(obj.get('id') or obj.get('uid') or 0)
+    for name, obj in USERS.items():
+        if name == u or any(obj.get(k) for k in ('is_channel','is_group','is_bot')):
+            continue
+        uid = _numeric_user_id(obj)
         if uid > max_id:
             max_id = uid
     return max_id + 1
@@ -490,7 +522,11 @@ class VibegramHandler(http.server.SimpleHTTPRequestHandler):
         self.send_header('Cache-Control', 'no-store, no-cache, must-revalidate')
         self.send_header('Content-Length', str(len(raw)))
         self.end_headers()
-        self.wfile.write(raw)
+        try:
+            self.wfile.write(raw)
+        except (BrokenPipeError, ConnectionResetError, ConnectionAbortedError):
+            # Browsers may abort a long-poll / push-subscribe response during navigation.
+            pass
 
     def do_GET(self):
         parsed = urlparse(self.path)
@@ -711,14 +747,18 @@ class VibegramHandler(http.server.SimpleHTTPRequestHandler):
             if phone and not 7 <= len(phone_digits) <= 15:
                 return self.send_json({'error': 'Телефон должен содержать от 7 до 15 цифр.'}, 400)
 
-            if not u or u == 'verify_bot':
-                return self.send_json({'error': 'Некорректный @username'}, 400)
+            if not u or u in ('verify_bot', 'rainbow_bot'):
+                return self.send_json({'error': 'Этот @username зарезервирован системным ботом'}, 400)
 
             # Проверка: не занят ли @username каналом или другим человеком
             if u in USERS:
                 existing_target = USERS[u]
+                if existing_target.get('is_bot'):
+                    return self.send_json({'error': 'Этот @username принадлежит системному боту'}, 409)
                 if existing_target.get('is_channel'):
                     return self.send_json({'error': f'Юзернейм @{u} уже занят каналом! Выберите другой.'}, 400)
+                if existing_target.get('is_group'):
+                    return self.send_json({'error': 'Этот username принадлежит группе.'}, 409)
                 existing_email = str(existing_target.get('email') or '').strip().lower()
                 # Если старый юзернейм не совпадает с новым и почта другая — значит юзернейм чужой!
                 if old_u != u and existing_email and email and existing_email != email:
@@ -753,12 +793,12 @@ class VibegramHandler(http.server.SimpleHTTPRequestHandler):
                 stored_avatar = _store_avatar_value(body.get('avatar'), existing.get('avatar', ''), max_bytes=512 * 1024)
             except ValueError as exc:
                 return self.send_json({'error': str(exc)}, 413)
-            user_id = existing.get('id')
-            if not user_id:
+            # Keep a valid numeric ID for an existing user; legacy malformed IDs
+            # must never leak into the numeric account-ID field.
+            user_id = _numeric_user_id(existing)
+            if user_id <= 0:
                 user_id = assign_user_id(u)
-            if u in ('paveldurov', 'vibegram'):
-                user_id = 1
-
+            
             # Public profile channel links are persisted server-side. Accept only
             # channels the profile follows or can manage; never trust arbitrary handles.
             requested_channels = body.get('profile_channels')
@@ -806,6 +846,11 @@ class VibegramHandler(http.server.SimpleHTTPRequestHandler):
                 'is_verified': bool(existing.get('is_verified', False)),
                 'verify_category': existing.get('verify_category', 'none'),
                 'verify_reason': existing.get('verify_reason', ''),
+                'rainbow_nick': bool(existing.get('rainbow_nick') and existing.get('rainbow_grant_version') == 1),
+                'rainbow_grant_version': existing.get('rainbow_grant_version') if existing.get('rainbow_nick') else None,
+                'rainbow_granted_by': existing.get('rainbow_granted_by') if existing.get('rainbow_nick') else None,
+                'rainbow_granted_at': existing.get('rainbow_granted_at') if existing.get('rainbow_nick') else None,
+                'rainbow_pending': bool(existing.get('rainbow_pending', False)),
                 'is_channel': False,
                 'last_seen': now,
                 'typing_to': existing.get('typing_to', ''),
@@ -1098,6 +1143,11 @@ class VibegramHandler(http.server.SimpleHTTPRequestHandler):
                 'verify_category': existing.get('verify_category', 'Официальный канал'),
                 'verify_reason': existing.get('verify_reason', 'Подлинность канала подтверждена модерацией Vibegram.'),
                 'verify_pending': bool(existing.get('verify_pending', False)),
+                'rainbow_nick': bool(existing.get('rainbow_nick') and existing.get('rainbow_grant_version') == 1),
+                'rainbow_grant_version': existing.get('rainbow_grant_version') if existing.get('rainbow_nick') else None,
+                'rainbow_granted_by': existing.get('rainbow_granted_by') if existing.get('rainbow_nick') else None,
+                'rainbow_granted_at': existing.get('rainbow_granted_at') if existing.get('rainbow_nick') else None,
+                'rainbow_pending': bool(existing.get('rainbow_pending', False)),
                 'last_seen': now
             }
             save_db()
@@ -1233,7 +1283,7 @@ class VibegramHandler(http.server.SimpleHTTPRequestHandler):
             creator = USERS.get(VERIFY_BOT_ADMIN or '', {})
             if decision not in ('approve', 'reject'):
                 return self.send_json({'error': 'Недопустимое решение'}, 400)
-            if not VERIFY_BOT_ADMIN or actor != VERIFY_BOT_ADMIN or int(creator.get('id') or 0) != 1:
+            if not VERIFY_BOT_ADMIN or actor != VERIFY_BOT_ADMIN or _numeric_user_id(creator) != 1:
                 return self.send_json({'error': 'Рассматривать заявки может только создатель, привязавший @verify_bot с ID 1'}, 403)
 
             request_message = next((m for m in MESSAGES if str(m.get('id')) == msg_id and m.get('verification_request')), None)
@@ -1531,7 +1581,7 @@ class VibegramHandler(http.server.SimpleHTTPRequestHandler):
                 MESSAGES.append(user_msg)
 
                 sender_obj = USERS.get(sender, {})
-                sender_id = int(sender_obj.get('id') or 0)
+                sender_id = _numeric_user_id(sender_obj)
                 clean_cmd = text.strip().lower()
                 parts = raw_parts
                 command = parts[0].lower() if parts else ''
@@ -1550,7 +1600,7 @@ class VibegramHandler(http.server.SimpleHTTPRequestHandler):
                         creator_username = VERIFY_BOT_ADMIN
                         if not creator_username:
                             creator_username = next((name for name, obj in USERS.items()
-                                if not obj.get('is_channel') and not obj.get('is_bot') and int(obj.get('id') or obj.get('uid') or 0) == 1), None)
+                                if not obj.get('is_channel') and not obj.get('is_bot') and _numeric_user_id(obj) == 1), None)
                         if creator_username and creator_username in USERS:
                             MESSAGES.append({
                                 'id': f"msg_{now + 1}_{len(MESSAGES)}_premium_request",
@@ -1601,7 +1651,7 @@ class VibegramHandler(http.server.SimpleHTTPRequestHandler):
                         creator_username = VERIFY_BOT_ADMIN
                         if not creator_username:
                             creator_username = next((name for name, obj in USERS.items()
-                                if not obj.get('is_channel') and not obj.get('is_bot') and int(obj.get('id') or obj.get('uid') or 0) == 1), None)
+                                if not obj.get('is_channel') and not obj.get('is_bot') and _numeric_user_id(obj) == 1), None)
                         if creator_username and creator_username in USERS:
                             MESSAGES.append({
                                 'id': f"msg_{now + 1}_{len(MESSAGES)}_team_request",
@@ -1644,7 +1694,7 @@ class VibegramHandler(http.server.SimpleHTTPRequestHandler):
                 # Авторизация Создателя в боте по вводу ID "1" или "/id 1".
                 # It remains separate from badge grants; ID alone can no longer grant Premium/team status.
                 elif clean_cmd in ('1', 'id 1', '/id 1', '/auth 1', 'id: 1'):
-                    if sender_id == 1 or sender in ('paveldurov', 'vibegram'):
+                    if sender_id == 1:
                         sender_obj['id'] = 1
                         VERIFY_BOT_ADMIN = sender
                         # Перенаправляем все нерассмотренные заявки этому аккаунту
@@ -1662,7 +1712,7 @@ class VibegramHandler(http.server.SimpleHTTPRequestHandler):
                     else:
                         bot_reply = (
                             f"⛔ Ошибка доступа!\n"
-                            f"Ваш личный ID: {sender_id}. Пароль «1» принадлежит только Создателю (@paveldurov / ID: 1)."
+                            f"Ваш личный ID: {sender_id}. Пароль «1» принадлежит только Создателю с подтверждённым ID 1."
                         )
                 else:
                     bot_reply = (
@@ -1779,36 +1829,147 @@ class VibegramHandler(http.server.SimpleHTTPRequestHandler):
                     return self.send_json({'ok': True, 'reactions': reactions})
             return self.send_json({'error': 'Message not found'}, 404)
 
-        # Голосование в опросах
+        # Голосование в опросах: один ответ, несколько ответов, отмена голоса и викторины.
         if parsed.path == '/api/poll/vote':
             msg_id = str(body.get('id') or '')
             voter = str(body.get('user') or '').strip().lower().lstrip('@')
-            try:
-                option_index = int(body.get('option'))
-            except (TypeError, ValueError):
-                option_index = -1
-            if voter not in USERS or not msg_id:
-                return self.send_json({'error': 'Укажите аккаунт и опрос.'}, 400)
+            try: option_index = int(body.get('option'))
+            except (TypeError, ValueError): option_index = -1
+            if voter not in USERS or USERS[voter].get('is_channel') or USERS[voter].get('is_group') or USERS[voter].get('is_bot') or not msg_id:
+                return self.send_json({'error': 'Укажите действующий аккаунт и опрос.'}, 400)
             for msg in MESSAGES:
                 media = msg.get('media') if isinstance(msg.get('media'), dict) else {}
-                if str(msg.get('id')) != msg_id or media.get('type') != 'poll':
-                    continue
+                if str(msg.get('id')) != msg_id or media.get('type') != 'poll': continue
+                if media.get('closed'): return self.send_json({'error': 'Опрос закрыт.'}, 409)
                 options = media.get('options') if isinstance(media.get('options'), list) else []
-                if option_index < 0 or option_index >= len(options):
-                    return self.send_json({'error': 'Вариант ответа не найден.'}, 400)
+                if option_index < -1 or option_index >= len(options): return self.send_json({'error': 'Вариант ответа не найден.'}, 400)
                 votes = media.setdefault('votes', {})
-                # One answer per user; clicking the selected option withdraws the vote.
-                for key in list(votes.keys()):
-                    voters = votes.get(key) if isinstance(votes.get(key), list) else []
-                    if voter in voters:
-                        voters.remove(voter)
-                    if not voters:
-                        votes.pop(key, None)
-                current = votes.setdefault(str(option_index), [])
-                current.append(voter)
+                was_selected = option_index >= 0 and voter in (votes.get(str(option_index)) or [])
+                # -1 means withdraw all choices; single-answer polls toggle the selected option.
+                if option_index == -1 or (not media.get('multiple') and was_selected):
+                    for key in list(votes.keys()):
+                        voters = votes.get(key) if isinstance(votes.get(key), list) else []
+                        while voter in voters: voters.remove(voter)
+                        if not voters: votes.pop(key, None)
+                    correct = None
+                elif media.get('multiple') and not media.get('is_quiz'):
+                    current = votes.setdefault(str(option_index), [])
+                    if voter in current: current.remove(voter)
+                    else: current.append(voter)
+                    if not current: votes.pop(str(option_index), None)
+                    correct = None
+                else:
+                    for key in list(votes.keys()):
+                        voters = votes.get(key) if isinstance(votes.get(key), list) else []
+                        while voter in voters: voters.remove(voter)
+                        if not voters: votes.pop(key, None)
+                    votes.setdefault(str(option_index), []).append(voter)
+                    correct = (option_index == int(media.get('correct_option') or 0)) if media.get('is_quiz') else None
                 save_db()
-                return self.send_json({'ok': True, 'votes': votes})
+                return self.send_json({'ok': True, 'votes': votes, 'correct': correct})
             return self.send_json({'error': 'Опрос не найден.'}, 404)
+
+        if parsed.path == '/api/poll/manage':
+            msg_id = str(body.get('id') or '')
+            actor = str(body.get('actor') or '').strip().lower().lstrip('@')
+            operation = str(body.get('operation') or '').lower()
+            if actor not in USERS or operation not in ('close', 'open'):
+                return self.send_json({'error': 'Некорректные параметры.'}, 400)
+            msg = next((m for m in MESSAGES if str(m.get('id')) == msg_id and isinstance(m.get('media'), dict) and m['media'].get('type') == 'poll'), None)
+            if not msg: return self.send_json({'error': 'Опрос не найден.'}, 404)
+            allowed = actor == msg.get('sender')
+            if msg.get('is_channel_post'):
+                channel = USERS.get(str(msg.get('to') or ''), {})
+                perms = (channel.get('admins') or {}).get(actor, {})
+                allowed = actor == channel.get('owner') or bool(perms.get('can_post'))
+            elif msg.get('is_group_message'):
+                group = USERS.get(str(msg.get('to') or ''), {})
+                perms = (group.get('admins') or {}).get(actor, {}) if isinstance(group.get('admins'), dict) else {}
+                allowed = actor == group.get('owner') or bool(perms.get('can_manage') or perms.get('can_post') or perms.get('can_promote')) or actor == msg.get('sender')
+            if not allowed: return self.send_json({'error': 'Закрыть или открыть опрос может только его автор или администратор сообщества.'}, 403)
+            msg['media']['closed'] = operation == 'close'
+            save_db()
+            return self.send_json({'ok': True, 'closed': msg['media']['closed']})
+
+        # Заявка на радужный ник. Флаги оформления нельзя передать через /api/profile.
+        if parsed.path == '/api/rainbow/request':
+            applicant = str(body.get('applicant') or '').strip().lower().lstrip('@')
+            target = str(body.get('target') or applicant).strip().lower().lstrip('@')
+            if applicant not in USERS or USERS[applicant].get('is_channel') or USERS[applicant].get('is_group') or USERS[applicant].get('is_bot'):
+                return self.send_json({'error': 'Заявитель должен быть обычным аккаунтом.'}, 403)
+            if target not in USERS:
+                return self.send_json({'error': 'Профиль или канал не найден.'}, 404)
+            target_obj = USERS[target]
+            if target_obj.get('is_group') or target_obj.get('is_bot'):
+                return self.send_json({'error': 'Радужное оформление можно запросить только для личного профиля или канала.'}, 400)
+            if target_obj.get('is_channel'):
+                permissions = (target_obj.get('admins') or {}).get(applicant, {})
+                if applicant != target_obj.get('owner') and not permissions.get('can_promote'):
+                    return self.send_json({'error': 'Для канала заявку может подать владелец или администратор с правом управления.'}, 403)
+            elif target != applicant:
+                return self.send_json({'error': 'Для личного профиля можно подать заявку только за себя.'}, 403)
+            if target_obj.get('rainbow_nick') and target_obj.get('rainbow_grant_version') == 1:
+                return self.send_json({'error': 'Радужный ник уже выдан.'}, 409)
+            if target_obj.get('rainbow_pending'):
+                return self.send_json({'error': 'Заявка уже ожидает решения создателя.'}, 409)
+            creator = _creator_username()
+            if not creator:
+                return self.send_json({'error': 'Создатель с ID 1 пока не привязал бота. Сначала привяжи @verify_bot.'}, 503)
+            target_obj['rainbow_pending'] = True
+            req_id = f'rainbow_{now}_{len(MESSAGES)}'
+            target_type = 'channel' if target_obj.get('is_channel') else 'profile'
+            admin_msg = {
+                'id': req_id, 'sender': 'rainbow_bot', 'to': creator,
+                'text': f'🌈 ЗАЯВКА НА РАДУЖНЫЙ НИК\nОбъект: @{target} ({target_type})\nЗаявитель: @{applicant}\nРешение принимает только Admin ID 1.',
+                'time': now, 'read': False, 'reactions': {},
+                'rainbow_request': {'target': target, 'target_name': target_obj.get('name', target), 'target_type': target_type, 'applicant': applicant, 'status': 'pending'}
+            }
+            ack = {'id': f'{req_id}_ack', 'sender': 'rainbow_bot', 'to': applicant,
+                'text': f'📨 Заявка на радужный ник для @{target} отправлена создателю Vibegram. Выдача произойдёт только после одобрения Admin ID 1.',
+                'time': now + 1, 'read': False, 'reactions': {}}
+            MESSAGES.extend([admin_msg, ack])
+            save_db()
+            dispatch_push_for_messages([admin_msg, ack], self._public_base_url())
+            return self.send_json({'ok': True, 'request_id': req_id})
+
+        if parsed.path == '/api/rainbow/decide':
+            msg_id = str(body.get('msg_id') or '')
+            actor = str(body.get('actor') or '').strip().lower().lstrip('@')
+            decision = str(body.get('decision') or '').lower()
+            if decision not in ('approve', 'reject'):
+                return self.send_json({'error': 'Недопустимое решение.'}, 400)
+            if not _is_admin_id_one(actor):
+                return self.send_json({'error': 'Радужные ники выдаёт только подтверждённый создатель Admin ID 1.'}, 403)
+            req_msg = next((m for m in MESSAGES if str(m.get('id')) == msg_id and m.get('rainbow_request')), None)
+            if not req_msg:
+                return self.send_json({'error': 'Заявка не найдена.'}, 404)
+            req = req_msg.get('rainbow_request') or {}
+            if req.get('status') != 'pending' or req_msg.get('to') != actor:
+                return self.send_json({'error': 'Заявка уже обработана или не назначена этому Admin.'}, 409)
+            target = str(req.get('target') or '').lower()
+            target_obj = USERS.get(target)
+            if not target_obj or target_obj.get('is_group') or target_obj.get('is_bot'):
+                return self.send_json({'error': 'Профиль или канал больше не существует.'}, 404)
+            req['status'] = 'approved' if decision == 'approve' else 'rejected'
+            target_obj['rainbow_pending'] = False
+            if decision == 'approve':
+                target_obj['rainbow_nick'] = True
+                target_obj['rainbow_grant_version'] = 1
+                target_obj['rainbow_granted_by'] = 'admin_id_1'
+                target_obj['rainbow_granted_at'] = now
+            else:
+                target_obj['rainbow_nick'] = False
+                target_obj.pop('rainbow_grant_version', None)
+                target_obj.pop('rainbow_granted_by', None)
+                target_obj.pop('rainbow_granted_at', None)
+            applicant = str(req.get('applicant') or '').lower()
+            notice = {'id': f'rainbow_result_{now}_{len(MESSAGES)}', 'sender': 'rainbow_bot', 'to': applicant,
+                'text': f"{'🌈 Радужный ник одобрен' if decision == 'approve' else '❌ Заявка на радужный ник отклонена'} для @{target}.",
+                'time': now, 'read': False, 'reactions': {}}
+            MESSAGES.append(notice)
+            save_db()
+            dispatch_push_for_messages([notice], self._public_base_url())
+            return self.send_json({'ok': True, 'decision': req['status'], 'target': target})
 
         # Жалоба на пользователя или сообщение. Сохраняется для последующей модерации.
         if parsed.path == '/api/report':
