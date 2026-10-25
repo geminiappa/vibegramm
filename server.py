@@ -323,6 +323,25 @@ class VibegramHandler(http.server.SimpleHTTPRequestHandler):
             if u in ('paveldurov', 'vibegram'):
                 user_id = 1
 
+            # Public profile channel links are persisted server-side. Accept only
+            # channels the profile follows or can manage; never trust arbitrary handles.
+            requested_channels = body.get('profile_channels')
+            if not isinstance(requested_channels, list):
+                requested_channels = existing.get('profile_channels', [])
+            eligible_channels = set()
+            for channel_handle, channel_obj in USERS.items():
+                if not channel_obj.get('is_channel'):
+                    continue
+                subscribers = channel_obj.get('subscribers', [])
+                admins = channel_obj.get('admins', {}) if isinstance(channel_obj.get('admins'), dict) else {}
+                if channel_obj.get('owner') == u or u in subscribers or u in admins:
+                    eligible_channels.add(channel_handle)
+            profile_channels = []
+            for channel_handle in requested_channels[:50]:
+                handle = str(channel_handle or '').strip().lower().lstrip('@')
+                if handle in eligible_channels and handle not in profile_channels:
+                    profile_channels.append(handle)
+
             USERS[u] = {
                 'id': user_id,
                 'username': u,
@@ -336,6 +355,7 @@ class VibegramHandler(http.server.SimpleHTTPRequestHandler):
                 # never let that blank value erase the existing image.
                 'avatar': (str(body.get('avatar') or '').strip() or existing.get('avatar', '')),
                 'privacy': body.get('privacy') or existing.get('privacy', 'everyone'),
+                'profile_channels': profile_channels,
                 'is_premium': bool(existing.get('is_premium', False)),
                 'premium_grant_version': existing.get('premium_grant_version'),
                 'premium_granted_by': existing.get('premium_granted_by'),
@@ -392,6 +412,10 @@ class VibegramHandler(http.server.SimpleHTTPRequestHandler):
                     if handle in USERS:
                         return self.send_json({'error': f'Канал @{handle} уже занят!'}, 400)
                     USERS[handle] = USERS.pop(old_handle)
+                    for profile in USERS.values():
+                        linked = profile.get('profile_channels', [])
+                        if isinstance(linked, list) and old_handle in linked:
+                            profile['profile_channels'] = [handle if item == old_handle else item for item in linked]
                     for m in MESSAGES:
                         if m['sender'] == old_handle: m['sender'] = handle
                         if m['to'] == old_handle: m['to'] = handle
