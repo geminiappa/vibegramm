@@ -1718,10 +1718,6 @@
           <span class="drawer-ico vg-ico-green"><svg viewBox="0 0 24 24" aria-hidden="true"><rect x="4" y="7" width="16" height="13" rx="3"/><path d="M12 3v4M8 12h.01M16 12h.01M9 16h6"/></svg></span>
           <span><strong>Верификация</strong><small>@verify_bot · заявки и статус</small></span>
         </button>
-        <button type="button" class="drawer-btn" id="drawerOpenRainbowBotBtn">
-          <span class="drawer-ico vg-ico-purple"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 19a8 8 0 0 1 16 0M7 15a5 5 0 0 1 10 0M10 11a2 2 0 0 1 4 0"/><path d="M3 5h18"/></svg></span>
-          <span><strong>Радужные ники</strong><small>@rainbow_bot · запросы на оформление</small></span>
-        </button>
         <button type="button" class="drawer-btn" id="drawerNotificationsBtn">
           <span class="drawer-ico vg-ico-amber"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M18 8a6 6 0 0 0-12 0c0 7-3 7-3 9h18c0-2-3-2-3-9M10 21h4"/></svg></span>
           <span><strong>Уведомления</strong><small>Push и звуки на этом устройстве</small></span>
@@ -2255,12 +2251,6 @@
           </div>
         </div>
 
-        <div class="tg-section-box" data-profile-panel="status" id="rainbowNickSettingsBox">
-          <div class="tg-section-header">Радужный ник Vibegram</div>
-          <div style="padding:4px 16px 9px;font-size:12px;line-height:1.5;color:var(--text-secondary);">Радужное оформление выдаёт только создатель Vibegram (ID 1). Отправь заявку в отдельного бота — обычные настройки профиля не могут включить эффект.</div>
-          <div style="padding:0 16px 12px;display:flex;align-items:center;gap:10px;flex-wrap:wrap;"><span id="rainbowNickState" class="vg-rainbow-state">Статус: не выдан</span><button type="button" class="btn-primary" id="requestRainbowNickBtn" style="width:auto;padding:10px 14px;">Запросить радужный ник</button></div>
-        </div>
-
         <div class="tg-section-box" data-profile-panel="status">
           <div class="tg-section-header">Заявка на верификацию аккаунта (Через @verify_bot)</div>
           <div style="padding: 4px 16px 6px; font-size: 12px; color: var(--text-secondary);" id="myProfileVerifyStateInfo"></div>
@@ -2339,7 +2329,6 @@
           <button type="button" class="ios-action-btn" id="iosMuteQuickBtn"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M18 8a6 6 0 0 0-12 0c0 7-3 7-3 9h18c0-2-3-2-3-9M10 21h4"/></svg><span id="iosMuteLabel">звук</span></button>
           <button type="button" class="ios-action-btn" id="iosCopyPeerUsernameBtn"><svg viewBox="0 0 24 24" aria-hidden="true"><rect x="8" y="8" width="12" height="12" rx="2"/><path d="M16 8V5a2 2 0 0 0-2-2H5a2 2 0 0 0-2 2v9a2 2 0 0 0 2 2h3"/></svg><span>скопировать @</span></button>
           <button type="button" class="ios-action-btn" id="iosEditChannelQuickBtn" style="display:none;"><svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="3"/><path d="m19 13 2 1-2 4-2-1a8 8 0 0 1-2 1l-.3 2h-4L10 18a8 8 0 0 1-2-1l-2 1-2-4 2-1a8 8 0 0 1 0-2l-2-1 2-4 2 1a8 8 0 0 1 2-1l.3-2h4L15 6a8 8 0 0 1 2 1l2-1 2 4-2 1a8 8 0 0 1 0 2Z"/></svg><span>управление каналом</span></button>
-          <button type="button" class="ios-action-btn" id="iosRainbowQuickBtn" style="display:none;"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 19a8 8 0 0 1 16 0M7 15a5 5 0 0 1 10 0M10 11a2 2 0 0 1 4 0"/><path d="M3 5h18"/></svg><span>радужный ник</span></button>
           <button type="button" class="ios-action-btn" id="iosManageGroupQuickBtn" style="display:none;"><svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="9" cy="8" r="3"/><circle cx="17" cy="9" r="2.3"/><path d="M3 20v-1a6 6 0 0 1 12 0v1M16 15a4 4 0 0 1 5 4v1"/></svg><span>управление группой</span></button>
           <button type="button" class="ios-action-btn" id="iosJoinGroupQuickBtn" style="display:none;"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 5v14M5 12h14"/></svg><span>вступить</span></button>
           <button type="button" class="ios-action-btn" id="iosSendMediaQuickBtn"><svg viewBox="0 0 24 24" aria-hidden="true"><rect x="3" y="3" width="18" height="18" rx="3"/><circle cx="8.5" cy="8.5" r="1.5"/><path d="m21 15-5-5L5 21"/></svg><span>медиа</span></button>
@@ -2488,7 +2477,7 @@
 
     function getUserIdNumber(username, metaUid, serverId) {
       const u = String(username || '').toLowerCase().replace(/^@+/, '');
-      if (u === 'verify_bot' || u === 'rainbow_bot') return 0;
+      if (u === 'verify_bot') return 0;
       const candidates = [serverId, usersMap[u]?.id, metaUid, usersMap[u]?.uid];
       for (const candidate of candidates) {
         if (candidate === null || candidate === undefined || candidate === '') continue;
@@ -2578,13 +2567,13 @@
       try {
         const raw = localStorage.getItem(CHATS_CACHE_PREFIX + u);
         if (!raw) {
-          openedPeers = ['verify_bot','rainbow_bot'];
+          openedPeers = ['verify_bot'];
           messagesList = [];
           return;
         }
         const parsed = JSON.parse(raw);
         if (Array.isArray(parsed.openedPeers)) {
-          openedPeers = (parsed.openedPeers.includes('verify_bot') && parsed.openedPeers.includes('rainbow_bot')) ? parsed.openedPeers : [...new Set(['verify_bot','rainbow_bot', ...parsed.openedPeers])];
+          openedPeers = parsed.openedPeers.includes('verify_bot') ? parsed.openedPeers : [...new Set(['verify_bot', ...parsed.openedPeers])];
         }
         if (Array.isArray(parsed.messagesList) && messagesList.length === 0) {
           messagesList = parsed.messagesList;
@@ -2826,7 +2815,7 @@
         alert('Заполните имя, @username и корректный Email. Подтверждать Email не нужно.');
         return;
       }
-      if (!/^[a-z0-9_]{3,32}$/.test(username) || ['verify_bot','rainbow_bot'].includes(username)) {
+      if (!/^[a-z0-9_]{3,32}$/.test(username) || ['verify_bot'].includes(username)) {
         alert('Username: 3–32 символа, только латиница, цифры и _.');
         return;
       }
@@ -3030,7 +3019,6 @@
     document.getElementById('vgAppsOpenWebBtn').addEventListener('click', () => { vgCloseModal('vgApplicationsModal'); window.open(location.origin + location.pathname, '_self'); });
     document.getElementById('drawerSavedMsgsBtn').addEventListener('click', () => { closeDrawer(); if (myProfile) openChatWith(myProfile.username); });
     document.getElementById('drawerOpenVerifyBotBtn').addEventListener('click', () => { closeDrawer(); openChatWith('verify_bot'); });
-    document.getElementById('drawerOpenRainbowBotBtn').addEventListener('click', () => { closeDrawer(); openChatWith('rainbow_bot'); });
     document.getElementById('drawerNotificationsBtn').addEventListener('click', () => { closeDrawer(); document.getElementById('enableNotificationsBtn')?.click(); });
     document.getElementById('drawerPremiumBtn').addEventListener('click', () => { closeDrawer(); vgSetProfileSettingsTab('status'); openMyProfileModal(); vgSetProfileSettingsTab('status'); });
     document.getElementById('vgProfileTabs')?.addEventListener('click', ev => {
@@ -3270,9 +3258,7 @@
     function getPeerObject(username) {
       const u = (username || '').toLowerCase();
       const me = myProfile ? myProfile.username.toLowerCase() : '';
-      if (u === 'rainbow_bot') {
-        return enrichEntity({ uid: 0, id: 0, username: 'rainbow_bot', name: 'Rainbow Nick Bot', bio: 'Отдельный бот заявок на радужное оформление профилей и каналов. Выдача доступна только создателю с ID 1.', color: '#a970ff', avatar: '', is_bot: true, is_verified: true, verify_category: 'Официальный бот Vibegram', verify_reason: 'Системный бот запросов радужного ника.', last_seen: serverTime });
-      }
+
       if (u === 'verify_bot') {
         return enrichEntity({
           uid: 0,
@@ -3769,7 +3755,7 @@
       const convMap = new Map();
 
       convMap.set('verify_bot', { peer: getPeerObject('verify_bot'), lastMsg: null, unreadCount: 0 });
-      convMap.set('rainbow_bot', { peer: getPeerObject('rainbow_bot'), lastMsg: null, unreadCount: 0 });
+      
 
       openedPeers.forEach(u => {
         if (!convMap.has(u)) convMap.set(u, { peer: getPeerObject(u), lastMsg: null, unreadCount: 0 });
@@ -3807,8 +3793,6 @@
       return Array.from(convMap.values()).sort((a, b) => {
         if (a.peer.username === 'verify_bot') return -2;
         if (b.peer.username === 'verify_bot') return 2;
-        if (a.peer.username === 'rainbow_bot') return -1;
-        if (b.peer.username === 'rainbow_bot') return 1;
         const ap = pinnedChatNames.includes(a.peer.username) ? 1 : 0;
         const bp = pinnedChatNames.includes(b.peer.username) ? 1 : 0;
         if (ap !== bp) return bp - ap;
@@ -3922,7 +3906,7 @@
       const targetEntity=usersMap[u];
       const viewer=String(myProfile?.username||'').toLowerCase();
       if(targetEntity?.is_group && !(targetEntity.owner===viewer || (targetEntity.members||[]).includes(viewer))){openUserProfile(u);return;}
-      if (!['verify_bot','rainbow_bot'].includes(u) && (!usersMap[u] && u !== (myProfile?.username || '').toLowerCase())) {
+      if (!['verify_bot'].includes(u) && (!usersMap[u] && u !== (myProfile?.username || '').toLowerCase())) {
         showCustomIosBanner('Не найдено', `Пользователь, группа или канал @${u} не найден`);
         return;
       }
@@ -3949,7 +3933,7 @@
 
       const me = myProfile.username.toLowerCase();
       const peer = getPeerObject(activePeer);
-      const isBotChat = activePeer === 'verify_bot' || activePeer === 'rainbow_bot';
+      const isBotChat = activePeer === 'verify_bot';
 
       const avatarBg = peer.avatar ? `background-image:url('${peer.avatar}')` : `background-color:${peer.color}`;
       activeChatAvatar.style.cssText = `width:38px;height:38px;font-size:15px;cursor:pointer;${avatarBg}`;
@@ -3959,7 +3943,7 @@
       const peerTypingNow = !peer.is_channel && !isBotChat && peer.typing_to === me && (Date.now() - Number(peer.typing_time || 0) < 5000);
       activeChatStatus.textContent = peerTypingNow
         ? 'печатает…'
-        : (isBotChat ? (activePeer === 'rainbow_bot' ? 'заявки на радужный ник' : 'общедоступный бот верификации') : (peer.is_group ? `${(peer.members || []).length} участников · групповая переписка` : getPresenceLabel(peer, me)));
+        : (isBotChat ? 'общедоступный бот верификации' : (peer.is_group ? `${(peer.members || []).length} участников · групповая переписка` : getPresenceLabel(peer, me)));
       activeChatStatus.classList.toggle('online', peerTypingNow || activeChatStatus.textContent === 'в сети');
 
       if (isBotChat) {
@@ -3999,7 +3983,7 @@
         headerSubBtn.style.display = 'none';
         messageForm.style.display = 'flex';
         channelReadonlyBar.style.display = 'none';
-        messageInput.placeholder = isBotChat ? (activePeer === 'rainbow_bot' ? 'Чтобы запросить радужный ник, нажми кнопку выше…' : 'Сообщение боту верификации…') : 'Сообщение...';
+        messageInput.placeholder = isBotChat ? 'Сообщение боту верификации…' : 'Сообщение...';
       }
 
       let chatMessages = [];
@@ -4031,7 +4015,7 @@
         messagesContainer.innerHTML = `
           <div class="msg-empty">
             ${isBotChat
-              ? (activePeer === 'rainbow_bot' ? `Это <b>@rainbow_bot</b>. Радужное оформление профиля или канала можно запросить через кнопку заявки. Решение принимает только серверный Admin ID 1.` : `Это общедоступный <b>@verify_bot</b>. Галочки каналам и профилям выдаются <b>только через заявки</b>. Решение принимает только серверный Admin ID 1.`)
+              ? `Это общедоступный <b>@verify_bot</b>. Галочки каналам и профилям выдаются <b>только через заявки</b>. Решение принимает только серверный Admin ID 1.`
               : `Сообщений пока нет.`}
           </div>
         `;
@@ -4057,7 +4041,7 @@
         }
 
         let forwardedHtml='';
-        if(msg.forwarded_from&&msg.forwarded_from.username){const forwardHandle=String(msg.forwarded_from.username).toLowerCase().replace(/^@+/,'');const forwardPeer=getPeerObject(forwardHandle);const forwardBg=forwardPeer.avatar?`background-image:url(\"${String(forwardPeer.avatar).replace(/\"/g,'&quot;')}\")`:`background-color:${forwardPeer.color||'#2aabee'}`;const forwardInitial=forwardPeer.avatar?'':escapeHtml(getInitials(forwardPeer.name||forwardHandle));const rainbow=Boolean(usersMap[forwardHandle]?.rainbow_nick&&usersMap[forwardHandle]?.rainbow_grant_version===1);forwardedHtml=`<div class=\"vg-forwarded-source\"><div class=\"vg-forwarded-avatar\" data-avatar-user=\"${escapeHtml(forwardHandle)}\" style=\"${forwardBg}\">${forwardInitial}</div><div class=\"vg-forwarded-meta\"><span>Переслано от</span><button type=\"button\" class=\"vg-forwarded-name ${rainbow?'vg-rainbow-name':''}\" data-open-user=\"${escapeHtml(forwardHandle)}\">${escapeHtml(forwardPeer.name||msg.forwarded_from.name||forwardHandle)} ${renderBadgesHtml(forwardPeer)}</button></div></div>`;}
+        if(msg.forwarded_from&&msg.forwarded_from.username){const forwardHandle=String(msg.forwarded_from.username).toLowerCase().replace(/^@+/,'');const forwardPeer=getPeerObject(forwardHandle);const forwardBg=forwardPeer.avatar?`background-image:url(\"${String(forwardPeer.avatar).replace(/\"/g,'&quot;')}\")`:`background-color:${forwardPeer.color||'#2aabee'}`;const forwardInitial=forwardPeer.avatar?'':escapeHtml(getInitials(forwardPeer.name||forwardHandle));forwardedHtml=`<div class=\"vg-forwarded-source\"><div class=\"vg-forwarded-avatar\" data-avatar-user=\"${escapeHtml(forwardHandle)}\" style=\"${forwardBg}\">${forwardInitial}</div><div class=\"vg-forwarded-meta\"><span>Переслано от</span><button type=\"button\" class=\"vg-forwarded-name \" data-open-user=\"${escapeHtml(forwardHandle)}\">${escapeHtml(forwardPeer.name||msg.forwarded_from.name||forwardHandle)} ${renderBadgesHtml(forwardPeer)}</button></div></div>`;}
 
         let replyQuoteHtml = '';
         if (msg.reply_to && msg.reply_to.text) {
@@ -4084,7 +4068,6 @@
         }
 
         let botVerifyHtml = '';
-        if(msg.rainbow_request){const rr=msg.rainbow_request;const pending=rr.status==='pending';const isAdmin=Boolean(isModeratorUnlocked&&Number(usersMap[me]?.id||0)===1);botVerifyHtml=`<div class=\"vg-rainbow-request-card\"><div class=\"vg-rainbow-request-title\">🌈 Заявка на радужный ник</div><div class=\"vg-rainbow-request-info\">Объект: <b>@${escapeHtml(rr.target||'')}</b> · ${rr.target_type==='channel'?'канал':'профиль'}<br>Заявитель: @${escapeHtml(rr.applicant||'')}</div>${pending&&isAdmin?'<div class=\"bot-verify-actions\"><button class=\"bot-verify-btn approve\" data-rainbow-decide=\"approve\">🌈 Выдать</button><button class=\"bot-verify-btn reject\" data-rainbow-decide=\"reject\">Отказать</button></div>':`<div class=\"bot-status-stamp\">${pending?'⏳ Ожидает решения создателя':rr.status==='approved'?'✅ Радужный ник выдан':'❌ Заявка отклонена'}</div>`}</div>`;}
         if (msg.verification_request) {
           const req = msg.verification_request;
           if (req.status === 'pending' && isModeratorUnlocked) {
@@ -5335,7 +5318,7 @@
       if (handle === me) { peerProfileModal.classList.remove('open'); vgSetProfileSettingsTab('profile'); openMyProfileModal(); return; }
       if (!usersMap[handle]) await pollServer();
       const entity=usersMap[handle];
-      if (!entity && !['verify_bot','rainbow_bot'].includes(handle)) { showCustomIosBanner('Профиль не найден', `Аккаунт, группа или канал @${handle} не найден на сервере.`); return; }
+      if (!entity && !['verify_bot'].includes(handle)) { showCustomIosBanner('Профиль не найден', `Аккаунт, группа или канал @${handle} не найден на сервере.`); return; }
       const commentsOverlay = document.getElementById('commentsModal'); commentsOverlay?.classList.remove('open');
       const isNonMemberPublicGroup=Boolean(entity?.is_group && !(entity.members||[]).includes(me) && entity.owner!==me);
       if(isNonMemberPublicGroup){vgProfilePreviewOnly=true;vgPreviewPreviousPeer=activePeer;activePeer=handle;openPeerProfile();return;}
@@ -5845,7 +5828,7 @@
       const original=messagesList;const hidden=new Set((vgPrefs.hidden_messages||[]).map(String));
       messagesList=original.filter(m=>!hidden.has(String(m.id)) && !(usersMap[activePeer]?.is_group && (vgPrefs.blocked_users||[]).includes(String(m.sender||''))));
       try{vgOriginalRenderActiveChat(forceScroll);}finally{messagesList=original;}
-      const callPeer=usersMap[activePeer]||{};const callsUnavailable=Boolean(callPeer.is_group||callPeer.is_channel||callPeer.is_bot||['verify_bot','rainbow_bot'].includes(activePeer));
+      const callPeer=usersMap[activePeer]||{};const callsUnavailable=Boolean(callPeer.is_group||callPeer.is_channel||callPeer.is_bot||['verify_bot'].includes(activePeer));
       ['vgVoiceCallBtn','vgVideoCallBtn'].forEach(id=>{const b=document.getElementById(id);if(b)b.style.display=callsUnavailable?'none':'';});
       if(vgSelectionMode)vgRefreshSelection();
     };
@@ -6484,17 +6467,6 @@
     setInterval(()=>{if(myProfile&&document.visibilityState==='visible')vgPollCallSignals();},4000);
     document.addEventListener('click', ev=>{if(vgContextPopover&&!vgContextPopover.contains(ev.target)&&!ev.target.closest('.vg-chat-actions-btn')){vgContextPopover.remove();vgContextPopover=null;}},true);
 
-    // Rainbow nickname request workflow. Grants are server-owned; localStorage never activates the effect.
-    async function vgSubmitRainbowRequest(targetHandle){
-      if(!myProfile)return;const target=String(targetHandle||myProfile.username).trim().toLowerCase().replace(/^@+/, '');
-      const button=document.getElementById(target===myProfile.username.toLowerCase()?'requestRainbowNickBtn':'iosRainbowQuickBtn');if(button)button.disabled=true;
-      try{const response=await fetch('/api/rainbow/request',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({applicant:myProfile.username,target})});const data=await response.json().catch(()=>({}));if(!response.ok)throw new Error(data.error||'Заявка не отправлена');vgToast(data.already_pending?'Заявка уже рассматривается':'Заявка отправлена',data.already_pending?'Создатель уже получил её.':'Решение появится в чате @rainbow_bot у создателя с ID 1.');await pollServer();openChatWith('rainbow_bot');}
-      catch(error){vgToast('Не удалось отправить заявку',error.message||'');}
-      finally{if(button)button.disabled=false;}
-    }
-    document.getElementById('requestRainbowNickBtn')?.addEventListener('click',()=>vgSubmitRainbowRequest(myProfile?.username));
-    document.getElementById('iosRainbowQuickBtn')?.addEventListener('click',()=>{const peer=usersMap[activePeer]||{};if(peer.is_channel)vgSubmitRainbowRequest(activePeer);});
-
     // Keep unread totals per local account badge fresh using each account's cached sync state.
     function vgUnreadForAccount(handle){
       const username=String(handle||'').toLowerCase();let data=null;
@@ -6513,24 +6485,15 @@
     const vgOriginalPollServerForAccountBadges=pollServer;
     pollServer=async function(){const result=await vgOriginalPollServerForAccountBadges();if(myProfile)updateDrawerInfo();return result;};
 
-    // Rainbow requests are visible only to the server-bound ID 1 account; every grant is validated again by the API.
-    const vgOriginalRenderActiveChatForRainbow=renderActiveChat;
-    renderActiveChat=function(forceScroll=false){vgOriginalRenderActiveChatForRainbow(forceScroll);const handle=String(activePeer||'');const isRainbow=handle==='rainbow_bot';if(isRainbow){verifyBotPanel.classList.add('active');verifyBotStatusText.innerHTML='🌈 <b>Rainbow Nick Bot</b><br>Отправь заявку на радужное оформление личного профиля или канала. Выдаёт его только создатель Vibegram с ID 1.';const apply=document.getElementById('botQuickApplyBtn');if(apply){apply.textContent='Запросить для профиля';apply.style.display='inline-flex';apply.onclick=()=>vgSubmitRainbowRequest(myProfile?.username);}}else if(handle==='verify_bot'){const apply=document.getElementById('botQuickApplyBtn');if(apply){apply.textContent='Подать заявку ✓';apply.style.display='inline-flex';apply.onclick=()=>{openMyProfileModal();vgSetProfileSettingsTab('status');};}}
-      {const rainbowSelf=usersMap[myProfile?.username?.toLowerCase()]||{};document.getElementById('rainbowNickState')?.replaceChildren(document.createTextNode(rainbowSelf.rainbow_nick&&rainbowSelf.rainbow_grant_version===1?'Статус: радужный ник активен':rainbowSelf.rainbow_pending?'Статус: заявка рассматривается':'Статус: не выдан'));}
+    // Keep the public verification bot available without rainbow-nickname features.
+    const vgBaseRenderActiveChatWithoutRainbow = renderActiveChat;
+    renderActiveChat = function(forceScroll=false){
+      vgBaseRenderActiveChatWithoutRainbow(forceScroll);
+      if(String(activePeer||'')==='verify_bot'){
+        const apply=document.getElementById('botQuickApplyBtn');
+        if(apply){apply.textContent='Подать заявку ✓';apply.style.display='inline-flex';apply.onclick=()=>{openMyProfileModal();vgSetProfileSettingsTab('status');};}
+      }
     };
-    document.getElementById('messagesContainer').addEventListener('click',async ev=>{const btn=ev.target.closest('[data-rainbow-decide]');if(!btn)return;ev.preventDefault();const msgEl=btn.closest('.message');const msgId=msgEl?.id?.replace(/^dom_/,'');const req=messagesList.find(m=>String(m.id)===String(msgId))?.rainbow_request;if(!req||!myProfile)return;btn.disabled=true;try{const response=await fetch('/api/rainbow/decide',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({msg_id:msgId,actor:myProfile.username,decision:btn.dataset.rainbowDecide})});const data=await response.json().catch(()=>({}));if(!response.ok)throw new Error(data.error||'Недостаточно прав');vgToast(data.decision==='approve'?'Радужный ник выдан':'Заявка отклонена','@'+req.target);await pollServer();}catch(error){vgToast('Решение не сохранено',error.message||'');}finally{btn.disabled=false;}});
-    const vgOriginalRenderPeerProfileForRainbow=openPeerProfile;
-    openPeerProfile=function(){vgOriginalRenderPeerProfileForRainbow();const peer=usersMap[activePeer]||{};const profileName=document.querySelector('#peerProfileName span');if(profileName)profileName.classList.toggle('vg-rainbow-name',Boolean(peer.rainbow_nick&&peer.rainbow_grant_version===1));const action=document.getElementById('iosRainbowQuickBtn');if(action){const me=String(myProfile?.username||'').toLowerCase();const perms=(peer.admins||{})[me]||{};action.style.display=Boolean(peer.is_channel&&(peer.owner===me||perms.can_promote))?'flex':'none';}const state=document.getElementById('rainbowNickState');const self=usersMap[myProfile?.username?.toLowerCase()]||{};if(state)state.textContent=self.rainbow_nick&&self.rainbow_grant_version===1?'Статус: радужный ник активен':self.rainbow_pending?'Статус: заявка рассматривается':'Статус: не выдан';const requestBtn=document.getElementById('requestRainbowNickBtn');if(requestBtn)requestBtn.disabled=Boolean(self.rainbow_pending||self.rainbow_nick&&self.rainbow_grant_version===1);};
-
-    // Add server-controlled rainbow styling to the main chat title, current account title and forwarded sender names.
-    const vgOriginalGetPeerObjectRainbow=getPeerObject;
-    getPeerObject=function(username){const peer=vgOriginalGetPeerObjectRainbow(username);const serverObj=usersMap[String(username||'').toLowerCase().replace(/^@+/,'')];peer.rainbow_nick=Boolean(serverObj?.rainbow_nick&&serverObj?.rainbow_grant_version===1);peer.rainbow_grant_version=serverObj?.rainbow_grant_version;return peer;};
-    const vgOriginalRenderActiveChatRainbowTitle=renderActiveChat;
-    renderActiveChat=function(forceScroll=false){vgOriginalRenderActiveChatRainbowTitle(forceScroll);const peer=usersMap[activePeer]||{};const link=document.querySelector('#activeChatName [data-open-user]');if(link)link.classList.toggle('vg-rainbow-name',Boolean(peer.rainbow_nick&&peer.rainbow_grant_version===1));const badges=messagesContainer.querySelectorAll('.vg-forwarded-name');badges.forEach(el=>{const handle=el.dataset.openUser;const u=usersMap[handle]||{};el.classList.toggle('vg-rainbow-name',Boolean(u.rainbow_nick&&u.rainbow_grant_version===1));});};
-
-    // A dedicated rainbow request card uses only server-provided metadata and a strict ID=1 action API.
-    const vgOriginalPollServerForRainbow=pollServer;
-    pollServer=async function(){const result=await vgOriginalPollServerForRainbow();if(myProfile){const me=myProfile.username.toLowerCase();const serverSelf=usersMap[me]||{};if(serverSelf.rainbow_nick&&serverSelf.rainbow_grant_version===1){myProfile.rainbow_nick=true;myProfile.rainbow_grant_version=1;}else{delete myProfile.rainbow_nick;delete myProfile.rainbow_grant_version;}upsertAccountInList(myProfile);if(activePeer==='rainbow_bot'||activePeer==='verify_bot')renderActiveChat();}return result;};
 
   </script>
 
@@ -6680,9 +6643,7 @@ button:disabled {cursor:not-allowed;}
 .account-switch-row{position:relative;padding-right:42px!important}
 .vg-account-unread{min-width:21px;height:21px;padding:0 6px;border-radius:999px;display:inline-flex;align-items:center;justify-content:center;background:#2aabee;color:#fff;font-size:10px;font-weight:850;box-shadow:0 2px 8px #0004;margin-left:auto;flex:0 0 auto;animation:vgBadgeIn .22s var(--vg-smooth)}
 .vg-account-unread[hidden]{display:none!important}
-/* Server-authorized rainbow nick, gently animated at compositor-friendly cadence. */
-.vg-rainbow-name{background:linear-gradient(100deg,#ff5e7e 0%,#ffb84d 18%,#f9f871 34%,#55e6a5 50%,#57c7ff 68%,#b58cff 84%,#ff5e7e 100%);background-size:260% 100%;color:transparent!important;-webkit-background-clip:text;background-clip:text;font-weight:850!important;animation:vgRainbowFlow 3.2s linear infinite}
-@keyframes vgRainbowFlow{to{background-position:260% 0}}
+}
 @keyframes vgBadgeIn{0%{transform:scale(.6);opacity:.15}100%{transform:scale(1);opacity:1}}
 /* Forwarded message source: profile avatar and current server badge row. */
 .vg-forwarded-source{display:flex;align-items:center;gap:8px;padding:7px 9px;margin:0 0 6px;border-left:3px solid #2aabee;border-radius:8px;background:rgba(42,171,238,.075);min-width:0}
@@ -6714,10 +6675,6 @@ button:disabled {cursor:not-allowed;}
 .vg-poll-create-option{display:flex;align-items:center;gap:9px;padding:8px 0;color:#c5d7e5;font-size:12px}
 .vg-poll-create-option input{accent-color:#2aabee;width:16px;height:16px}
 .vg-field-label{display:block;color:#9eb3c4;font-size:11px;font-weight:800;margin:5px 0 6px}
-.vg-rainbow-state{display:inline-flex;align-items:center;border:1px solid rgba(42,171,238,.2);background:rgba(42,171,238,.08);color:#b5d8ec;border-radius:999px;padding:7px 10px;font-size:11px;font-weight:750}
-.vg-rainbow-request-card{margin:10px 0;padding:12px;border:1px solid rgba(178,129,255,.24);border-radius:14px;background:rgba(131,86,225,.09)}
-.vg-rainbow-request-title{font-size:13px;font-weight:850;color:#d6c1ff;margin-bottom:6px}
-.vg-rainbow-request-info{font-size:12px;color:#b4c7d7;line-height:1.6;overflow-wrap:anywhere}
 .vg-platform-download{display:inline-flex;align-items:center;justify-content:center;gap:6px;margin-top:7px;width:100%;box-sizing:border-box;border:0;border-radius:10px;background:#2aabee;color:#fff!important;text-decoration:none;padding:9px 8px;font-size:11px;font-weight:850;cursor:pointer;transition:transform .18s var(--vg-smooth),filter .18s ease}
 .vg-platform-download:hover{filter:brightness(1.1);transform:translateY(-1px)}
 .vg-platform-download:active{transform:scale(.98)}
@@ -6755,7 +6712,7 @@ button:disabled {cursor:not-allowed;}
   .vg-poll{max-width:min(78vw,350px);min-width:min(245px,70vw)}
 }
 @media(min-width:769px){.vg-apps-grid{grid-template-columns:repeat(3,minmax(0,1fr))}.vg-apps-web{display:none!important}}
-@media(prefers-reduced-motion:reduce){.vg-rainbow-name,.vg-account-unread,.reaction-pill:active{animation:none!important}.chat-item,.drawer-btn,.vg-folder-chip,.vg-header-tool,.vg-composer-tool,.reaction-pill,.ios-action-btn,.vg-created-entity-row{transition:none!important}}
+@media(prefers-reduced-motion:reduce){.vg-account-unread,.reaction-pill:active{animation:none!important}.chat-item,.drawer-btn,.vg-folder-chip,.vg-header-tool,.vg-composer-tool,.reaction-pill,.ios-action-btn,.vg-created-entity-row{transition:none!important}}
 </style>
 
 
@@ -6764,10 +6721,10 @@ button:disabled {cursor:not-allowed;}
 .drawer-soon-dot{display:none!important}
 .chat-item{touch-action:pan-y}.vg-chat-actions-btn{touch-action:manipulation}
 #peerProfileName{display:flex;align-items:center;justify-content:center;gap:6px;flex-wrap:wrap;text-align:center;max-width:100%;overflow-wrap:anywhere}
-#peerProfileName .vg-rainbow-name{display:inline-block}.profile-linked-channels,#profileCreatedEntitiesList{max-width:100%;min-width:0}.vg-created-entity-row,.vg-drawer-entity{min-width:0;max-width:100%}
+.profile-linked-channels,#profileCreatedEntitiesList{max-width:100%;min-width:0}.vg-created-entity-row,.vg-drawer-entity{min-width:0;max-width:100%}
 .vg-apps-grid{align-items:stretch;gap:12px}.vg-app-platform{box-sizing:border-box;min-width:0;overflow-wrap:anywhere}.vg-platform-download{min-height:36px}
 @media(max-width:768px){.chat-header-identity{pointer-events:none;max-width:calc(100% - 130px)!important}.chat-header-identity .avatar,#openPeerProfileBtn{pointer-events:auto}.chat-header-identity .chat-header-title{font-size:12px!important}#activeChatName .user-nav-link{max-width:48vw;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}.chat-item{min-height:68px}.account-switch-row{min-height:58px}.vg-chat-actions-btn{min-width:32px!important;min-height:32px!important}}
-@media(prefers-reduced-motion:reduce){.vg-rainbow-name,.vg-account-unread,.reaction-pill:active{animation:none!important}}
+@media(prefers-reduced-motion:reduce){.vg-account-unread,.reaction-pill:active{animation:none!important}}
 
 .dev-svg-badge{display:inline-flex;align-items:center;justify-content:center;vertical-align:middle;width:18px;height:18px;flex:0 0 auto;filter:drop-shadow(0 1px 4px rgba(42,171,238,.26));transition:transform .18s ease,filter .18s ease}.dev-svg-badge svg{width:18px!important;height:18px!important;display:block}.dev-svg-badge:hover{transform:translateY(-1px) scale(1.08);filter:drop-shadow(0 2px 7px rgba(42,171,238,.4))}
 </style>
@@ -6999,105 +6956,21 @@ button:focus-visible,a:focus-visible,input:focus-visible,textarea:focus-visible,
 @media(prefers-reduced-motion:reduce){.modal-overlay.open>.tg-settings-modal,.modal-overlay.open>.ios-sheet-modal,.vg-modal.open>.vg-modal-card{animation:none!important}}
 </style>
 
-<style id="vibegram-rainbow-and-interface-v2">
-/* Rainbow usernames: only server-approved grants get the effect. Keep badges/icons readable. */
-.vg-rainbow-name,
-.vg-rainbow-name > .vg-badge,
-.vg-rainbow-name .vg-verified-badge,
-.vg-rainbow-name .vg-premium-badge { isolation:isolate; }
-.vg-rainbow-name:not(:has(svg)):not(:has(.vg-badge)) {
-  display:inline-block; max-width:100%; color:transparent!important;
-  background-image:linear-gradient(105deg,#ff4d6d 0%,#ff9f43 16%,#ffe66d 31%,#52e0a1 47%,#42c9f5 63%,#9b7bff 79%,#ff4d6d 100%);
-  background-size:300% 100%; background-position:0% 50%; background-clip:text;
-  -webkit-background-clip:text; -webkit-text-fill-color:transparent;
-  font-weight:800; animation:vgRainbowFlow 4.2s linear infinite;
-}
-/* Ensure badge markup and SVGs never inherit transparent text from the rainbow label. */
-.vg-rainbow-name .vg-badge,.vg-rainbow-name svg,.vg-rainbow-name .badge,
-.vg-rainbow-name [class*="verified"],.vg-rainbow-name [class*="premium"] {
-  -webkit-text-fill-color:initial; color:initial; background-clip:border-box;
-}
-@keyframes vgRainbowFlow { to { background-position:300% 50%; } }
-#drawerUserName,#peerProfileName,.chat-header-identity,.chat-item-name,.chat-item-title,
-.channel-post-header,.vg-group-sender,.vg-forwarded-meta { min-width:0; }
-#drawerUserName,#peerProfileName { overflow-wrap:anywhere; }
-#drawerUserName .vg-rainbow-name,#peerProfileName .vg-rainbow-name,
-[data-open-user].vg-rainbow-name,.vg-forwarded-name.vg-rainbow-name {
-  vertical-align:baseline; text-decoration:none; cursor:pointer;
-}
+<style id="vibegram-interface-v2">
 /* App-wide alignment polish: consistent box sizing, controls and safe scrolling. */
 #app, #app * { box-sizing:border-box; }
 button,input,textarea,select { font:inherit; }
 button { -webkit-tap-highlight-color:transparent; }
 .modal-overlay,.vg-modal,.ios-sheet-overlay { overscroll-behavior:contain; }
 .modal-overlay > *, .vg-modal > *, .ios-sheet-modal, .tg-settings-modal { min-width:0; }
-.tg-section-box,.tg-row-item,.vg-modal-card,.vg-created-entity-row,.vg-drawer-entity,
-.chat-item,.chat-header-identity,.chat-header-tools { min-width:0; }
-.tg-row-item,.vg-modal-head,.vg-modal-footer,.vg-action-row,.vg-group-footer-actions {
-  flex-wrap:wrap; gap:10px;
-}
+.tg-section-box,.tg-row-item,.vg-modal-card,.vg-created-entity-row,.vg-drawer-entity,.chat-item,.chat-header-identity,.chat-header-tools { min-width:0; }
+.tg-row-item,.vg-modal-head,.vg-modal-footer,.vg-action-row,.vg-group-footer-actions { flex-wrap:wrap; gap:10px; }
 .tg-row-body { min-width:0; overflow-wrap:anywhere; }
-.tg-row-body input,.tg-row-body textarea,.tg-row-body select,
-.tg-section-box input,.tg-section-box textarea,.tg-section-box select { max-width:100%; }
+.tg-row-body input,.tg-row-body textarea,.tg-row-body select,.tg-section-box input,.tg-section-box textarea,.tg-section-box select { max-width:100%; }
 img,video { max-width:100%; }
-@media(max-width:768px){
-  .vg-rainbow-name:not(:has(svg)):not(:has(.vg-badge)){animation-duration:5.5s}
-  .tg-row-item { align-items:flex-start; }
-  .tg-row-body { flex:1 1 180px; }
-  .modal-overlay,.vg-modal { padding:8px!important; }
-  .modal-overlay > .tg-settings-modal,.modal-overlay > .ios-sheet-modal,
-  .vg-modal > .vg-modal-card { width:100%!important; max-width:100%!important; }
-  .chat-header-identity { overflow:hidden; }
-}
-@media(prefers-reduced-motion:reduce){.vg-rainbow-name{animation:none!important}}
+@media(max-width:768px){ .tg-row-item { align-items:flex-start; } .tg-row-body { flex:1 1 180px; } .modal-overlay,.vg-modal { padding:8px!important; } .modal-overlay > .tg-settings-modal,.modal-overlay > .ios-sheet-modal,.vg-modal > .vg-modal-card { width:100%!important; max-width:100%!important; } .chat-header-identity { overflow:hidden; } }
 </style>
-<script id="vibegram-rainbow-interface-v2">
-(()=>{
-  const granted = handle => {
-    const h=String(handle||'').trim().toLowerCase().replace(/^@+/, '');
-    const map=(typeof usersMap!=='undefined'?usersMap:window.usersMap); const u=map && map[h];
-    return !!(u && u.rainbow_nick===true && Number(u.rainbow_grant_version)===1);
-  };
-  const refreshRainbowNames = () => {
-    try {
-      document.querySelectorAll('[data-open-user]').forEach(el=>{
-        const h=el.getAttribute('data-open-user');
-        el.classList.toggle('vg-rainbow-name',granted(h));
-      });
-      const profile=(typeof myProfile!=='undefined'?myProfile:window.myProfile); const me=profile && profile.username;
-      const self=granted(me);
-      const drawer=document.querySelector('#drawerUserName > span');
-      if(drawer) drawer.classList.toggle('vg-rainbow-name',self);
-      const peerName=document.querySelector('#peerProfileName span');
-      if(peerName){
-        const active=(typeof activePeer!=='undefined'?activePeer:window.activePeer);
-        peerName.classList.toggle('vg-rainbow-name',granted(active));
-      }
-      const state=document.getElementById('rainbowNickState');
-      if(state){
-        const map=(typeof usersMap!=='undefined'?usersMap:window.usersMap); const u=map && map[String(me||'').toLowerCase()];
-        state.textContent=granted(me)?'🌈 Радужный ник активен':(u&&u.rainbow_pending?'Заявка рассматривается':'Радужный ник не выдан');
-        state.classList.toggle('is-active',granted(me));
-      }
-    } catch(e) { /* UI enhancement must never interrupt chat rendering. */ }
-  };
-  if(document.readyState==='loading') document.addEventListener('DOMContentLoaded',()=>{
-    refreshRainbowNames();
-    new MutationObserver(refreshRainbowNames).observe(document.body,{childList:true,subtree:true});
-  },{once:true});
-  else {
-    refreshRainbowNames();
-    new MutationObserver(refreshRainbowNames).observe(document.body,{childList:true,subtree:true});
-  }
-  document.addEventListener('click',e=>{
-    const button=e.target.closest('#requestRainbowNickBtn');
-    if(!button)return;
-    // Existing app handler owns the API request; this only refreshes visible status afterward.
-    setTimeout(refreshRainbowNames,350);
-  });
-  window.addEventListener('focus',refreshRainbowNames);
-})();
-</script>
+
 
 </body>
 </html>
