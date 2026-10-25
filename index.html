@@ -1211,6 +1211,213 @@
   }
 </style>
 
+
+<style id="vibegram-messenger-premium-design">
+  :root {
+    --bg-main:#0b141d; --bg-wallpaper:#0b141d; --bg-panel:#17212b; --bg-panel-solid:#17212b;
+    --bg-hover:rgba(139,177,205,.09); --bg-active:#2b5278; --bg-input:#242f3d;
+    --msg-out:#2b5278; --msg-in:#182533; --text-primary:#f2f6fa; --text-secondary:#91a3b5;
+    --accent:#2aabee; --accent-purple:#6886d8; --online:#4bcf8a; --danger:#f05d66;
+    --border:rgba(162,189,211,.11); --spring:cubic-bezier(.2,.8,.2,1);
+  }
+  html,body { background:#0b141d; color:#f2f6fa; }
+  body { font-feature-settings:"cv11","ss01"; }
+  button,input,textarea,select { font:inherit; }
+  button { touch-action:manipulation; }
+  .app { background:#0b141d; isolation:isolate; }
+  .sidebar { width:clamp(318px,31vw,402px); min-width:318px; background:#111d29; border-right:1px solid rgba(0,0,0,.28); box-shadow:10px 0 36px rgba(0,0,0,.10); z-index:2; }
+  .sidebar-header { background:#17212b; min-height:70px; padding:12px 15px; gap:10px; border-bottom:1px solid rgba(0,0,0,.2); }
+  .brand-title { color:#f5f8fb; -webkit-text-fill-color:#f5f8fb; font-size:21px; font-weight:800; letter-spacing:-.55px; display:flex; align-items:center; gap:9px; }
+  .brand-title::before { content:"V"; display:grid; place-items:center; flex:0 0 30px; width:30px; height:30px; border-radius:11px 11px 11px 4px; color:#fff; font-size:16px; font-weight:900; background:linear-gradient(145deg,#45c5f8,#268ddd 66%,#2368b2); box-shadow:0 5px 18px rgba(42,171,238,.24); }
+  .icon-btn { color:#a5b8c8; border-radius:12px; transition:background .18s,color .18s,transform .18s; }
+  .icon-btn:hover { background:rgba(255,255,255,.075); color:#fff; }
+  .notify-toggle { border:1px solid rgba(255,255,255,.065); }
+  .search-wrapper { min-width:0; }
+  .search-input,#searchInput { background:#242f3d!important; border:1px solid rgba(255,255,255,.025)!important; border-radius:13px!important; color:#f3f7fa!important; padding:11px 13px!important; transition:border-color .2s,box-shadow .2s!important; }
+  .search-input:focus,#searchInput:focus { border-color:rgba(42,171,238,.5)!important; box-shadow:0 0 0 3px rgba(42,171,238,.09)!important; }
+  .search-input::placeholder,#searchInput::placeholder { color:#899bad!important; }
+  .vg-folders-bar { gap:5px; padding:10px 12px 9px; background:#17212b; border-bottom:1px solid rgba(0,0,0,.18); }
+  .vg-folder-chip { padding:7px 11px; border-radius:11px; background:transparent; color:#98aaba; font-size:12px; transition:background .18s,color .18s,border-color .18s; }
+  .vg-folder-chip.active { background:rgba(42,171,238,.17); color:#82d7ff; border-color:rgba(42,171,238,.13); }
+  .vg-folder-add { border-radius:10px; color:#91b9d3; border-color:rgba(255,255,255,.08); background:rgba(255,255,255,.025); }
+  .chat-list { padding:7px 8px 14px; background:#111d29; }
+  .chat-item { position:relative; min-height:72px; padding:10px 11px; margin:3px 0; gap:12px; border:1px solid transparent; border-radius:15px; background:transparent; transition:background .16s,border-color .16s,transform .16s; }
+  .chat-item:hover { background:rgba(161,191,216,.065); border-color:rgba(255,255,255,.025); }
+  .chat-item.active { background:linear-gradient(100deg,rgba(43,82,120,.96),rgba(38,76,111,.84)); border-color:rgba(104,172,219,.14); box-shadow:inset 3px 0 0 #4fc3f7,0 5px 14px rgba(0,0,0,.06); }
+  .chat-item.active .chat-preview,.chat-item.active .chat-time { color:#d3e5f3; }
+  .avatar { box-shadow:0 0 0 1px rgba(218,236,249,.12); }
+  .avatar-wrap::after { box-shadow:0 0 0 2px #111d29; }
+  .chat-item.active .avatar-wrap::after { box-shadow:0 0 0 2px #2b5278; }
+  .chat-name { color:#f2f6fa; font-size:14.5px; font-weight:720; letter-spacing:-.1px; }
+  .chat-preview { color:#91a3b5; font-size:12.5px; line-height:1.45; margin-top:3px; }
+  .chat-time { color:#8698a9; font-size:11px; }
+  .unread-badge { min-width:20px; height:20px; border-radius:10px; background:#2aabee; font-size:11px; box-shadow:0 2px 7px #0002; }
+  .chat-area { position:relative; background:#0b141d; background-image:radial-gradient(ellipse at 50% 8%,rgba(42,171,238,.055),transparent 47%); }
+  .chat-header { position:relative; z-index:1; height:66px; min-height:66px; background:#17212b; padding:0 clamp(14px,2vw,24px); gap:13px; border-bottom:1px solid rgba(0,0,0,.25); box-shadow:0 4px 14px rgba(0,0,0,.06); }
+  .chat-header-info { display:flex; flex-direction:column; justify-content:center; gap:4px; }
+  .chat-header-title { color:#f5f8fb; font-size:15.5px; font-weight:750; letter-spacing:-.2px; }
+  .chat-header-status { color:#92a5b6; font-size:12px; }
+  .chat-header-status.online { color:#65d99a; }
+  .vg-header-tools { gap:4px; }
+  .vg-header-tool { width:37px; height:37px; border-radius:12px; color:#92a8bb; font-size:19px; transition:background .16s,color .16s,transform .16s; }
+  .vg-header-tool:hover { background:rgba(42,171,238,.13); color:#74d4ff; }
+  .messages-container { position:relative; flex:1; min-height:0; padding:24px clamp(18px,4vw,64px) 20px; gap:7px; background-color:#0b141d; background-image:radial-gradient(circle at 20% 15%,rgba(106,150,184,.055) 0 1px,transparent 1.5px),radial-gradient(circle at 80% 75%,rgba(106,150,184,.04) 0 1px,transparent 1.5px),linear-gradient(180deg,rgba(11,20,29,.10),rgba(11,20,29,.22)); background-size:35px 35px,47px 47px,100% 100%; }
+  .message { position:relative; max-width:min(74%,700px); padding:9px 12px 7px; border-radius:15px; font-size:14.5px; line-height:1.48; letter-spacing:0; box-shadow:0 2px 2px rgba(0,0,0,.08); border:1px solid transparent; }
+  .message.out { background:linear-gradient(155deg,#2b5278,#294b6d); color:#f5f9fc; border-bottom-right-radius:5px; }
+  .message.in { background:#182533; color:#edf3f8; border-bottom-left-radius:5px; border-color:rgba(255,255,255,.018); }
+  .message.channel-post { background:#182533; border:1px solid rgba(142,172,197,.10); border-radius:16px; box-shadow:0 8px 20px rgba(0,0,0,.08); }
+  .message.out .message-time,.message.out .msg-time,.message.out .message-meta { color:rgba(223,240,252,.68); }
+  .message.in .message-time,.message.in .msg-time,.message.in .message-meta { color:#8199aa; }
+  .message-text { line-height:1.5; overflow-wrap:anywhere; word-break:break-word; }
+  .message-link,.message a,.msg-reply-quote a,.comment-text a { color:#83d8ff!important; text-decoration:underline; text-decoration-color:rgba(131,216,255,.42); text-underline-offset:3px; }
+  .message a:hover,.msg-reply-quote a:hover,.comment-text a:hover { color:#c6efff!important; }
+  .message.out a { color:#a4e4ff!important; }
+  .message:active { transform:scale(.997); }
+  .pinned-banner { background:#182937; border-left:3px solid #2aabee; border-bottom:1px solid rgba(255,255,255,.05); }
+  .pinned-label { color:#79cfff; }
+  .bot-top-panel { background:linear-gradient(100deg,rgba(28,49,65,.96),rgba(23,39,52,.92)); border-bottom:1px solid rgba(255,255,255,.045); }
+  .reply-bar { background:#172a39; border-top:1px solid rgba(255,255,255,.045); border-left:3px solid #2aabee; }
+  .chat-input-bar { position:relative; z-index:2; gap:8px; padding:11px 18px max(11px,env(safe-area-inset-bottom)); background:#17212b; border-top:1px solid rgba(255,255,255,.035); box-shadow:0 -5px 20px rgba(0,0,0,.05); }
+  .msg-input,#messageInput { min-height:43px; background:#242f3d!important; color:#edf5fa!important; border:1px solid rgba(255,255,255,.025)!important; border-radius:16px!important; padding:12px 15px!important; font-size:14.5px!important; transition:border-color .18s,background .18s!important; }
+  .msg-input:focus,#messageInput:focus { background:#263444!important; border-color:rgba(42,171,238,.38)!important; }
+  .attach-btn,.sticker-send-btn,.vg-composer-tool { width:37px; min-width:37px; height:40px; border-radius:13px; color:#91adc2; background:transparent; transition:background .18s,color .18s; }
+  .attach-btn:hover,.sticker-send-btn:hover,.vg-composer-tool:hover { background:rgba(42,171,238,.10); color:#7bd5ff; }
+  .send-btn { width:42px!important; min-width:42px; height:42px!important; border-radius:14px!important; background:linear-gradient(145deg,#35b8f1,#2196d2)!important; box-shadow:0 5px 15px rgba(42,171,238,.16); font-size:21px; }
+  .send-btn:hover { filter:brightness(1.08); }
+  .no-chat-selected { background:linear-gradient(145deg,rgba(25,43,58,.94),rgba(19,33,45,.94)); color:#a9bfce; border:1px solid rgba(148,185,210,.08); border-radius:16px; padding:15px 20px; max-width:min(90%,520px); line-height:1.6; box-shadow:0 10px 34px rgba(0,0,0,.12); }
+  .no-chat-selected b { color:#d7e8f4; }
+  .drawer-overlay { background:rgba(3,9,15,.62); backdrop-filter:blur(7px); }
+  .side-drawer { background:#121f2c; border-right:1px solid rgba(255,255,255,.07); box-shadow:20px 0 70px rgba(0,0,0,.33); }
+  .drawer-profile-card { background:radial-gradient(ellipse at 90% 0,rgba(42,171,238,.24),transparent 58%),linear-gradient(145deg,#1b3347,#17212b 70%); }
+  .drawer-group { background:#172633; border-color:rgba(255,255,255,.045); border-radius:16px; }
+  .drawer-btn { border-radius:11px; padding:11px 12px; color:#d2dee8; }
+  .drawer-btn:hover { background:rgba(42,171,238,.10); }
+  .auth-screen { background:radial-gradient(ellipse at 50% 0,rgba(42,171,238,.20),transparent 50%),#0b141d; }
+  .auth-card { background:rgba(23,33,43,.96); border:1px solid rgba(153,191,218,.12); border-radius:26px; box-shadow:0 28px 80px rgba(0,0,0,.38); }
+  .auth-logo { background:linear-gradient(145deg,#3ac0f6,#268bca); border-radius:22px 22px 22px 8px; box-shadow:0 12px 28px rgba(42,171,238,.23); }
+  .auth-field label { color:#8bd9fb; }
+  .auth-input { background:#0f1a25; border:1px solid rgba(255,255,255,.08); border-radius:13px; }
+  .auth-input:focus { border-color:#2aabee; box-shadow:0 0 0 3px rgba(42,171,238,.11); }
+  .modal-overlay { background:rgba(3,9,15,.72); backdrop-filter:blur(13px); }
+  .tg-settings-modal,.ios-sheet-modal { background:#17212b!important; border:1px solid rgba(164,196,220,.10)!important; border-radius:22px!important; box-shadow:0 25px 90px rgba(0,0,0,.42)!important; }
+  .vg-modal { background:rgba(3,9,15,.72); backdrop-filter:blur(13px); }
+  .vg-modal-card { background:#17212b; border-color:rgba(164,196,220,.11); border-radius:22px; box-shadow:0 30px 100px rgba(0,0,0,.48); }
+  .vg-modal-head { background:rgba(255,255,255,.012); padding:17px 19px; color:#f3f7fa; }
+  .vg-input,.vg-textarea,.vg-select { background:#0f1a25; border-color:rgba(255,255,255,.09); border-radius:13px; transition:border-color .15s,box-shadow .15s; }
+  .vg-input:focus,.vg-textarea:focus,.vg-select:focus { border-color:rgba(42,171,238,.55); box-shadow:0 0 0 3px rgba(42,171,238,.08); }
+  .vg-primary { background:linear-gradient(135deg,#39baf1,#218fd0); color:#fff; box-shadow:0 5px 16px rgba(42,171,238,.13); }
+  .vg-primary:hover { filter:brightness(1.07); }
+  .vg-secondary { background:#263645; color:#d8e5ef; border:1px solid rgba(255,255,255,.045); }
+  .vg-danger { background:rgba(237,83,93,.14); color:#ff9ba2; }
+  .vg-chat-popover { background:#1b2a38; border-color:rgba(255,255,255,.11); border-radius:15px; box-shadow:0 20px 55px rgba(0,0,0,.45); }
+  .vg-chat-popover button { padding:11px 12px; border-radius:10px; }
+  .vg-chat-popover button:hover { background:rgba(42,171,238,.11); }
+  .vg-selection-toolbar { background:#1a2a38; border-color:rgba(255,255,255,.10); border-radius:18px; box-shadow:0 18px 55px rgba(0,0,0,.42); }
+  .toast-stack .toast,.toast { border:1px solid rgba(177,206,229,.10); border-radius:15px; background:rgba(24,38,51,.97); box-shadow:0 12px 36px rgba(0,0,0,.25); backdrop-filter:blur(18px); }
+  .chat-list,.messages-container,.drawer-scroll { scrollbar-width:thin; scrollbar-color:rgba(147,176,199,.25) transparent; }
+  .chat-list::-webkit-scrollbar,.messages-container::-webkit-scrollbar,.drawer-scroll::-webkit-scrollbar { width:5px; }
+  .chat-list::-webkit-scrollbar-thumb,.messages-container::-webkit-scrollbar-thumb,.drawer-scroll::-webkit-scrollbar-thumb { background:rgba(147,176,199,.22); border-radius:10px; }
+  .vg-message-result-flash { animation:vgMessageFlash 1.8s ease; }
+  :focus-visible { outline:2px solid rgba(76,195,246,.8); outline-offset:2px; }
+
+  /* Purpose-built WebRTC call screen */
+  .vg-call-overlay { align-items:center!important; justify-content:center!important; padding:20px!important; z-index:15000!important; }
+  .vg-call-card { width:min(100%,510px)!important; max-height:min(92dvh,850px)!important; overflow:auto; background:radial-gradient(ellipse at 50% 0,rgba(42,171,238,.12),transparent 47%),linear-gradient(155deg,#172532,#101b26 72%)!important; border:1px solid rgba(157,202,229,.12)!important; border-radius:28px!important; padding:0!important; box-shadow:0 32px 100px rgba(0,0,0,.58)!important; }
+  .vg-call-topbar { display:flex; align-items:center; justify-content:space-between; padding:16px 19px 9px; border-bottom:1px solid rgba(255,255,255,.045); }
+  .vg-call-brand { display:flex; align-items:center; gap:9px; color:#d9e8f3; font-size:11px; letter-spacing:1.7px; font-weight:850; }
+  .vg-call-brand small { color:#6ecdfa; font-size:9px; letter-spacing:1.4px; margin-left:3px; }
+  .vg-call-brand-mark { display:grid; place-items:center; width:29px; height:29px; border-radius:11px 11px 11px 4px; font-size:15px; font-weight:900; letter-spacing:0; color:white; background:linear-gradient(145deg,#45c5f8,#2589c9); }
+  .vg-call-kind-label { color:#87b5d0; font-size:11px; font-weight:750; letter-spacing:.2px; padding:6px 9px; border-radius:9px; background:rgba(255,255,255,.035); margin-left:auto; margin-right:8px; }
+  .vg-call-minimize { margin-left:0; width:32px; height:32px; display:grid; place-items:center; border:0; border-radius:11px; background:rgba(255,255,255,.06); color:#b8ccda; cursor:pointer; font-size:22px; line-height:1; }
+  .vg-call-minimize:hover { background:rgba(255,255,255,.12); color:white; }
+  .vg-call-profile { display:flex; flex-direction:column; align-items:center; padding:22px 20px 15px; text-align:center; }
+  .vg-call-avatar { width:76px; height:76px; border-radius:25px; display:grid; place-items:center; color:white; font-size:28px; font-weight:850; box-shadow:0 0 0 7px rgba(42,171,238,.07),0 10px 28px rgba(0,0,0,.25); border:1px solid rgba(255,255,255,.13); background:linear-gradient(145deg,#34b8ee,#286db4); }
+  .vg-call-peer { color:#f4f8fb; font-size:21px; font-weight:800; letter-spacing:-.55px; margin-top:15px; }
+  .vg-call-status { color:#9fb5c6; font-size:13px; margin:7px 0 0; min-height:19px; text-align:center; }
+  .vg-call-duration { min-height:17px; margin-top:4px; font-size:12px; font-weight:700; letter-spacing:1.1px; color:#65d2ff; font-variant-numeric:tabular-nums; }
+  .vg-call-stage { margin:0 17px; min-height:170px; height:clamp(170px,34vh,330px); position:relative; overflow:hidden; border:1px solid rgba(255,255,255,.07); border-radius:22px; background:radial-gradient(ellipse at 50% 45%,rgba(42,171,238,.14),transparent 55%),#0b141d; display:grid; place-items:center; }
+  .vg-call-video { display:none; width:100%; height:100%; max-height:none; object-fit:cover; border-radius:0; background:#070d13; }
+  .vg-call-local { display:none; }
+  #vgRemoteVideo { position:absolute; inset:0; }
+  .vg-call-local { width:clamp(76px,20%,118px); height:clamp(104px,24%,150px); max-height:none; object-fit:cover; position:absolute; bottom:13px; right:13px; border:2px solid rgba(255,255,255,.72); border-radius:14px; background:#15212c; box-shadow:0 6px 20px #0007; z-index:2; }
+  .vg-call-audio-art { width:100%; height:100%; position:absolute; inset:0; display:grid; place-items:center; overflow:hidden; }
+  .vg-call-art-mark { display:grid; place-items:center; width:88px; height:88px; border-radius:30px 30px 30px 9px; background:linear-gradient(145deg,#42c3f3,#287ac0 70%,#244a80); color:white; font-size:35px; font-weight:900; box-shadow:0 10px 44px rgba(42,171,238,.25); z-index:1; }
+  .vg-call-wave { position:absolute; width:120px; height:120px; border-radius:50%; border:1px solid rgba(77,194,244,.23); animation:vgCallWave 3s ease-out infinite; }
+  .vg-call-wave-b { animation-delay:1s; }.vg-call-wave-c { animation-delay:2s; }
+  @keyframes vgCallWave { 0%{transform:scale(.7);opacity:.1} 35%{opacity:.65} 100%{transform:scale(2.8);opacity:0} }
+  .vg-call-actions { display:flex; justify-content:center; align-items:center; flex-wrap:wrap; gap:13px; padding:23px 15px 12px; }
+  .vg-call-action { display:flex; flex-direction:column; align-items:center; justify-content:center; gap:8px; min-width:77px; min-height:75px; padding:9px 11px; border:1px solid rgba(255,255,255,.07); border-radius:19px; background:rgba(255,255,255,.055); color:#d6e4ee; cursor:pointer; font-size:11px; font-weight:700; transition:transform .15s,background .15s,border-color .15s; }
+  .vg-call-action:hover { transform:translateY(-2px); background:rgba(255,255,255,.09); border-color:rgba(255,255,255,.13); }
+  .vg-call-action-icon { display:grid; place-items:center; width:38px; height:38px; border-radius:14px; background:#263b4b; color:#a6dfff; font-size:19px; font-weight:800; }
+  .vg-call-accept .vg-call-action-icon { background:#28b86d; color:white; }
+  .vg-call-reject .vg-call-action-icon,.vg-call-hangup .vg-call-action-icon { background:#e94d58; color:white; }
+  .vg-call-action.is-off .vg-call-action-icon { background:#a94750; color:white; }
+  .vg-call-enable-audio { display:block; margin:0 auto 6px; padding:9px 14px; border:1px solid rgba(42,171,238,.25); border-radius:12px; color:#8edcff; background:rgba(42,171,238,.10); cursor:pointer; font-size:12px; font-weight:750; }
+  .vg-call-enable-audio[hidden] { display:none; }
+  .vg-call-footer { padding:4px 25px 21px; max-width:420px; margin:0 auto; text-align:center; color:#6f8799; font-size:11px; line-height:1.5; }
+  .vg-call-float { position:fixed; z-index:14999; right:20px; bottom:20px; display:flex; gap:9px; align-items:center; padding:13px 15px; border:1px solid rgba(108,202,246,.24); border-radius:17px; background:rgba(23,38,51,.97); color:#f0f7fb; box-shadow:0 15px 45px rgba(0,0,0,.4); backdrop-filter:blur(18px); cursor:pointer; }
+  .vg-call-float[hidden] { display:none; }
+  .vg-call-float-dot { width:9px; height:9px; border-radius:50%; background:#45d58e; box-shadow:0 0 0 4px rgba(69,213,142,.13); }
+  .vg-call-float-open { color:#71d2ff; font-size:11px; font-weight:800; margin-left:5px; }
+  @media(max-width:760px) {
+    .sidebar { width:100%; min-width:0; }
+    .sidebar-header { padding:calc(9px + env(safe-area-inset-top)) 12px 10px; }
+    .brand-title { font-size:19px; }
+    .chat-area { background:#0b141d; }
+    .chat-header { height:59px; min-height:59px; padding:0 10px; gap:8px; }
+    .vg-header-tool { width:32px; height:34px; border-radius:10px; }
+    .messages-container { padding:14px 10px 13px; gap:5px; }
+    .message { max-width:88%; padding:8px 10px 7px; font-size:14.5px; }
+    .chat-input-bar { gap:5px; padding:8px 8px max(9px,env(safe-area-inset-bottom)); }
+    .attach-btn,.sticker-send-btn,.vg-composer-tool { width:30px; min-width:30px; height:36px; border-radius:10px; font-size:16px; }
+    .msg-input,#messageInput { min-height:40px; font-size:16px!important; padding:10px 12px!important; }
+    .send-btn { width:39px!important; min-width:39px; height:39px!important; border-radius:13px!important; }
+    .vg-call-overlay { padding:10px!important; align-items:center!important; }
+    .vg-call-card { width:100%!important; max-height:calc(94dvh - env(safe-area-inset-top))!important; border-radius:25px!important; }
+    .vg-call-kind-label { display:none; }
+    .vg-call-profile { padding:16px 12px 12px; }
+    .vg-call-avatar { width:64px; height:64px; border-radius:22px; font-size:23px; }
+    .vg-call-peer { margin-top:12px; font-size:19px; }
+    .vg-call-stage { min-height:180px; height:32vh; margin:0 10px; border-radius:18px; }
+    .vg-call-actions { gap:9px; padding:17px 8px 9px; }
+    .vg-call-action { min-width:69px; min-height:68px; padding:7px 8px; border-radius:16px; gap:6px; }
+    .vg-call-action-icon { width:34px; height:34px; border-radius:12px; }
+    .vg-call-footer { padding:4px 18px 16px; }
+    .vg-call-float { right:10px; bottom:calc(10px + env(safe-area-inset-bottom)); }
+  }
+  @media(prefers-reduced-motion:reduce) { .vg-call-wave { animation:none!important; } .vg-call-action,.chat-item,.icon-btn,.send-btn { transition:none!important; } }
+  /* Profiles, settings, post cards, comments and embedded menus share the same visual system. */
+  .tg-settings-modal,.ios-sheet-modal { color:#edf4f9!important; }
+  .tg-profile-banner,.tg-profile-banner-bg { background:linear-gradient(135deg,#19384d,#1a2a3a 57%,#17212b)!important; }
+  .tg-section-box,.ios-card-group,.comment-card,.comments-list-box,.badge-info-card { background:#1b2a38!important; border:1px solid rgba(167,199,220,.075)!important; border-radius:16px!important; }
+  .tg-section-header,.ios-cell-label { color:#7fcff6!important; }
+  .tg-row-item,.ios-cell { border-color:rgba(255,255,255,.055)!important; }
+  .tg-row-item:hover,.ios-cell:hover { background:rgba(42,171,238,.07)!important; }
+  .tg-row-icon { background:rgba(42,171,238,.12)!important; color:#8bdbff!important; border-radius:11px!important; }
+  .tg-row-hint,.ios-cell-label,.ios-ticks { color:#8ca2b4!important; }
+  .tg-inline-input,.tg-inline-select,.ios-cell input,.ios-cell select,.ios-cell textarea { background:#0f1a25!important; color:#eef5fa!important; border:1px solid rgba(255,255,255,.09)!important; border-radius:11px!important; }
+  .tg-inline-input:focus,.tg-inline-select:focus,.ios-cell input:focus,.ios-cell select:focus,.ios-cell textarea:focus { border-color:rgba(42,171,238,.5)!important; }
+  .tg-save-footer { background:linear-gradient(180deg,transparent,#17212b 35%)!important; }
+  .ios-hero { background:radial-gradient(ellipse at 50% 0,rgba(42,171,238,.13),transparent 68%)!important; }
+  .ios-hero-avatar,.tg-avatar-main { box-shadow:0 0 0 5px rgba(42,171,238,.07),0 13px 35px rgba(0,0,0,.2)!important; border:1px solid rgba(255,255,255,.12)!important; }
+  .ios-action-btn,.btn-primary { border-radius:13px!important; transition:transform .15s,filter .15s,background .15s!important; }
+  .ios-action-btn:active,.btn-primary:active { transform:scale(.98); }
+  .user-nav-link { color:#81d6ff!important; }
+  .channel-post-header { border-color:rgba(255,255,255,.06)!important; }
+  .channel-comments-bar,.channel-readonly-bar { background:#17212b!important; border-top:1px solid rgba(255,255,255,.045)!important; }
+  .channel-sub-bottom-btn,.header-sub-pill { background:linear-gradient(135deg,#36b8ef,#218fd0)!important; color:#fff!important; border:0!important; border-radius:12px!important; box-shadow:0 5px 15px rgba(42,171,238,.12); }
+  .comment-author { color:#9edfff!important; }
+  .comment-text { color:#d6e3ec!important; line-height:1.5; overflow-wrap:anywhere; }
+  .sticker-send-panel { background:#1b2a38!important; border:1px solid rgba(255,255,255,.08)!important; border-radius:18px!important; box-shadow:0 14px 44px rgba(0,0,0,.35)!important; }
+  .sticker-send-title { color:#8bdcff!important; }
+  .profile-channels-picker,.profile-linked-channels { background:#1b2a38!important; border-color:rgba(255,255,255,.07)!important; border-radius:15px!important; }
+  .admin-perms-grid { gap:8px!important; }
+  .vg-chat-actions-btn { border-radius:9px; }
+  .vg-chat-actions-btn:hover { background:rgba(42,171,238,.11); }
+  @media(max-width:760px) { .tg-settings-modal,.ios-sheet-modal { border-radius:23px 23px 15px 15px!important; } .vg-call-kind-label { display:none; } }
+  @media(prefers-reduced-motion:reduce) { * { scroll-behavior:auto!important; } }
+</style>
+
 </head>
 <body>
 
@@ -1530,9 +1737,38 @@
   <div class="vg-modal" id="vgPollModal" role="dialog" aria-modal="true" aria-labelledby="vgPollTitle">
     <section class="vg-modal-card" style="max-width:480px;"><header class="vg-modal-head"><span id="vgPollTitle">Создать опрос</span><button type="button" data-vg-close="vgPollModal" aria-label="Закрыть">×</button></header><form class="vg-modal-body" id="vgPollForm"><input class="vg-input" id="vgPollQuestion" maxlength="300" placeholder="Вопрос" required><textarea class="vg-textarea" id="vgPollOptions" placeholder="Вариант 1&#10;Вариант 2&#10;Вариант 3" required></textarea><div class="vg-helper">Укажи от 2 до 10 вариантов — каждый с новой строки. Один ответ от пользователя.</div><div class="vg-action-row"><button type="submit" class="vg-primary">Опубликовать опрос</button><button type="button" class="vg-secondary" data-vg-close="vgPollModal">Отмена</button></div></form></section>
   </div>
-  <div class="vg-modal" id="vgCallModal" role="dialog" aria-modal="true" aria-labelledby="vgCallTitle">
-    <section class="vg-modal-card" style="max-width:520px;"><header class="vg-modal-head"><span id="vgCallTitle">Звонок Vibegram</span><button type="button" id="vgCallMinimizeBtn" aria-label="Закрыть окно звонка">×</button></header><div class="vg-modal-body"><div class="vg-call-stage"><video class="vg-call-video" id="vgRemoteVideo" autoplay playsinline></video><video class="vg-call-local" id="vgLocalVideo" autoplay muted playsinline></video><audio id="vgRemoteAudio" autoplay></audio></div><div class="vg-call-status" id="vgCallStatus">Подключение…</div><div class="vg-action-row vg-call-actions" id="vgIncomingCallActions" style="display:none;"><button class="vg-primary" type="button" id="vgAcceptCallBtn">Принять</button><button class="vg-danger" type="button" id="vgRejectCallBtn">Отклонить</button></div><div class="vg-action-row vg-call-actions" id="vgActiveCallActions" style="display:none;"><button class="vg-secondary" type="button" id="vgMuteCallBtn">🎙 Микрофон</button><button class="vg-secondary" type="button" id="vgCameraCallBtn">▣ Камера</button><button class="vg-danger" type="button" id="vgHangupCallBtn">Завершить</button></div><div class="vg-helper" style="text-align:center;margin-top:12px;">Звонки используют WebRTC. Для некоторых сетей может потребоваться TURN-сервер.</div></div></section>
+  <div class="vg-modal vg-call-overlay" id="vgCallModal" role="dialog" aria-modal="true" aria-labelledby="vgCallTitle">
+    <section class="vg-modal-card vg-call-card">
+      <header class="vg-call-topbar">
+        <div class="vg-call-brand"><span class="vg-call-brand-mark">V</span><span>VIBEGRAM <small>CALL</small></span></div><span id="vgCallTitle" class="vg-call-kind-label">Звонок Vibegram</span>
+        <button type="button" id="vgCallMinimizeBtn" class="vg-call-minimize" title="Свернуть звонок" aria-label="Свернуть звонок">—</button>
+      </header>
+      <div class="vg-call-profile">
+        <div class="vg-call-avatar" id="vgCallAvatar">V</div>
+        <div class="vg-call-peer" id="vgCallPeerName">Звонок Vibegram</div>
+        <div class="vg-call-status" id="vgCallStatus" aria-live="polite">Подключение…</div>
+        <div class="vg-call-duration" id="vgCallDuration"> </div>
+      </div>
+      <div class="vg-call-stage" id="vgCallStage">
+        <div class="vg-call-audio-art" id="vgCallAudioArt" aria-hidden="true"><span class="vg-call-wave vg-call-wave-a"></span><span class="vg-call-wave vg-call-wave-b"></span><span class="vg-call-wave vg-call-wave-c"></span><div class="vg-call-art-mark">V</div></div>
+        <video class="vg-call-video" id="vgRemoteVideo" autoplay playsinline></video>
+        <video class="vg-call-local" id="vgLocalVideo" autoplay muted playsinline></video>
+      </div>
+      <audio id="vgRemoteAudio" autoplay></audio>
+      <button type="button" class="vg-call-enable-audio" id="vgCallEnableAudio" hidden>Включить звук</button>
+      <div class="vg-call-actions vg-call-incoming-actions" id="vgIncomingCallActions" style="display:none;">
+        <button class="vg-call-action vg-call-accept" type="button" id="vgAcceptCallBtn"><span class="vg-call-action-icon">✓</span><span>Принять</span></button>
+        <button class="vg-call-action vg-call-reject" type="button" id="vgRejectCallBtn"><span class="vg-call-action-icon">×</span><span>Отклонить</span></button>
+      </div>
+      <div class="vg-call-actions vg-call-active-actions" id="vgActiveCallActions" style="display:none;">
+        <button class="vg-call-action" type="button" id="vgMuteCallBtn"><span class="vg-call-action-icon">♩</span><span>Микрофон</span></button>
+        <button class="vg-call-action" type="button" id="vgCameraCallBtn"><span class="vg-call-action-icon">▣</span><span>Камера</span></button>
+        <button class="vg-call-action vg-call-hangup" type="button" id="vgHangupCallBtn"><span class="vg-call-action-icon">⌕</span><span>Завершить</span></button>
+      </div>
+      <div class="vg-call-footer" id="vgCallFooter">Для звонка разреши доступ к микрофону. Видеозвонок также использует камеру.</div>
+    </section>
   </div>
+  <button type="button" id="vgCallFloatBtn" class="vg-call-float" hidden aria-label="Вернуться к звонку"><span class="vg-call-float-dot"></span><span id="vgCallFloatText">Звонок продолжается</span><span class="vg-call-float-open">Открыть</span></button>
   <div class="vg-selection-toolbar" id="vgSelectionToolbar"><span id="vgSelectionCount">Выбрано: 0</span><button type="button" id="vgSelectCopyBtn">Копировать</button><button type="button" id="vgSelectForwardBtn">Переслать</button><button type="button" class="danger" id="vgSelectDeleteBtn">Удалить</button><button type="button" id="vgSelectCancelBtn">Отмена</button></div>
 
   <!-- Основной интерфейс -->
@@ -4841,7 +5077,9 @@
     let vgRecordingStream = null;
     let vgLastSignalSeq = 0;
     const vgSeenSignals = new Set();
-    let vgCall = { pc:null, stream:null, remote:null, target:null, kind:null, incoming:null, pendingIce:[], makingOffer:false };
+    let vgCall = { pc:null, stream:null, remote:null, target:null, kind:null, incoming:null, pendingIce:[], makingOffer:false, callId:null, startedAt:0, timer:null, timeout:null, ringTimer:null };
+    let vgCallIceServers = [{urls:'stun:stun.l.google.com:19302'},{urls:'stun:stun1.l.google.com:19302'}];
+    let vgCallRingContext = null;
     let vgCallPollTimer = null;
 
     const vgPrefKey = () => `vibegram_feature_prefs_${(myProfile?.username || 'guest').toLowerCase()}`;
@@ -5092,38 +5330,58 @@
       }catch(e){vgToast('Нет доступа к микрофону','Разреши доступ к микрофону в настройках браузера.');}
     });
 
-    // WebRTC audio/video calling with server-mediated offer/answer/ICE signaling.
+    // Vibegram real-time 1:1 calling. Signalling is handled by the server; media flows peer-to-peer over WebRTC.
     const vgCallModal=document.getElementById('vgCallModal'), vgCallStatus=document.getElementById('vgCallStatus');
     const vgRemoteVideo=document.getElementById('vgRemoteVideo'), vgLocalVideo=document.getElementById('vgLocalVideo'), vgRemoteAudio=document.getElementById('vgRemoteAudio');
+    const vgCallPeerName=document.getElementById('vgCallPeerName'), vgCallAvatar=document.getElementById('vgCallAvatar'), vgCallDuration=document.getElementById('vgCallDuration');
+    const vgCallFloatBtn=document.getElementById('vgCallFloatBtn');
+    function vgCallId(){return (window.crypto&&crypto.randomUUID)?crypto.randomUUID():('vg-'+Date.now().toString(36)+'-'+Math.random().toString(36).slice(2,11));}
+    function vgCallPeerDisplay(handle){try{const p=getPeerObject(handle);return {name:p.name||handle,username:p.username||handle,color:p.color||'#2aabee'};}catch(_){return {name:handle,username:handle,color:'#2aabee'};}}
+    function vgCallIdentity(handle){const p=vgCallPeerDisplay(handle);vgCallPeerName.textContent=p.name;vgCallAvatar.textContent=(typeof getInitials==='function'?getInitials(p.name):String(p.name||'V').slice(0,1).toUpperCase());vgCallAvatar.style.backgroundColor=p.color;vgCallModal.dataset.callPeer=handle||'';}
     function vgSetCallStatus(t){vgCallStatus.textContent=t;}
     function vgCallButtons(incoming){document.getElementById('vgIncomingCallActions').style.display=incoming?'flex':'none';document.getElementById('vgActiveCallActions').style.display=incoming?'none':'flex';}
-    async function vgSendSignal(to,kind,payload={}){if(!myProfile||!to)return;try{await fetch('/api/call/signal',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({from:myProfile.username,to,kind,payload})});}catch(_){} }
-    function vgCreatePeer(target,kind){const pc=new RTCPeerConnection({iceServers:[{urls:'stun:stun.l.google.com:19302'},{urls:'stun:stun1.l.google.com:19302'}]});vgCall.pc=pc;vgCall.target=target;vgCall.kind=kind;vgCall.pendingIce=vgCall.pendingIce||[];pc.onicecandidate=e=>{if(e.candidate)vgSendSignal(target,'ice',e.candidate.toJSON());};pc.ontrack=e=>{const stream=e.streams[0];if(kind==='video'){vgRemoteVideo.srcObject=stream;vgRemoteVideo.muted=false;vgRemoteVideo.style.display='block';vgRemoteAudio.srcObject=stream;vgRemoteAudio.muted=true;}else{vgRemoteVideo.style.display='none';vgRemoteAudio.srcObject=stream;vgRemoteAudio.muted=false;}vgSetCallStatus('На связи с @'+target);};pc.onconnectionstatechange=()=>{if(pc.connectionState==='connected')vgSetCallStatus('На связи с @'+target);if(['failed','disconnected'].includes(pc.connectionState))vgSetCallStatus('Соединение нестабильно…');if(pc.connectionState==='closed')vgSetCallStatus('Звонок завершён');};return pc;}
-    async function vgStartCall(kind){if(!myProfile||!activePeer||activePeer===myProfile.username.toLowerCase()||activePeer==='verify_bot'||getPeerObject(activePeer).is_channel){vgToast('Этот чат не поддерживает звонки','Открой личный чат с пользователем.');return;}if(vgCall.pc){vgToast('Звонок уже активен','Сначала заверши текущий звонок.');return;}try{const stream=await navigator.mediaDevices.getUserMedia({audio:true,video:kind==='video'});vgCall.stream=stream;vgCall.kind=kind;vgCall.target=activePeer;vgLocalVideo.srcObject=stream;vgLocalVideo.style.display=kind==='video'?'block':'none';vgRemoteVideo.style.display=kind==='video'?'block':'none';vgCallModal.classList.add('open');vgCallButtons(false);vgSetCallStatus('Вызов @'+activePeer+'…');const pc=vgCreatePeer(activePeer,kind);stream.getTracks().forEach(t=>pc.addTrack(t,stream));const offer=await pc.createOffer();await pc.setLocalDescription(offer);await vgSendSignal(activePeer,'offer',{sdp:pc.localDescription,media:kind});}catch(e){vgToast('Не удалось начать звонок',e.message||'Проверь доступ к микрофону и камере.');vgHangupCall(true);}}
-    async function vgAcceptIncoming(){const call=vgCall.incoming;if(!call||!myProfile)return;try{const kind=call.payload?.media==='video'?'video':'audio';const stream=await navigator.mediaDevices.getUserMedia({audio:true,video:kind==='video'});vgCall.stream=stream;vgCall.target=call.from;vgCall.kind=kind;vgCallModal.classList.add('open');vgCallButtons(false);vgLocalVideo.srcObject=stream;vgLocalVideo.style.display=kind==='video'?'block':'none';vgRemoteVideo.style.display=kind==='video'?'block':'none';const pc=vgCreatePeer(call.from,kind);stream.getTracks().forEach(t=>pc.addTrack(t,stream));await pc.setRemoteDescription(new RTCSessionDescription(call.payload.sdp));for(const ice of vgCall.pendingIce.splice(0)){try{await pc.addIceCandidate(new RTCIceCandidate(ice));}catch(_){}}const answer=await pc.createAnswer();await pc.setLocalDescription(answer);await vgSendSignal(call.from,'answer',{sdp:pc.localDescription});vgCall.incoming=null;}catch(e){vgToast('Не удалось принять звонок',e.message||'');await vgSendSignal(call.from,'reject',{});vgHangupCall(true);}}
-    async function vgHangupCall(silent=false){const target=vgCall.target||vgCall.incoming?.from;if(target&&!silent)await vgSendSignal(target,'hangup',{});try{vgCall.pc?.close();}catch(_){}vgCall.stream?.getTracks().forEach(t=>t.stop());vgCall.remote?.getTracks().forEach(t=>t.stop());vgCall={pc:null,stream:null,remote:null,target:null,kind:null,incoming:null,pendingIce:[],makingOffer:false};vgRemoteVideo.srcObject=null;vgLocalVideo.srcObject=null;vgRemoteAudio.srcObject=null;vgCallModal.classList.remove('open');vgCallButtons(false);}
-    async function vgHandleSignal(signal){if(!signal||vgSeenSignals.has(signal.id))return;vgSeenSignals.add(signal.id);if(vgSeenSignals.size>2000)vgSeenSignals.clear();const {from,kind,payload}=signal;
+    function vgOpenCallModal(){vgCallModal.classList.add('open');vgCallFloatBtn.hidden=true;}
+    function vgMinimizeCall(){if(vgCall.pc||vgCall.incoming){vgCallModal.classList.remove('open');vgCallFloatBtn.hidden=false;const handle=vgCall.target||vgCall.incoming?.from||'';document.getElementById('vgCallFloatText').textContent=handle?`Звонок · @${handle}`:'Звонок продолжается';}else vgCallModal.classList.remove('open');}
+    function vgCloseCallFloat(){vgCallFloatBtn.hidden=true;}
+    function vgStartRing(){vgStopRing();try{const Ctx=window.AudioContext||window.webkitAudioContext;if(!Ctx)return;vgCallRingContext=vgCallRingContext||new Ctx();vgCallRingContext.resume?.().catch(()=>{});const beep=()=>{if(!vgCallRingContext)return;try{const osc=vgCallRingContext.createOscillator(),gain=vgCallRingContext.createGain();osc.type='sine';osc.frequency.value=660;gain.gain.setValueAtTime(.0001,vgCallRingContext.currentTime);gain.gain.exponentialRampToValueAtTime(.08,vgCallRingContext.currentTime+.025);gain.gain.exponentialRampToValueAtTime(.0001,vgCallRingContext.currentTime+.26);osc.connect(gain);gain.connect(vgCallRingContext.destination);osc.start();osc.stop(vgCallRingContext.currentTime+.28);}catch(_){}};beep();vgCall.ringTimer=setInterval(beep,1250);}catch(_){}}
+    function vgStopRing(){if(vgCall.ringTimer){clearInterval(vgCall.ringTimer);vgCall.ringTimer=null;}}
+    async function vgLoadCallConfig(){try{const r=await fetch('/api/call/config',{cache:'no-store'});if(r.ok){const d=await r.json();if(Array.isArray(d.iceServers)&&d.iceServers.length)vgCallIceServers=d.iceServers;}}catch(_){}return vgCallIceServers;}
+    async function vgSendSignal(to,kind,payload={}){if(!myProfile||!to)return false;const id=payload?.callId||vgCall.callId||vgCall.incoming?.payload?.callId||null;const body={from:myProfile.username,to,kind,payload:{...(payload&&typeof payload==='object'?payload:{}),...(id?{callId:id}:{})}};try{const r=await fetch('/api/call/signal',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify(body),cache:'no-store'});if(!r.ok){const d=await r.json().catch(()=>({}));throw new Error(d.error||`HTTP ${r.status}`);}return true;}catch(e){console.warn('[Vibegram call signalling]',e);return false;}}
+    function vgSetCallConnected(){if(!vgCall.startedAt){vgCall.startedAt=Date.now();if(vgCall.timeout){clearTimeout(vgCall.timeout);vgCall.timeout=null;}vgCallDuration.textContent='00:00';if(vgCall.timer)clearInterval(vgCall.timer);vgCall.timer=setInterval(()=>{if(!vgCall.startedAt)return;const s=Math.max(0,Math.floor((Date.now()-vgCall.startedAt)/1000));vgCallDuration.textContent=String(Math.floor(s/60)).padStart(2,'0')+':'+String(s%60).padStart(2,'0');},1000);}vgSetCallStatus('На связи');document.getElementById('vgCallFooter').textContent=vgCall.kind==='video'?'Видеозвонок защищён прямым WebRTC-соединением.':'Голосовой звонок защищён прямым WebRTC-соединением.';}
+    async function vgCreatePeer(target,kind){const cfg=await vgLoadCallConfig();const pc=new RTCPeerConnection({iceServers:cfg,iceCandidatePoolSize:4,bundlePolicy:'max-bundle'});vgCall.pc=pc;vgCall.target=target;vgCall.kind=kind;pc.onicecandidate=e=>{if(e.candidate)vgSendSignal(target,'ice',{...e.candidate.toJSON(),callId:vgCall.callId});};pc.ontrack=e=>{let stream=e.streams?.[0];if(!stream){stream=vgCall.remote||new MediaStream();if(!stream.getTracks().some(t=>t.id===e.track.id))stream.addTrack(e.track);}vgCall.remote=stream;if(kind==='video'){vgRemoteVideo.srcObject=stream;vgRemoteVideo.muted=false;vgRemoteVideo.style.display='block';vgRemoteAudio.srcObject=null;vgRemoteAudio.muted=true;document.getElementById('vgCallAudioArt').style.display='none';vgRemoteVideo.play().catch(()=>document.getElementById('vgCallEnableAudio').hidden=false);}else{vgRemoteVideo.style.display='none';vgRemoteAudio.srcObject=stream;vgRemoteAudio.muted=false;vgRemoteAudio.play().catch(()=>document.getElementById('vgCallEnableAudio').hidden=false);}if(pc.connectionState==='connected')vgSetCallConnected();};pc.onconnectionstatechange=()=>{if(pc.connectionState==='connected')vgSetCallConnected();else if(pc.connectionState==='connecting')vgSetCallStatus('Устанавливаем соединение…');else if(pc.connectionState==='disconnected'){vgSetCallStatus('Восстанавливаем связь…');}else if(pc.connectionState==='failed'){vgSetCallStatus('Не удалось установить соединение');document.getElementById('vgCallFooter').textContent='Попробуй снова. Если устройства в разных сетях, настрой TURN-сервер в Render.';} };pc.oniceconnectionstatechange=()=>{if(pc.iceConnectionState==='connected'||pc.iceConnectionState==='completed')vgSetCallConnected();else if(pc.iceConnectionState==='failed'){vgSetCallStatus('Проблема сетевого соединения');document.getElementById('vgCallFooter').textContent='Для соединения через строгие NAT/VPN может понадобиться TURN-сервер.';}};pc.onicecandidateerror=e=>{if(e.errorCode===701)console.debug('[Vibegram] STUN/TURN server unreachable',e.url);};return pc;}
+    async function vgFlushPendingIce(){const pc=vgCall.pc;if(!pc||!pc.remoteDescription)return;for(const candidate of vgCall.pendingIce.splice(0)){try{await pc.addIceCandidate(new RTCIceCandidate(candidate));}catch(e){console.debug('[Vibegram ICE candidate]',e);}}}
+    async function vgStartCall(kind){if(!myProfile||!activePeer||activePeer===myProfile.username.toLowerCase()||activePeer==='verify_bot'||getPeerObject(activePeer).is_channel||getPeerObject(activePeer).is_group){vgToast('Звонок недоступен','Открой личный чат с пользователем.');return;}if(vgCall.pc||vgCall.incoming){vgToast('Звонок уже активен','Заверши текущий звонок перед новым.');return;}if(!window.isSecureContext||!navigator.mediaDevices?.getUserMedia||!window.RTCPeerConnection){vgToast('Звонки недоступны','Открой Vibegram через HTTPS и используй актуальный браузер.');return;}const target=activePeer;vgCall={pc:null,stream:null,remote:null,target,kind,incoming:null,pendingIce:[],makingOffer:false,callId:vgCallId(),startedAt:0,timer:null,timeout:null,ringTimer:null};try{await vgLoadCallConfig();vgCall.stream=await navigator.mediaDevices.getUserMedia({audio:{echoCancellation:true,noiseSuppression:true,autoGainControl:true},video:kind==='video'?{width:{ideal:1280},height:{ideal:720},facingMode:'user'}:false});vgCallIdentity(target);vgOpenCallModal();vgCallButtons(false);vgCallDuration.textContent='';vgLocalVideo.srcObject=vgCall.stream;vgLocalVideo.style.display=kind==='video'?'block':'none';vgRemoteVideo.srcObject=null;vgRemoteVideo.style.display='none';document.getElementById('vgCallAudioArt').style.display=kind==='video'?'none':'grid';document.getElementById('vgCallTitle').textContent=kind==='video'?'Видеозвонок':'Голосовой звонок';document.getElementById('vgCallFooter').textContent='Вызов отправлен. Дождись ответа собеседника…';vgSetCallStatus('Вызов @'+target+'…');const pc=await vgCreatePeer(target,kind);vgCall.stream.getTracks().forEach(t=>pc.addTrack(t,vgCall.stream));const offer=await pc.createOffer();await pc.setLocalDescription(offer);const sent=await vgSendSignal(target,'offer',{sdp:pc.localDescription,media:kind,callId:vgCall.callId});if(!sent)throw new Error('Сервер не принял запрос звонка.');vgCall.timeout=setTimeout(async()=>{if(vgCall.pc&&!vgCall.startedAt){await vgSendSignal(target,'cancel',{callId:vgCall.callId});vgToast('Нет ответа','Звонок завершён по тайм-ауту.');await vgHangupCall(true);}},50000);}catch(e){vgToast('Не удалось начать звонок',e.message||'Проверь доступ к микрофону и камере.');await vgHangupCall(true);}}
+    async function vgAcceptIncoming(){const call=vgCall.incoming;if(!call||!myProfile)return;const from=call.from;const kind=call.payload?.media==='video'?'video':'audio';vgStopRing();try{if(!window.isSecureContext||!navigator.mediaDevices?.getUserMedia)throw new Error('Для звонков нужен HTTPS и разрешение на микрофон.');vgCall.target=from;vgCall.callId=call.payload?.callId||vgCall.callId||vgCallId();vgCall.kind=kind;vgCallIdentity(from);vgOpenCallModal();vgCallButtons(false);vgCallDuration.textContent='';vgRemoteVideo.srcObject=null;vgLocalVideo.srcObject=null;vgLocalVideo.style.display=kind==='video'?'block':'none';vgRemoteVideo.style.display=kind==='video'?'block':'none';document.getElementById('vgCallAudioArt').style.display=kind==='video'?'none':'grid';document.getElementById('vgCallEnableAudio').hidden=true;vgCall.stream=await navigator.mediaDevices.getUserMedia({audio:{echoCancellation:true,noiseSuppression:true,autoGainControl:true},video:kind==='video'?{width:{ideal:1280},height:{ideal:720},facingMode:'user'}:false});vgLocalVideo.srcObject=vgCall.stream;const pc=await vgCreatePeer(from,kind);vgCall.stream.getTracks().forEach(t=>pc.addTrack(t,vgCall.stream));await pc.setRemoteDescription(new RTCSessionDescription(call.payload.sdp));await vgFlushPendingIce();const answer=await pc.createAnswer();await pc.setLocalDescription(answer);if(!await vgSendSignal(from,'answer',{sdp:pc.localDescription,callId:vgCall.callId}))throw new Error('Не удалось отправить ответ на звонок.');vgCall.incoming=null;document.getElementById('vgCallTitle').textContent=kind==='video'?'Видеозвонок':'Голосовой звонок';document.getElementById('vgCallFooter').textContent='Подключаем защищённый медиаканал…';vgSetCallStatus('Соединяемся…');}catch(e){vgToast('Не удалось принять звонок',e.message||'');await vgSendSignal(from,'reject',{callId:vgCall.callId});await vgHangupCall(true);}}
+    async function vgHangupCall(silent=false){const target=vgCall.target||vgCall.incoming?.from;const callId=vgCall.callId||vgCall.incoming?.payload?.callId;if(target&&!silent)await vgSendSignal(target,'hangup',{callId});vgStopRing();if(vgCall.timeout)clearTimeout(vgCall.timeout);if(vgCall.timer)clearInterval(vgCall.timer);try{vgCall.pc?.getSenders?.().forEach(s=>{try{s.track?.stop();}catch(_){}});vgCall.pc?.close();}catch(_){}vgCall.stream?.getTracks().forEach(t=>t.stop());vgCall.remote?.getTracks().forEach(t=>t.stop());vgCall={pc:null,stream:null,remote:null,target:null,kind:null,incoming:null,pendingIce:[],makingOffer:false,callId:null,startedAt:0,timer:null,timeout:null,ringTimer:null};vgRemoteVideo.srcObject=null;vgLocalVideo.srcObject=null;vgRemoteAudio.srcObject=null;vgRemoteVideo.style.display='none';vgLocalVideo.style.display='none';document.getElementById('vgCallAudioArt').style.display='grid';document.getElementById('vgCallEnableAudio').hidden=true;vgCallDuration.textContent='';vgCallModal.classList.remove('open');vgCallFloatBtn.hidden=true;vgCallButtons(false);document.getElementById('vgCallTitle').textContent='Звонок Vibegram';document.getElementById('vgCallFooter').textContent='Для звонка разреши доступ к микрофону. Видеозвонок также использует камеру.';}
+    async function vgHandleSignal(signal){if(!signal||vgSeenSignals.has(signal.id))return;vgSeenSignals.add(signal.id);if(vgSeenSignals.size>3000){const arr=Array.from(vgSeenSignals);vgSeenSignals.clear();arr.slice(-1000).forEach(x=>vgSeenSignals.add(x));}const {from,kind,payload={}}=signal;const incomingId=payload.callId||null;
       if(kind==='offer'){
-        if(vgCall.pc||vgCall.incoming){await vgSendSignal(from,'busy',{});return;}vgCall.incoming=signal;vgCall.target=from;vgCall.kind=payload?.media||'audio';vgCallModal.classList.add('open');vgCallButtons(true);vgSetCallStatus(`Входящий ${vgCall.kind==='video'?'видеозвонок':'голосовой звонок'} от @${from}`);document.getElementById('vgCallTitle').textContent='Входящий звонок';return;
+        if(vgCall.pc||vgCall.incoming){await vgSendSignal(from,'busy',{callId:incomingId});return;}
+        vgCall={pc:null,stream:null,remote:null,target:from,kind:payload.media==='video'?'video':'audio',incoming:signal,pendingIce:[],makingOffer:false,callId:incomingId||vgCallId(),startedAt:0,timer:null,timeout:null,ringTimer:null};
+        vgCallIdentity(from);vgCallModal.classList.add('open');vgCallFloatBtn.hidden=true;vgRemoteVideo.style.display='none';vgLocalVideo.style.display='none';vgCallButtons(true);vgCallDuration.textContent='';document.getElementById('vgCallEnableAudio').hidden=true;document.getElementById('vgCallTitle').textContent=vgCall.kind==='video'?'Входящий видеозвонок':'Входящий звонок';document.getElementById('vgCallFooter').textContent='Тебе звонят в Vibegram';vgSetCallStatus(`${vgCall.kind==='video'?'Видеозвонок':'Голосовой звонок'} от @${from}`);document.getElementById('vgCallAudioArt').style.display='grid';vgStartRing();if(document.visibilityState==='hidden'&&'Notification'in window&&Notification.permission==='granted'){try{new Notification('Входящий звонок Vibegram',{body:`@${from} ${vgCall.kind==='video'?'звонит по видео':'звонит'}`,tag:'vibegram-call'});}catch(_){}}return;
       }
-      if(kind==='reject'||kind==='busy'){vgToast(kind==='busy'?'Пользователь занят':'Звонок отклонён','@'+from);await vgHangupCall(true);return;}
+      const currentId=vgCall.callId||vgCall.incoming?.payload?.callId||null;
+      // Ignore late signals from an earlier call or another peer; they must not tear down the current call.
+      if(vgCall.target&&from!==vgCall.target)return;
+      if(currentId&&incomingId&&currentId!==incomingId)return;
+      if(kind==='reject'||kind==='cancel'||kind==='busy'){if(vgCall.target===from){vgToast(kind==='busy'?'Пользователь занят':kind==='cancel'?'Звонок отменён':'Звонок отклонён','@'+from);await vgHangupCall(true);}return;}
       if(kind==='hangup'){if(vgCall.target===from||vgCall.incoming?.from===from){vgToast('Звонок завершён','@'+from);await vgHangupCall(true);}return;}
-      if(kind==='ice' && vgCall.incoming?.from===from && !vgCall.pc){vgCall.pendingIce.push(payload);return;}
+      if(kind==='ice'&&vgCall.incoming?.from===from&&!vgCall.pc){vgCall.pendingIce.push(payload);return;}
       if(vgCall.target!==from||!vgCall.pc)return;
-      if(kind==='answer'){try{await vgCall.pc.setRemoteDescription(new RTCSessionDescription(payload.sdp));for(const ice of vgCall.pendingIce.splice(0)){try{await vgCall.pc.addIceCandidate(new RTCIceCandidate(ice));}catch(_){}}vgSetCallStatus('Соединяемся с @'+from+'…');}catch(e){vgToast('Ошибка звонка',e.message||'');await vgHangupCall(true);}}
-      if(kind==='ice'){try{if(vgCall.pc.remoteDescription)await vgCall.pc.addIceCandidate(new RTCIceCandidate(payload));else vgCall.pendingIce.push(payload);}catch(_){} }
+      if(kind==='answer'){try{if(!vgCall.pc.remoteDescription){await vgCall.pc.setRemoteDescription(new RTCSessionDescription(payload.sdp));await vgFlushPendingIce();vgSetCallStatus('Устанавливаем соединение…');}}catch(e){vgToast('Ошибка соединения',e.message||'Не удалось обработать ответ собеседника.');await vgHangupCall(true);}}
+      if(kind==='ice'){try{if(vgCall.pc.remoteDescription)await vgCall.pc.addIceCandidate(new RTCIceCandidate(payload));else vgCall.pendingIce.push(payload);}catch(e){console.debug('[Vibegram ICE candidate]',e);}}
     }
-    async function vgPollCallSignals(){if(!myProfile)return;try{const r=await fetch(`/api/call/signals?user=${encodeURIComponent(myProfile.username)}&since=${vgLastSignalSeq}`,{cache:'no-store'});if(!r.ok)return;const d=await r.json();for(const sig of d.signals||[]){vgLastSignalSeq=Math.max(vgLastSignalSeq,Number(sig.seq)||0);await vgHandleSignal(sig);} }catch(_){} }
+    async function vgPollCallSignals(){if(!myProfile)return;try{const r=await fetch(`/api/call/signals?user=${encodeURIComponent(myProfile.username)}&since=${vgLastSignalSeq}`,{cache:'no-store'});if(!r.ok)return;const d=await r.json();for(const sig of d.signals||[]){vgLastSignalSeq=Math.max(vgLastSignalSeq,Number(sig.seq)||0);await vgHandleSignal(sig);}}catch(e){console.debug('[Vibegram call poll]',e);}}
     document.getElementById('vgVoiceCallBtn').addEventListener('click',()=>vgStartCall('audio'));
     document.getElementById('vgVideoCallBtn').addEventListener('click',()=>vgStartCall('video'));
     document.getElementById('vgAcceptCallBtn').addEventListener('click',vgAcceptIncoming);
-    document.getElementById('vgRejectCallBtn').addEventListener('click',async()=>{const target=vgCall.incoming?.from;if(target)await vgSendSignal(target,'reject',{});await vgHangupCall(true);});
+    document.getElementById('vgRejectCallBtn').addEventListener('click',async()=>{const target=vgCall.incoming?.from;if(target)await vgSendSignal(target,'reject',{callId:vgCall.callId});await vgHangupCall(true);});
     document.getElementById('vgHangupCallBtn').addEventListener('click',()=>vgHangupCall(false));
-    document.getElementById('vgCallMinimizeBtn').addEventListener('click',()=>{if(vgCall.pc)vgHangupCall(false);else vgCloseModal('vgCallModal');});
-    document.getElementById('vgMuteCallBtn').addEventListener('click',()=>{const tracks=vgCall.stream?.getAudioTracks()||[];if(!tracks.length)return;const next=tracks.some(t=>t.enabled);tracks.forEach(t=>t.enabled=!next);document.getElementById('vgMuteCallBtn').textContent=next?'🔇 Микрофон':'🎙 Микрофон';});
-    document.getElementById('vgCameraCallBtn').addEventListener('click',()=>{const tracks=vgCall.stream?.getVideoTracks()||[];if(!tracks.length){vgToast('Камера не используется','');return;}const next=tracks.some(t=>t.enabled);tracks.forEach(t=>t.enabled=!next);document.getElementById('vgCameraCallBtn').textContent=next?'◻ Камера':'▣ Камера';});
-    if(!vgCallPollTimer)vgCallPollTimer=setInterval(vgPollCallSignals,1300);
-
+    document.getElementById('vgCallMinimizeBtn').addEventListener('click',vgMinimizeCall);
+    vgCallFloatBtn.addEventListener('click',vgOpenCallModal);
+    document.getElementById('vgCallEnableAudio').addEventListener('click',async()=>{try{if(vgCall.kind==='video')await vgRemoteVideo.play();else await vgRemoteAudio.play();document.getElementById('vgCallEnableAudio').hidden=true;}catch(_){vgToast('Не удалось включить звук','Проверь звук устройства и разрешения браузера.');}});
+    document.getElementById('vgMuteCallBtn').addEventListener('click',()=>{const tracks=vgCall.stream?.getAudioTracks()||[];if(!tracks.length)return;const next=tracks.some(t=>t.enabled);tracks.forEach(t=>t.enabled=!next);const b=document.getElementById('vgMuteCallBtn');b.classList.toggle('is-off',next);b.querySelector('span:last-child').textContent=next?'Включить микрофон':'Микрофон';b.querySelector('.vg-call-action-icon').textContent=next?'×':'♩';});
+    document.getElementById('vgCameraCallBtn').addEventListener('click',()=>{const tracks=vgCall.stream?.getVideoTracks()||[];if(!tracks.length){vgToast('Это голосовой звонок','Чтобы использовать камеру, начни видеозвонок.');return;}const next=tracks.some(t=>t.enabled);tracks.forEach(t=>t.enabled=!next);const b=document.getElementById('vgCameraCallBtn');b.classList.toggle('is-off',next);b.querySelector('span:last-child').textContent=next?'Включить камеру':'Камера';b.querySelector('.vg-call-action-icon').textContent=next?'×':'▣';});
+    if(!vgCallPollTimer){vgPollCallSignals();vgCallPollTimer=setInterval(vgPollCallSignals,900);}
 
     // Group chat creation, owner/admin tools, membership and invite-link join flow.
     async function vgCreateGroupFlow() {

@@ -548,6 +548,25 @@ class VibegramHandler(http.server.SimpleHTTPRequestHandler):
             rows.sort(key=lambda x: int(x.get('send_at') or 0))
             return self.send_json({'ok': True, 'scheduled': rows})
 
+        if parsed.path == '/api/call/config':
+            # STUN works for many network pairs; configure TURN_URLS / TURN_USERNAME /
+            # TURN_CREDENTIAL in the host environment for reliable relaying across strict NATs.
+            ice_servers = [
+                {'urls': 'stun:stun.l.google.com:19302'},
+                {'urls': 'stun:stun1.l.google.com:19302'},
+            ]
+            turn_urls_raw = os.environ.get('TURN_URLS', os.environ.get('TURN_URL', '')).strip()
+            turn_username = os.environ.get('TURN_USERNAME', '').strip()
+            turn_credential = os.environ.get('TURN_CREDENTIAL', '').strip()
+            turn_urls = [u.strip() for u in turn_urls_raw.split(',') if u.strip()]
+            if turn_urls and turn_username and turn_credential:
+                ice_servers.append({
+                    'urls': turn_urls if len(turn_urls) > 1 else turn_urls[0],
+                    'username': turn_username,
+                    'credential': turn_credential,
+                })
+            return self.send_json({'ok': True, 'iceServers': ice_servers, 'turnEnabled': bool(turn_urls and turn_username and turn_credential)})
+
         if parsed.path == '/api/call/signals':
             qs = parse_qs(parsed.query)
             username = str(qs.get('user', [''])[0] or '').strip().lower().lstrip('@')
@@ -1267,7 +1286,13 @@ class VibegramHandler(http.server.SimpleHTTPRequestHandler):
             payload = body.get('payload')
             if sender not in USERS or target not in USERS or sender == target:
                 return self.send_json({'error': 'Пользователь не найден.'}, 404)
-            if kind not in ('offer', 'answer', 'ice', 'reject', 'hangup', 'busy'):
+            if USERS[sender].get('is_channel') or USERS[sender].get('is_group') or USERS[sender].get('is_bot') or USERS[target].get('is_channel') or USERS[target].get('is_group') or USERS[target].get('is_bot'):
+                return self.send_json({'error': 'Звонки доступны только между личными аккаунтами.'}, 400)
+            sender_blocks = USER_PREFS.get(sender, {}).get('blocked_users', []) if isinstance(USER_PREFS.get(sender, {}), dict) else []
+            target_blocks = USER_PREFS.get(target, {}).get('blocked_users', []) if isinstance(USER_PREFS.get(target, {}), dict) else []
+            if target in sender_blocks or sender in target_blocks:
+                return self.send_json({'error': 'Звонок недоступен из-за настроек блокировки.'}, 403)
+            if kind not in ('offer', 'answer', 'ice', 'reject', 'cancel', 'hangup', 'busy'):
                 return self.send_json({'error': 'Недопустимый сигнал звонка.'}, 400)
             if len(json.dumps(payload, ensure_ascii=False)) > 180000:
                 return self.send_json({'error': 'Сигнал слишком большой.'}, 413)
@@ -1275,6 +1300,24 @@ class VibegramHandler(http.server.SimpleHTTPRequestHandler):
                 seq = int(time.time() * 1000) * 1000 + len(CALL_SIGNALS) % 1000
                 CALL_SIGNALS.append({'seq': seq, 'id': f'call_{seq}', 'from': sender, 'to': target, 'kind': kind, 'payload': payload, 'time': now})
                 CALL_SIGNALS[:] = CALL_SIGNALS[-1000:]
+            # Optional background notification for an installed PWA. The actual
+            # microphone/camera permissions are still requested only after the user accepts.
+            if kind == 'offer':
+                try:
+                    base_url = self._public_base_url()
+                    sender_profile = USERS.get(sender, {})
+                    media = str((payload or {}).get('media') or 'audio') if isinstance(payload, dict) else 'audio'
+                    send_web_push(target, {
+                        'title': 'Входящий звонок Vibegram',
+                        'body': f"@{sender} {'звонит по видео' if media == 'video' else 'звонит'}",
+                        'icon': _absolute_public_url(sender_profile.get('avatar'), base_url, sender),
+                        'badge': base_url + '/pwa-192.png',
+                        'username': sender,
+                        'url': base_url + '/?openChat=' + sender,
+                        'tag': 'vibegram-call-' + sender
+                    })
+                except Exception as exc:
+                    print(f'[Vibegram call push] {str(exc)[:200]}', flush=True)
             return self.send_json({'ok': True, 'seq': seq})
 
         if parsed.path == '/api/typing':
