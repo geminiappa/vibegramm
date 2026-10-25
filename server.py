@@ -610,8 +610,26 @@ class VibegramHandler(http.server.SimpleHTTPRequestHandler):
                 if (m.get('sender') == me or m.get('to') == me or m.get('to') in channels_set or m.get('sender') in channels_set)
                 or (m.get('to') in groups_set and (me in (USERS.get(m.get('to'), {}).get('members') or []) or USERS.get(m.get('to'), {}).get('owner') == me))
             ]
-            visible_users = {name: _public_user(name, user_obj) for name, user_obj in USERS.items()
-                             if not user_obj.get('is_group') or me in (user_obj.get('members') or []) or user_obj.get('owner') == me}
+            visible_users = {}
+            for name, user_obj in USERS.items():
+                if user_obj.get('is_group'):
+                    is_member = me in (user_obj.get('members') or []) or user_obj.get('owner') == me
+                    is_public = user_obj.get('is_public', True) is not False
+                    if not is_member and not is_public:
+                        continue
+                    public_group = _public_user(name, user_obj)
+                    public_group['member_count'] = len(user_obj.get('members') or [])
+                    public_group['is_member'] = bool(is_member)
+                    if not is_member:
+                        # Public discovery must not expose invite tokens, private
+                        # membership lists, admin permissions, or group message state.
+                        public_group['members'] = []
+                        public_group.pop('admins', None)
+                        public_group.pop('invite_token', None)
+                        public_group.pop('last_group_message', None)
+                    visible_users[name] = public_group
+                else:
+                    visible_users[name] = _public_user(name, user_obj)
             self.send_json({
                 'users': visible_users,
                 'messages': my_messages,
@@ -821,25 +839,38 @@ class VibegramHandler(http.server.SimpleHTTPRequestHandler):
                     members.append(member)
             if unknown:
                 return self.send_json({'error': 'Не найдены аккаунты: ' + ', '.join('@'+x for x in unknown[:10])}, 400)
+            try:
+                group_avatar = _store_avatar_value(body.get('avatar') or '', '', max_bytes=1024 * 1024)
+            except ValueError as exc:
+                return self.send_json({'error': str(exc)}, 400)
             USERS[handle] = {
                 'id': f'group_{now}_{len(USERS)}', 'username': handle, 'name': name,
-                'bio': description or 'Групповой чат Vibegram', 'color': '#2aabee', 'avatar': '',
-                'is_channel': False, 'is_group': True, 'owner': owner, 'members': members,
+                'bio': description or 'Групповой чат Vibegram', 'color': '#2aabee', 'avatar': group_avatar,
+                'is_channel': False, 'is_group': True, 'is_public': bool(body.get('is_public', True)),
+                'owner': owner, 'members': members,
                 'admins': {owner: {'manage_members': True, 'manage_settings': True, 'can_post': True}},
                 'slow_mode_seconds': 0, 'last_group_message': {}, 'created_at': now, 'invite_token': secrets.token_urlsafe(18),
                 'last_seen': now, 'privacy': 'members'
             }
             save_db()
-            return self.send_json({'ok': True, 'group': _public_user(handle, USERS[handle])})
+            group_public = _public_user(handle, USERS[handle])
+            group_public['member_count'] = len(members)
+            group_public['is_member'] = True
+            return self.send_json({'ok': True, 'group': group_public})
 
         if parsed.path == '/api/group/join':
             username = str(body.get('username') or '').strip().lower().lstrip('@')
             token = str(body.get('token') or '').strip()
+            requested_group = str(body.get('group') or '').strip().lower().lstrip('@')
             if username not in USERS or USERS[username].get('is_channel') or USERS[username].get('is_group') or USERS[username].get('is_bot'):
                 return self.send_json({'error': 'Сначала войдите в обычный аккаунт Vibegram.'}, 403)
-            group_pair = next(((key, val) for key, val in USERS.items() if val.get('is_group') and secrets.compare_digest(str(val.get('invite_token') or ''), token)), None)
+            group_pair = next(((key, val) for key, val in USERS.items() if token and val.get('is_group') and secrets.compare_digest(str(val.get('invite_token') or ''), token)), None)
+            if not group_pair and requested_group:
+                candidate = USERS.get(requested_group)
+                if candidate and candidate.get('is_group') and candidate.get('is_public', True) is not False:
+                    group_pair = (requested_group, candidate)
             if not group_pair:
-                return self.send_json({'error': 'Ссылка-приглашение недействительна или отозвана.'}, 404)
+                return self.send_json({'error': 'Группа не найдена, она приватная или ссылка-приглашение недействительна.'}, 404)
             handle, group = group_pair
             members = group.setdefault('members', [])
             if username not in members:
@@ -847,7 +878,7 @@ class VibegramHandler(http.server.SimpleHTTPRequestHandler):
                     return self.send_json({'error': 'В группе достигнут лимит в 500 участников.'}, 409)
                 members.append(username)
                 save_db()
-            return self.send_json({'ok': True, 'group': {'username': handle, 'name': group.get('name')}, 'joined': True})
+            return self.send_json({'ok': True, 'group': {'username': handle, 'name': group.get('name'), 'is_group': True}, 'joined': True})
 
         if parsed.path == '/api/group/member':
             actor = str(body.get('actor') or '').strip().lower().lstrip('@')
@@ -868,6 +899,8 @@ class VibegramHandler(http.server.SimpleHTTPRequestHandler):
                 if USERS[member].get('is_channel') or USERS[member].get('is_group') or USERS[member].get('is_bot'):
                     return self.send_json({'error': 'Можно добавлять только личные аккаунты.'}, 400)
                 if member not in members:
+                    if len(members) >= 500:
+                        return self.send_json({'error': 'В группе достигнут лимит в 500 участников.'}, 409)
                     members.append(member)
             elif action == 'remove':
                 if member == group.get('owner'):
@@ -890,6 +923,58 @@ class VibegramHandler(http.server.SimpleHTTPRequestHandler):
             save_db()
             return self.send_json({'ok': True, 'members': members, 'admins': admins})
 
+        if parsed.path == '/api/group/leave':
+            actor = str(body.get('actor') or '').strip().lower().lstrip('@')
+            handle = str(body.get('group') or '').strip().lower().lstrip('@')
+            group = USERS.get(handle)
+            if actor not in USERS or USERS[actor].get('is_channel') or USERS[actor].get('is_group') or USERS[actor].get('is_bot'):
+                return self.send_json({'error': 'Аккаунт не найден.'}, 403)
+            if not isinstance(group, dict) or not group.get('is_group'):
+                return self.send_json({'error': 'Группа не найдена.'}, 404)
+            if actor == group.get('owner'):
+                return self.send_json({'error': 'Владелец не может покинуть группу. Передай владение или удали группу.'}, 400)
+            members = group.setdefault('members', [])
+            if actor not in members:
+                return self.send_json({'error': 'Ты не состоишь в этой группе.'}, 409)
+            members.remove(actor)
+            (group.get('admins') or {}).pop(actor, None)
+            PINS.pop(get_chat_key(actor, handle), None)
+            for pref_key in ('chatlist:' + actor,):
+                pinned = PINS.get(pref_key)
+                if isinstance(pinned, list): PINS[pref_key] = [item for item in pinned if str(item).lower() != handle]
+            actor_prefs = USER_PREFS.get(actor, {})
+            if isinstance(actor_prefs, dict):
+                actor_prefs.get('folders', {}).pop(handle, None)
+                for pref_key in ('archived_chats', 'muted_chats'):
+                    if isinstance(actor_prefs.get(pref_key), list): actor_prefs[pref_key] = [item for item in actor_prefs[pref_key] if str(item).lower() != handle]
+            save_db()
+            return self.send_json({'ok': True, 'left': True, 'group': handle})
+
+        if parsed.path == '/api/group/delete':
+            actor = str(body.get('actor') or '').strip().lower().lstrip('@')
+            handle = str(body.get('group') or '').strip().lower().lstrip('@')
+            group = USERS.get(handle)
+            if actor not in USERS or USERS[actor].get('is_channel') or USERS[actor].get('is_group') or USERS[actor].get('is_bot'):
+                return self.send_json({'error': 'Аккаунт не найден.'}, 403)
+            if not isinstance(group, dict) or not group.get('is_group'):
+                return self.send_json({'error': 'Группа не найдена.'}, 404)
+            if actor != group.get('owner'):
+                return self.send_json({'error': 'Удалить группу может только её владелец.'}, 403)
+            USERS.pop(handle, None)
+            MESSAGES[:] = [m for m in MESSAGES if m.get('to') != handle and m.get('sender') != handle]
+            SCHEDULED_MESSAGES[:] = [m for m in SCHEDULED_MESSAGES if m.get('to') != handle]
+            PINS.pop('group:' + handle, None)
+            for pin_key, pin_value in list(PINS.items()):
+                if pin_key.startswith('chatlist:') and isinstance(pin_value, list):
+                    PINS[pin_key] = [item for item in pin_value if str(item).lower() != handle]
+            for pref in USER_PREFS.values():
+                if not isinstance(pref, dict): continue
+                pref.get('folders', {}).pop(handle, None)
+                for pref_key in ('archived_chats', 'muted_chats'):
+                    if isinstance(pref.get(pref_key), list): pref[pref_key] = [item for item in pref[pref_key] if str(item).lower() != handle]
+            save_db()
+            return self.send_json({'ok': True, 'deleted': True, 'group': handle})
+
         if parsed.path == '/api/group/settings':
             actor = str(body.get('actor') or '').strip().lower().lstrip('@')
             handle = str(body.get('group') or '').strip().lower().lstrip('@')
@@ -908,8 +993,22 @@ class VibegramHandler(http.server.SimpleHTTPRequestHandler):
                     group['slow_mode_seconds'] = max(0, min(60, int(body.get('slow_mode_seconds'))))
                 except (TypeError, ValueError):
                     return self.send_json({'error': 'Медленный режим: число от 0 до 60 секунд.'}, 400)
+            if 'is_public' in body:
+                group['is_public'] = bool(body.get('is_public'))
+            if 'avatar' in body:
+                try:
+                    group['avatar'] = _store_avatar_value(body.get('avatar') or '', group.get('avatar', ''), max_bytes=1024 * 1024)
+                except ValueError as exc:
+                    return self.send_json({'error': str(exc)}, 400)
+            if 'color' in body:
+                color = str(body.get('color') or '').strip()
+                if re.fullmatch(r'#[0-9a-fA-F]{6}', color):
+                    group['color'] = color
             save_db()
-            return self.send_json({'ok': True, 'group': _public_user(handle, group)})
+            group_public = _public_user(handle, group)
+            group_public['member_count'] = len(group.get('members') or [])
+            group_public['is_member'] = actor in (group.get('members') or []) or actor == group.get('owner')
+            return self.send_json({'ok': True, 'group': group_public})
 
         # Создание или редактирование Telegram-канала (исправлена валидация и права админов)
         if parsed.path == '/api/channel/save':
@@ -1777,10 +1876,23 @@ class VibegramHandler(http.server.SimpleHTTPRequestHandler):
                 group = USERS[peer]
                 if group.get('owner') == me:
                     USERS.pop(peer, None)
-                    MESSAGES[:] = [m for m in MESSAGES if m.get('to') != peer]
-                else:
+                    MESSAGES[:] = [m for m in MESSAGES if m.get('to') != peer and m.get('sender') != peer]
+                    SCHEDULED_MESSAGES[:] = [m for m in SCHEDULED_MESSAGES if m.get('to') != peer]
+                    PINS.pop('group:' + peer, None)
+                    for pin_key, pin_value in list(PINS.items()):
+                        if pin_key.startswith('chatlist:') and isinstance(pin_value, list):
+                            PINS[pin_key] = [item for item in pin_value if str(item).lower() != peer]
+                    for pref in USER_PREFS.values():
+                        if isinstance(pref, dict):
+                            pref.get('folders', {}).pop(peer, None)
+                            for pref_key in ('archived_chats', 'muted_chats'):
+                                if isinstance(pref.get(pref_key), list): pref[pref_key] = [item for item in pref[pref_key] if str(item).lower() != peer]
+                elif me in (group.get('members') or []):
                     group['members'] = [x for x in (group.get('members') or []) if x != me]
                     (group.get('admins') or {}).pop(me, None)
+                    PINS.pop('group:' + peer, None) if not group.get('members') else None
+                else:
+                    return self.send_json({'error': 'Ты не состоишь в этой группе.'}, 409)
             elif peer in USERS and USERS[peer].get('is_channel'):
                 if USERS[peer].get('owner') == me:
                     del USERS[peer]

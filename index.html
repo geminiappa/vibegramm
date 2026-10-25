@@ -1500,6 +1500,120 @@
     #vgVoiceRecordBtn.recording { width:76px!important; min-width:76px!important; flex-basis:76px!important; }
     .vg-voice-waveform { gap:2px; }
   }
+
+  /* Vibegram polished navigation, profile settings, groups and apps UI */
+  .drawer-scroll{padding:10px 12px 18px;gap:5px;}
+  .drawer-group{padding:9px 0;border-bottom:1px solid rgba(160,195,220,.09);}
+  .drawer-group-title{padding:7px 12px 10px;color:#7f9db1;font-size:10px;letter-spacing:1.15px;text-transform:uppercase;font-weight:850;}
+  .drawer-btn{min-height:54px;border-radius:14px!important;padding:9px 10px!important;display:flex!important;align-items:center;gap:11px;transition:background .16s,border-color .16s,transform .16s;border:1px solid transparent!important;}
+  .drawer-btn:hover,.drawer-btn:focus-visible{background:rgba(42,171,238,.09)!important;border-color:rgba(42,171,238,.14)!important;outline:none;}
+  .drawer-btn:active{transform:scale(.99);}
+  .drawer-btn>span:nth-child(2){display:flex;flex-direction:column;align-items:flex-start;gap:2px;min-width:0;flex:1;text-align:left;}
+  .drawer-btn strong{font-size:13px;line-height:1.25;font-weight:760;color:#edf6fb;}
+  .drawer-btn small{font-size:10.5px;font-weight:500;color:#7f9aaa;line-height:1.3;white-space:normal;}
+  .drawer-ico{flex:0 0 39px!important;width:39px!important;height:39px!important;border-radius:13px!important;display:grid!important;place-items:center;font-size:0!important;}
+  .drawer-ico svg{width:20px;height:20px;fill:none;stroke:currentColor;stroke-width:1.75;stroke-linecap:round;stroke-linejoin:round;}
+  .vg-ico-blue{background:rgba(42,171,238,.16)!important;color:#7bd5ff!important;}
+  .vg-ico-purple{background:rgba(145,105,255,.17)!important;color:#b3a1ff!important;}
+  .vg-ico-cyan{background:rgba(76,209,224,.15)!important;color:#78e4ee!important;}
+  .vg-ico-green{background:rgba(50,205,126,.15)!important;color:#72e2a1!important;}
+  .vg-ico-gold{background:rgba(255,190,75,.15)!important;color:#ffd17a!important;}
+  .vg-ico-amber{background:rgba(255,175,55,.14)!important;color:#ffc46f!important;}
+  .vg-ico-red{background:rgba(244,80,98,.13)!important;color:#ff8a96!important;}
+  .drawer-soon-dot{font-size:9px;font-weight:900;letter-spacing:.6px;color:#9eaebb;background:rgba(255,255,255,.065);border:1px solid rgba(255,255,255,.08);border-radius:7px;padding:4px 6px;}
+  .side-drawer{width:min(355px,calc(100vw - 28px));padding-bottom:env(safe-area-inset-bottom);}
+  .drawer-profile-card{padding:18px 17px!important;background:radial-gradient(ellipse at 5% 0,rgba(42,171,238,.18),transparent 65%),linear-gradient(145deg,#1d3547,#17212b 75%)!important;border-bottom:1px solid rgba(160,200,230,.1);}
+  .vg-profile-tabs{display:flex;gap:5px;padding:8px 10px 10px;overflow-x:auto;flex-shrink:0;background:#17212b;border-bottom:1px solid rgba(160,195,220,.08);scrollbar-width:none;}
+  .vg-profile-tabs::-webkit-scrollbar{display:none;}
+  .vg-profile-tabs button{display:flex;align-items:center;justify-content:center;gap:6px;flex:1 0 auto;min-height:38px;padding:8px 12px;border:1px solid transparent;border-radius:12px;background:transparent;color:#91a9bb;font-family:inherit;font-size:11px;font-weight:650;line-height:1.15;cursor:pointer;white-space:nowrap;}
+  .vg-profile-tabs button svg{width:16px;height:16px;fill:none;stroke:currentColor;stroke-width:1.7;stroke-linecap:round;stroke-linejoin:round;}
+  .vg-profile-tabs button.active{background:rgba(42,171,238,.14);border-color:rgba(42,171,238,.18);color:#8bdcff;}
+  #myProfileModal [data-profile-panel][hidden]{display:none!important;}
+  #myProfileModal .tg-settings-scroll{gap:12px;padding:12px;background:#111d28;}
+  #myProfileModal .tg-section-box{border:1px solid rgba(157,196,221,.08);border-radius:17px;overflow:hidden;background:linear-gradient(150deg,rgba(30,48,63,.94),rgba(22,35,47,.98));}
+  #myProfileModal .tg-section-header{padding:15px 16px 10px;color:#85a5ba;letter-spacing:.8px;font-size:10px;}
+  #myProfileModal .tg-row-item{border-top:1px solid rgba(157,196,221,.07);padding:11px 13px;}
+  #myProfileModal .tg-inline-input,#myProfileModal .tg-inline-select{color:#f1f7fb;background:rgba(6,16,25,.34);border:1px solid rgba(157,196,221,.1);border-radius:10px;padding:9px 10px;}
+  .vg-modal-card.vg-workspace-card{max-width:560px;width:min(560px,100%);border:1px solid rgba(151,200,229,.12);background:radial-gradient(ellipse at 10% 0,rgba(42,171,238,.12),transparent 40%),linear-gradient(160deg,#172735,#101b26 72%);}
+  .vg-workspace-card .vg-modal-head{position:sticky;top:0;background:rgba(20,34,46,.94);backdrop-filter:blur(18px);z-index:2;border-bottom:1px solid rgba(161,195,217,.09);}
+  .vg-workspace-card .vg-modal-body{gap:10px;}
+  .vg-field-label{display:block;margin:4px 0 -3px;color:#9db4c5;font-size:11px;font-weight:780;letter-spacing:.15px;}
+  .vg-username-field{display:flex;align-items:center;gap:7px;}
+  .vg-username-field>span{color:#68cfff;font-size:15px;font-weight:850;}
+  .vg-username-field .vg-input{flex:1;min-width:0;}
+  .vg-group-hero,.vg-group-manage-hero{display:flex;align-items:center;gap:14px;padding:13px;border:1px solid rgba(140,193,223,.1);background:rgba(255,255,255,.025);border-radius:17px;margin-bottom:4px;}
+  .vg-group-hero-copy{display:flex;flex-direction:column;gap:5px;min-width:0;}
+  .vg-group-hero-copy strong{color:#f3f8fb;font-size:15px;}
+  .vg-group-hero-copy span,.vg-group-hero-copy code{color:#89a3b6;font-size:11px;line-height:1.45;overflow-wrap:anywhere;}
+  .vg-group-hero-copy code{color:#70d2ff;}
+  .vg-group-avatar-picker{position:relative;width:80px;height:80px;flex:0 0 80px;border:1px dashed rgba(105,203,249,.4);border-radius:22px;background:linear-gradient(145deg,rgba(42,171,238,.16),rgba(67,98,132,.22));color:#8edfff;display:flex;flex-direction:column;gap:4px;align-items:center;justify-content:center;cursor:pointer;overflow:hidden;}
+  .vg-group-avatar-picker>span{display:grid;place-items:center;width:100%;height:100%;background-size:cover;background-position:center;font-size:25px;}
+  .vg-group-avatar-picker small{font-size:9px;font-weight:750;background:rgba(10,22,32,.78);position:absolute;padding:3px 6px;border-radius:7px;align-self:center;margin-top:50px;}
+  .vg-group-avatar-small{width:66px;height:66px;flex-basis:66px;border-radius:20px;position:relative;}
+  .vg-group-avatar-small small{margin-top:42px;}
+  .vg-action-row{display:flex;gap:8px;flex-wrap:wrap;margin-top:7px;}
+  .vg-action-row>*{flex:1;min-width:130px;}
+  .vg-group-manage-card{max-width:640px!important;}
+  .vg-group-manage-section{display:grid;gap:9px;padding:13px;border:1px solid rgba(146,193,220,.1);border-radius:16px;background:rgba(255,255,255,.022);margin-top:4px;}
+  .vg-group-section-title{font-size:13px;font-weight:850;color:#e8f5fc;}
+  .vg-group-section-heading{display:flex;align-items:center;justify-content:space-between;gap:10px;}
+  .vg-count-pill{font-size:11px;color:#7fd7ff;background:rgba(42,171,238,.13);padding:5px 9px;border-radius:10px;}
+  .vg-group-add-member{display:flex;gap:7px;}
+  .vg-group-add-member .vg-input{min-width:0;flex:1;}
+  .vg-group-add-member .vg-primary{white-space:nowrap;}
+  .vg-group-member-list{display:flex;flex-direction:column;gap:6px;max-height:260px;overflow:auto;}
+  .vg-group-member-row{display:flex;align-items:center;gap:9px;min-width:0;padding:9px;border:1px solid rgba(150,192,218,.07);border-radius:13px;background:rgba(6,17,26,.25);}
+  .vg-group-member-avatar{width:37px;height:37px;flex:0 0 37px;display:grid;place-items:center;border-radius:13px;background-size:cover;background-position:center;color:white;font-size:13px;font-weight:850;}
+  .vg-group-member-details{display:flex;flex-direction:column;gap:3px;min-width:0;flex:1;}
+  .vg-group-member-details strong{overflow:hidden;text-overflow:ellipsis;white-space:nowrap;color:#eaf4fa;font-size:12px;}
+  .vg-group-member-details span{color:#7f9aaa;font-size:10px;}
+  .vg-group-role{font-size:9px;font-weight:800;color:#8ed9ff;background:rgba(42,171,238,.11);padding:5px 7px;border-radius:8px;white-space:nowrap;}
+  .vg-group-member-actions{display:flex;gap:4px;}
+  .vg-group-member-actions button{border:1px solid rgba(130,188,220,.13);border-radius:8px;background:rgba(42,171,238,.07);color:#a8deff;font-size:9px;font-weight:750;padding:6px 7px;cursor:pointer;}
+  .vg-group-member-actions button.danger{color:#ff9da7;background:rgba(235,71,93,.08);}
+  .vg-group-footer-actions{display:flex;justify-content:space-between;gap:8px;padding-top:5px;}
+  .vg-group-footer-actions .vg-danger{color:#ff8d9b;background:rgba(233,77,88,.1);border:1px solid rgba(233,77,88,.22);border-radius:12px;padding:10px 13px;font:750 12px inherit;cursor:pointer;}
+  .vg-created-entities{margin-top:12px;padding:13px;border:1px solid rgba(130,185,218,.1);border-radius:16px;background:rgba(255,255,255,.022);}
+  .vg-created-entities-list{display:flex;flex-direction:column;gap:7px;}
+  .vg-created-entity-row{display:flex;align-items:center;gap:10px;width:100%;padding:9px;border:1px solid rgba(143,190,217,.08);border-radius:13px;background:rgba(3,14,23,.22);text-align:left;cursor:pointer;color:inherit;}
+  .vg-created-entity-row:hover{background:rgba(42,171,238,.09);}
+  .vg-created-entity-avatar{width:40px;height:40px;flex:0 0 40px;display:grid;place-items:center;border-radius:14px;background-size:cover;background-position:center;color:#dff6ff;font-size:16px;}
+  .vg-created-entity-info{display:flex;flex-direction:column;gap:3px;min-width:0;flex:1;}
+  .vg-created-entity-info strong{font-size:12px;color:#edf7fc;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;}
+  .vg-created-entity-info small{font-size:10px;color:#86a1b4;line-height:1.35;}
+  .vg-created-entity-arrow{color:#79d4ff;font-size:24px;}
+  .vg-apps-intro{display:flex;gap:13px;align-items:center;padding:12px;background:rgba(42,171,238,.07);border:1px solid rgba(42,171,238,.12);border-radius:17px;}
+  .vg-apps-logo{width:51px;height:51px;flex:0 0 51px;display:grid;place-items:center;border-radius:18px 18px 18px 6px;color:white;font-weight:950;font-size:23px;background:linear-gradient(145deg,#42c3f3,#287ac0);box-shadow:0 6px 20px rgba(42,171,238,.18);}
+  .vg-apps-intro strong{font-size:13px;color:#f2f8fc;}
+  .vg-apps-intro p{margin:5px 0 0;font-size:11px;line-height:1.45;color:#8da8bb;}
+  .vg-apps-grid{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:9px;margin:8px 0;}
+  .vg-app-platform{display:flex;flex-direction:column;align-items:center;gap:7px;text-align:center;padding:14px 8px;border:1px solid rgba(142,189,217,.1);border-radius:16px;background:rgba(255,255,255,.025);min-width:0;}
+  .vg-app-platform-icon{width:45px;height:45px;display:grid;place-items:center;border-radius:15px;background:rgba(42,171,238,.12);color:#7ed7ff;}
+  .vg-app-platform-icon svg{width:24px;height:24px;fill:none;stroke:currentColor;stroke-width:1.7;stroke-linecap:round;stroke-linejoin:round;}
+  .vg-app-platform strong{font-size:11px;color:#eef7fb;}
+  .vg-app-platform span{font-size:10px;line-height:1.35;color:#839eaf;min-height:28px;}
+  .vg-app-platform b{font-size:9px;letter-spacing:.6px;background:rgba(255,255,255,.06);color:#b6c8d4;padding:5px 8px;border-radius:8px;}
+  .vg-apps-web{display:flex;gap:12px;align-items:center;justify-content:space-between;padding:13px;border:1px solid rgba(48,209,136,.13);background:rgba(48,209,136,.045);border-radius:16px;}
+  .vg-apps-web>div{display:flex;flex-direction:column;gap:5px;min-width:0;}
+  .vg-apps-web strong{font-size:12px;color:#eaf8f0;}.vg-apps-web span{font-size:10px;line-height:1.4;color:#87a998;}
+  .vg-apps-web button{flex:0 0 auto;font-size:11px!important;padding:10px 12px!important;}
+  .ios-actions-grid{grid-template-columns:repeat(auto-fit,minmax(67px,1fr));}
+  @media(max-width:600px){.vg-profile-tabs button{padding:8px 10px;}.vg-apps-grid{gap:6px;}.vg-app-platform{padding:11px 5px;}.vg-apps-web{align-items:stretch;flex-direction:column;}.vg-apps-web button{width:100%;}.vg-group-add-member{flex-direction:column;}.vg-group-member-row{flex-wrap:wrap;}.vg-group-role{margin-left:auto;}.vg-group-member-actions{width:100%;justify-content:flex-end;padding-top:2px;}.vg-group-avatar-picker{width:68px;height:68px;flex-basis:68px;}.vg-group-avatar-picker small{margin-top:43px;}}
+
+  /* Shared icon-button system: tactile targets and consistent visual hierarchy. */
+  .icon-btn,.vg-header-tool,.vg-composer-tool,.vg-folder-add,.send-btn,.attach-btn,.sticker-send-btn{ -webkit-tap-highlight-color:transparent; transition:background .16s,border-color .16s,color .16s,transform .16s,box-shadow .16s; }
+  .icon-btn:focus-visible,.vg-header-tool:focus-visible,.vg-composer-tool:focus-visible,.vg-folder-add:focus-visible,.drawer-btn:focus-visible,.ios-action-btn:focus-visible{outline:2px solid rgba(81,196,255,.85);outline-offset:2px;}
+  .vg-header-tool{width:38px;min-width:38px;height:38px;border-radius:12px!important;border:1px solid rgba(161,199,223,.08)!important;background:rgba(255,255,255,.025)!important;color:#9fc7dd!important;font-size:17px;}
+  .vg-header-tool:hover{background:rgba(42,171,238,.12)!important;color:#d4f3ff!important;border-color:rgba(42,171,238,.22)!important;}
+  .vg-composer-tool,.attach-btn,.sticker-send-btn{min-width:36px;min-height:36px;border-radius:12px!important;border:1px solid rgba(153,197,224,.08)!important;background:rgba(255,255,255,.035)!important;color:#a8cce1!important;display:grid;place-items:center;}
+  .vg-composer-tool:hover,.attach-btn:hover,.sticker-send-btn:hover{background:rgba(42,171,238,.12)!important;color:#e3f7ff!important;}
+  .vg-folder-add{width:34px;height:34px;border-radius:11px!important;background:rgba(42,171,238,.09)!important;border:1px solid rgba(42,171,238,.12)!important;color:#8bdcff!important;}
+  .send-btn{width:40px;height:40px;min-width:40px;border-radius:14px!important;background:linear-gradient(145deg,#36b9ef,#218acb)!important;box-shadow:0 5px 15px rgba(42,171,238,.18);color:white!important;}
+  .send-btn:hover{filter:brightness(1.08);transform:translateY(-1px);}
+  .ios-action-btn{border:1px solid rgba(143,194,224,.09)!important;background:rgba(255,255,255,.035)!important;color:#8dd9ff!important;}
+  .ios-action-btn span{color:#a8c1d1!important;font-size:10px!important;line-height:1.25;}
+  .drawer-profile-card .avatar{box-shadow:0 0 0 4px rgba(42,171,238,.1),0 10px 22px rgba(0,0,0,.2);}
+  @media(max-width:760px){.vg-header-tool{width:34px;min-width:34px;height:34px;}.vg-composer-tool,.attach-btn,.sticker-send-btn{min-width:33px;min-height:33px;}}
 </style>
 
 </head>
@@ -1556,48 +1670,66 @@
         <div class="drawer-group-title">Аккаунты</div>
         <div id="drawerAccountsList"></div>
         <button type="button" class="drawer-btn" id="drawerAddAccountBtn" style="color:#64d2ff;">
-          <span class="drawer-ico" style="background:rgba(10,132,255,0.2);color:#64d2ff;">＋</span>
+          <span class="drawer-ico vg-ico-blue"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 5v14M5 12h14"/></svg></span>
           <span>Добавить аккаунт</span>
         </button>
       </div>
 
-      <div class="drawer-group">
-        <div class="drawer-group-title">Навигация и Каналы</div>
-        <button type="button" class="drawer-btn" id="drawerMyProfileBtn">
-          <span class="drawer-ico" style="background:#0a84ff;">👤</span>
-          <span>Мой профиль и Настройки</span>
+      <div class="drawer-group drawer-primary-actions">
+        <div class="drawer-group-title">Создать и открыть</div>
+        <button type="button" class="drawer-btn" id="drawerCreateGroupBtn">
+          <span class="drawer-ico vg-ico-blue"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2M9 11a4 4 0 1 0 0-8 4 4 0 0 0 0 8M19 8v6M16 11h6"/></svg></span>
+          <span><strong>Создать группу</strong><small>Общий чат с участниками</small></span>
         </button>
         <button type="button" class="drawer-btn" id="drawerCreateChannelBtn">
-          <span class="drawer-ico" style="background:#5e5ce6;">📢</span>
-          <span>Создать канал</span>
+          <span class="drawer-ico vg-ico-purple"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 4h16v13H8l-4 3V4Z M8 8h8M8 12h5"/></svg></span>
+          <span><strong>Создать канал</strong><small>Публикации и подписчики</small></span>
         </button>
         <button type="button" class="drawer-btn" id="drawerSavedMsgsBtn">
-          <span class="drawer-ico" style="background:#64d2ff;color:#000;">🔖</span>
-          <span>Избранное</span>
+          <span class="drawer-ico vg-ico-cyan"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M6 3h12v18l-6-4-6 4V3Z"/></svg></span>
+          <span><strong>Избранное</strong><small>Личные сохранённые сообщения</small></span>
+        </button>
+        <button type="button" class="drawer-btn" id="drawerAppsBtn">
+          <span class="drawer-ico vg-ico-green"><svg viewBox="0 0 24 24" aria-hidden="true"><rect x="3" y="4" width="18" height="12" rx="2"/><path d="M8 20h8M12 16v4M7 8h10"/></svg></span>
+          <span><strong>Скачать Vibegram</strong><small>ПК · iOS · Android</small></span>
+          <span class="drawer-soon-dot">SOON</span>
+        </button>
+      </div>
+
+      <div class="drawer-group vg-drawer-communities" id="drawerCommunitiesSection">
+        <div class="drawer-section-heading"><div class="drawer-group-title">Мои группы и каналы</div><span class="vg-count-pill" id="drawerCommunitiesCount">0</span></div>
+        <div id="drawerCommunitiesList" class="vg-drawer-communities-list"><div class="vg-drawer-empty">Здесь появятся твои сообщества</div></div>
+        <button type="button" class="drawer-btn vg-discover-entry" id="drawerBrowseCommunitiesBtn">
+          <span class="drawer-ico vg-ico-cyan"><svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="10.5" cy="10.5" r="6.5"/><path d="m16 16 5 5M10.5 7v7M7 10.5h7"/></svg></span>
+          <span><strong>Найти людей и сообщества</strong><small>Аккаунты, группы и каналы</small></span>
         </button>
       </div>
 
       <div class="drawer-group">
-        <div class="drawer-group-title">Верификация и Статус</div>
+        <div class="drawer-group-title">Мой аккаунт</div>
+        <button type="button" class="drawer-btn" id="drawerMyProfileBtn">
+          <span class="drawer-ico vg-ico-blue"><svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="8" r="4"/><path d="M4 21a8 8 0 0 1 16 0"/></svg></span>
+          <span><strong>Настройки профиля</strong><small>Данные, безопасность, приватность</small></span>
+        </button>
         <button type="button" class="drawer-btn" id="drawerOpenVerifyBotBtn">
-          <span class="drawer-ico" style="background:#30d158;">🤖</span>
-          <span>Бот Верификации (@verify_bot)</span>
+          <span class="drawer-ico vg-ico-green"><svg viewBox="0 0 24 24" aria-hidden="true"><rect x="4" y="7" width="16" height="13" rx="3"/><path d="M12 3v4M8 12h.01M16 12h.01M9 16h6"/></svg></span>
+          <span><strong>Верификация</strong><small>@verify_bot · заявки и статус</small></span>
         </button>
         <button type="button" class="drawer-btn" id="drawerPremiumBtn">
-          <span class="drawer-ico" style="background:linear-gradient(135deg,#5e5ce6,#ff9f0a);">⭐</span>
-          <span>Vibegram Premium и Эмодзи</span>
+          <span class="drawer-ico vg-ico-gold"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="m12 3 2.7 5.5 6.1.9-4.4 4.3 1 6.1-5.4-2.9-5.4 2.9 1-6.1-4.4-4.3 6.1-.9L12 3Z"/></svg></span>
+          <span><strong>Premium и эмодзи</strong><small>Статус и оформление профиля</small></span>
         </button>
       </div>
 
       <div class="drawer-group">
-        <div class="drawer-group-title">Управление</div>
-        <button type="button" class="drawer-btn" id="drawerWipeServerBtn" style="color:#ff9f0a;">
-          <span class="drawer-ico" style="background:rgba(255,159,10,0.2);">🧹</span>
-          <span>Очистить все чаты</span>
+        <div class="drawer-group-title">Управление аккаунтом</div>
+        <button type="button" class="drawer-btn" id="drawerWipeServerBtn" style="color:#ffbf5e;">
+          <span class="drawer-ico vg-ico-amber"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 7h16M10 11v6M14 11v6M6 7l1 14h10l1-14M9 7V4h6v3"/></svg></span>
+          <span><strong>Очистить переписки</strong><small>Удаление чатов не удаляет аккаунт</small></span>
         </button>
         <button type="button" class="drawer-btn" id="drawerLogoutBtn" style="color:var(--danger);">
-          <span class="drawer-ico" style="background:rgba(255,69,58,0.2);">🚪</span>
-          <span>Выйти из текущего аккаунта</span>
+          <span class="drawer-ico vg-ico-red"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M10 17l5-5-5-5M15 12H3M13 3h6a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2h-6"/></svg></span>
+          <span><strong>Выйти из аккаунта</strong><small>Текущий профиль на этом устройстве</small></span>
         </button>
       </div>
     </div>
@@ -1638,16 +1770,16 @@
       <button class="react-emoji-btn" data-emoji="💎">💎</button>
     </div>
     <div class="context-menu">
-      <button class="context-item" id="ctxReplyBtn">↩️ <span>Ответить</span></button>
-      <button class="context-item" id="ctxForwardBtn">➡️ <span>Переслать</span></button>
-      <button class="context-item" id="ctxPinBtn">📌 <span id="ctxPinLabel">Закрепить</span></button>
-      <button class="context-item" id="ctxCopyBtn">📋 <span>Копировать текст</span></button>
-      <button class="context-item" id="vgCtxEditBtn">✎ <span>Редактировать</span></button>
-      <button class="context-item" id="vgCtxTranslateBtn">文 <span>Перевести текст</span></button>
-      <button class="context-item" id="vgCtxSelectBtn">☑ <span>Выбрать сообщения</span></button>
-      <button class="context-item" id="vgCtxDeleteMeBtn">◌ <span>Удалить у себя</span></button>
-      <button class="context-item danger" id="ctxDeleteBtn">🗑 <span>Удалить у всех</span></button>
-      <button class="context-item danger" id="vgCtxReportBtn">⚑ <span>Пожаловаться</span></button>
+      <button class="context-item" id="ctxReplyBtn"><svg class="vg-menu-icon" viewBox="0 0 24 24" aria-hidden="true"><path d="M9 8 4 12l5 4M4 12h9a6 6 0 0 1 6 6"/></svg><span>Ответить</span></button>
+      <button class="context-item" id="ctxForwardBtn"><svg class="vg-menu-icon" viewBox="0 0 24 24" aria-hidden="true"><path d="M14 5 21 12l-7 7M21 12H9a6 6 0 0 0-6 6"/></svg><span>Переслать</span></button>
+      <button class="context-item" id="ctxPinBtn"><svg class="vg-menu-icon" viewBox="0 0 24 24" aria-hidden="true"><path d="m8 4 8 0-1 5 3 3v2H6v-2l3-3-1-5ZM12 14v7"/></svg><span id="ctxPinLabel">Закрепить</span></button>
+      <button class="context-item" id="ctxCopyBtn"><svg class="vg-menu-icon" viewBox="0 0 24 24" aria-hidden="true"><rect x="8" y="8" width="12" height="12" rx="2"/><path d="M16 8V5a2 2 0 0 0-2-2H5a2 2 0 0 0-2 2v9a2 2 0 0 0 2 2h3"/></svg><span>Копировать текст</span></button>
+      <button class="context-item" id="vgCtxEditBtn"><svg class="vg-menu-icon" viewBox="0 0 24 24" aria-hidden="true"><path d="m4 16-.8 4.8L8 20l11-11-4-4L4 16Z"/><path d="m13.5 6.5 4 4"/></svg><span>Редактировать</span></button>
+      <button class="context-item" id="vgCtxTranslateBtn"><svg class="vg-menu-icon" viewBox="0 0 24 24" aria-hidden="true"><path d="M3 5h11M8.5 3v2M5 9c2 3 5 5 8 6M12 8c-2 4-4 7-8 9M16 14l3-7 3 7M17 12h4"/></svg><span>Перевести текст</span></button>
+      <button class="context-item" id="vgCtxSelectBtn"><svg class="vg-menu-icon" viewBox="0 0 24 24" aria-hidden="true"><rect x="4" y="4" width="16" height="16" rx="3"/><path d="m8 12 3 3 5-6"/></svg><span>Выбрать сообщения</span></button>
+      <button class="context-item" id="vgCtxDeleteMeBtn"><svg class="vg-menu-icon" viewBox="0 0 24 24" aria-hidden="true"><path d="M4 7h16M10 11v7M14 11v7M6 7l1 14h10l1-14M9 7V4h6v3"/></svg><span>Удалить у себя</span></button>
+      <button class="context-item danger" id="ctxDeleteBtn"><svg class="vg-menu-icon" viewBox="0 0 24 24" aria-hidden="true"><path d="M4 7h16M10 11v7M14 11v7M6 7l1 14h10l1-14M9 7V4h6v3"/></svg><span>Удалить у всех</span></button>
+      <button class="context-item danger" id="vgCtxReportBtn"><svg class="vg-menu-icon" viewBox="0 0 24 24" aria-hidden="true"><path d="M5 21V4M5 5c5-4 9 4 14 0v10c-5 4-9-4-14 0"/></svg><span>Пожаловаться</span></button>
     </div>
   </div>
 
@@ -1695,8 +1827,8 @@
           <button class="icon-btn" id="closeChannelModalBtn" style="color:#fff;">&times;</button>
         </div>
         <div class="tg-avatar-container" id="chAvatarWrap">
-          <div class="tg-avatar-main" id="chAvatarPreview">📢</div>
-          <div class="tg-cam-fab">📷</div>
+          <div class="tg-avatar-main" id="chAvatarPreview">V</div>
+          <div class="tg-cam-fab"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 7h3l1.5-2h7L17 7h3v12H4z"/><circle cx="12" cy="13" r="3.5"/></svg></div>
           <input type="file" id="chAvatarFileInput" accept="image/*" style="display:none;">
         </div>
         <div class="color-picker-row" id="chColorPickerRow"></div>
@@ -1706,7 +1838,7 @@
         <div class="tg-section-box">
           <div class="tg-section-header">Основные данные канала</div>
           <div class="tg-row-item">
-            <div class="tg-row-icon" style="background:#0a84ff;">📢</div>
+            <div class="tg-row-icon" style="background:#0a84ff;"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 5h16v14H4zM8 9h8M8 13h5"/></svg></div>
             <div class="tg-row-body">
               <input type="text" id="chNameInput" class="tg-inline-input" placeholder="Название канала">
               <div class="tg-row-hint">Обязательное поле</div>
@@ -1720,7 +1852,7 @@
             </div>
           </div>
           <div class="tg-row-item">
-            <div class="tg-row-icon" style="background:#30d158;">ℹ️</div>
+            <div class="tg-row-icon" style="background:#30d158;"><svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="9"/><path d="M12 11v5M12 7h.01"/></svg></div>
             <div class="tg-row-body">
               <input type="text" id="chBioInput" class="tg-inline-input" placeholder="Описание канала">
               <div class="tg-row-hint">О чем ваш канал</div>
@@ -1779,15 +1911,15 @@
         <input type="color" id="brushColorPicker" value="#ff3b30" style="width:26px;height:26px;border:none;background:none;">
         <button type="button" class="tool-chip" id="toolTextBtn">🔤 Текст</button>
         <button type="button" class="tool-chip" id="toolRotateBtn">🔄 90°</button>
-        <button type="button" class="tool-chip" id="toolCropBtn">✂️ 1:1</button>
+        <button type="button" class="tool-chip" id="toolCropBtn"><svg class="vg-menu-icon" viewBox="0 0 24 24" aria-hidden="true"><circle cx="6" cy="6" r="3"/><circle cx="6" cy="18" r="3"/><path d="m8.2 8.2 11.6 11.6M8.2 15.8 20 4"/></svg>1:1</button>
         <button type="button" class="tool-chip" id="toolFilterBtn">✨ Фильтр</button>
         <button type="button" class="tool-chip" id="toolQualityPhotoBtn">HD 1080p</button>
         <button type="button" class="tool-chip" id="toolResetPhotoBtn">Сброс</button>
       </div>
       <div id="videoToolsBox" style="display:none;flex-direction:column;gap:6px;">
         <div class="editor-tool-row">
-          <button type="button" class="tool-chip active" data-vqual="720p">🎬 720p HD</button>
-          <button type="button" class="tool-chip" id="videoMuteToggleBtn">🔊 Звук: Вкл</button>
+          <button type="button" class="tool-chip active" data-vqual="720p"><svg class="vg-menu-icon" viewBox="0 0 24 24" aria-hidden="true"><rect x="3" y="5" width="18" height="14" rx="2"/><path d="m10 9 5 3-5 3z"/></svg>720p HD</button>
+          <button type="button" class="tool-chip" id="videoMuteToggleBtn"><svg class="vg-menu-icon" viewBox="0 0 24 24" aria-hidden="true"><path d="M4 9v6h4l5 4V5L8 9H4Z"/><path d="M17 9a5 5 0 0 1 0 6M19 5a10 10 0 0 1 0 14"/></svg>Звук: Вкл</button>
           <span id="videoTrimInfo" style="font-size:12px;color:#64d2ff;margin-left:auto;"></span>
         </div>
         <div class="trim-row">
@@ -1800,6 +1932,75 @@
         <button type="button" class="send-btn" id="sendMediaConfirmBtn">↑</button>
       </div>
     </div>
+  </div>
+
+  <!-- Каталог аккаунтов, групп и каналов -->
+  <div class="vg-modal" id="vgDirectoryModal" role="dialog" aria-modal="true" aria-labelledby="vgDirectoryTitle">
+    <section class="vg-modal-card vg-workspace-card vg-directory-card">
+      <header class="vg-modal-head"><div><span id="vgDirectoryTitle">Люди и сообщества</span><small class="vg-modal-subtitle">Найди аккаунт, группу или канал Vibegram</small></div><button type="button" data-vg-close="vgDirectoryModal" aria-label="Закрыть">×</button></header>
+      <div class="vg-modal-body">
+        <div class="vg-directory-search-wrap"><svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="10.5" cy="10.5" r="6.5"/><path d="m16 16 5 5"/></svg><input id="vgDirectorySearch" class="vg-input" type="search" placeholder="Имя, @username или название…" autocomplete="off"></div>
+        <div class="vg-directory-filters" id="vgDirectoryFilters" role="group" aria-label="Тип результата">
+          <button type="button" class="active" data-directory-filter="all">Все</button><button type="button" data-directory-filter="person">Люди</button><button type="button" data-directory-filter="group">Группы</button><button type="button" data-directory-filter="channel">Каналы</button>
+        </div>
+        <div class="vg-directory-summary" id="vgDirectorySummary">Доступные аккаунты и сообщества</div>
+        <div class="vg-directory-results" id="vgDirectoryResults" aria-live="polite"></div>
+      </div>
+    </section>
+  </div>
+
+  <!-- Vibegram: polished group creation, group management and app downloads -->
+  <div class="vg-modal" id="vgCreateGroupModal" role="dialog" aria-modal="true" aria-labelledby="vgCreateGroupTitle">
+    <section class="vg-modal-card vg-workspace-card">
+      <header class="vg-modal-head"><span id="vgCreateGroupTitle">Создать группу</span><button type="button" data-vg-close="vgCreateGroupModal" aria-label="Закрыть">×</button></header>
+      <form class="vg-modal-body" id="vgCreateGroupForm">
+        <div class="vg-group-hero">
+          <button type="button" class="vg-group-avatar-picker" id="vgCreateGroupAvatarBtn" aria-label="Выбрать аватар группы"><span id="vgCreateGroupAvatarPreview"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 5v14M5 12h14"/></svg></span><small>Аватар группы</small></button>
+          <input type="file" id="vgCreateGroupAvatarFile" accept="image/png,image/jpeg,image/webp" hidden>
+          <div class="vg-group-hero-copy"><strong>Новая группа Vibegram</strong><span>Общий чат, участники, администраторы и приглашения</span></div>
+        </div>
+        <label class="vg-field-label" for="vgCreateGroupName">Название</label><input class="vg-input" id="vgCreateGroupName" maxlength="80" placeholder="Например, Друзья" required>
+        <label class="vg-field-label" for="vgCreateGroupUsername">Публичный username</label><div class="vg-username-field"><span>@</span><input class="vg-input" id="vgCreateGroupUsername" maxlength="32" placeholder="friends_chat" required pattern="[a-zA-Z0-9_]{3,32}"></div>
+        <div class="vg-helper">3–32 символа: латиница, цифры и подчёркивание. Username должен быть свободен.</div>
+        <label class="vg-field-label" for="vgCreateGroupDescription">Описание</label><textarea class="vg-textarea" id="vgCreateGroupDescription" maxlength="600" placeholder="О чём эта группа? (необязательно)"></textarea>
+        <label class="vg-field-label" for="vgCreateGroupMembers">Добавить участников</label><input class="vg-input" id="vgCreateGroupMembers" placeholder="username1, username2 (необязательно)">
+        <label class="vg-field-label" for="vgCreateGroupPrivacy">Кто может найти группу</label><select class="vg-input" id="vgCreateGroupPrivacy"><option value="public">Публичная — доступна по username</option><option value="private">Приватная — только по приглашению</option></select>
+        <div class="vg-action-row"><button type="submit" class="vg-primary" id="vgCreateGroupSubmit">Создать группу</button><button type="button" class="vg-secondary" data-vg-close="vgCreateGroupModal">Отмена</button></div>
+      </form>
+    </section>
+  </div>
+  <div class="vg-modal" id="vgManageGroupModal" role="dialog" aria-modal="true" aria-labelledby="vgManageGroupTitle">
+    <section class="vg-modal-card vg-workspace-card vg-group-manage-card">
+      <header class="vg-modal-head"><span id="vgManageGroupTitle">Управление группой</span><button type="button" data-vg-close="vgManageGroupModal" aria-label="Закрыть">×</button></header>
+      <div class="vg-modal-body">
+        <div class="vg-group-manage-hero"><button type="button" class="vg-group-avatar-picker vg-group-avatar-small" id="vgManageGroupAvatarBtn" aria-label="Изменить аватар группы"><span id="vgManageGroupAvatarPreview">V</span><small>Изменить</small></button><input type="file" id="vgManageGroupAvatarFile" accept="image/png,image/jpeg,image/webp" hidden><div class="vg-group-hero-copy"><strong id="vgManageGroupNameHero">Группа</strong><span id="vgManageGroupMeta">Управление участниками</span><code id="vgManageGroupHandle">@group</code></div></div>
+        <div class="vg-group-manage-section"><div class="vg-group-section-title">Основные настройки</div>
+          <label class="vg-field-label" for="vgManageGroupName">Название</label><input class="vg-input" id="vgManageGroupName" maxlength="80">
+          <label class="vg-field-label" for="vgManageGroupDescription">Описание</label><textarea class="vg-textarea" id="vgManageGroupDescription" maxlength="600"></textarea>
+          <label class="vg-field-label" for="vgManageGroupPrivacy">Доступ</label><select class="vg-input" id="vgManageGroupPrivacy"><option value="public">Публичная</option><option value="private">Приватная</option></select>
+          <label class="vg-field-label" for="vgManageGroupSlowMode">Медленный режим</label><select class="vg-input" id="vgManageGroupSlowMode"><option value="0">Выключен</option><option value="5">1 сообщение в 5 сек.</option><option value="10">1 сообщение в 10 сек.</option><option value="15">1 сообщение в 15 сек.</option><option value="30">1 сообщение в 30 сек.</option><option value="60">1 сообщение в минуту</option></select>
+          <div class="vg-action-row"><button type="button" class="vg-primary" id="vgManageGroupSaveBtn">Сохранить настройки</button><button type="button" class="vg-secondary" id="vgCopyGroupInviteBtn">Скопировать приглашение</button></div>
+        </div>
+        <div class="vg-group-manage-section"><div class="vg-group-section-heading"><div><div class="vg-group-section-title">Участники</div><div class="vg-helper" id="vgManageMembersHint">Управление составом группы</div></div><span class="vg-count-pill" id="vgManageMembersCount">0</span></div>
+          <div class="vg-group-add-member"><input class="vg-input" id="vgGroupAddMemberInput" placeholder="@username участника"><button type="button" class="vg-primary" id="vgGroupAddMemberBtn">Добавить</button></div>
+          <div class="vg-group-member-list" id="vgGroupMemberList"></div>
+        </div>
+        <div class="vg-group-footer-actions"><button type="button" class="vg-secondary" id="vgGroupLeaveBtn">Покинуть группу</button><button type="button" class="vg-danger" id="vgGroupDeleteBtn" hidden>Удалить группу</button></div>
+      </div>
+    </section>
+  </div>
+  <div class="vg-modal" id="vgApplicationsModal" role="dialog" aria-modal="true" aria-labelledby="vgApplicationsTitle">
+    <section class="vg-modal-card vg-workspace-card">
+      <header class="vg-modal-head"><span id="vgApplicationsTitle">Приложения Vibegram</span><button type="button" data-vg-close="vgApplicationsModal" aria-label="Закрыть">×</button></header>
+      <div class="vg-modal-body"><div class="vg-apps-intro"><div class="vg-apps-logo">V</div><div><strong>Один аккаунт на всех устройствах</strong><p>Переписки и настройки синхронизируются между поддерживаемыми клиентами.</p></div></div>
+        <div class="vg-apps-grid">
+          <article class="vg-app-platform"><div class="vg-app-platform-icon"><svg viewBox="0 0 24 24" aria-hidden="true"><rect x="3" y="4" width="18" height="13" rx="2"/><path d="M8 21h8M12 17v4M7 8h10"/></svg></div><strong>ПК / Windows</strong><span>Нативная версия</span><b>Скоро</b></article>
+          <article class="vg-app-platform"><div class="vg-app-platform-icon"><svg viewBox="0 0 24 24" aria-hidden="true"><rect x="6" y="2" width="12" height="20" rx="3"/><path d="M10 18h4"/></svg></div><strong>iPhone / iOS</strong><span>Мобильное приложение</span><b>Скоро</b></article>
+          <article class="vg-app-platform"><div class="vg-app-platform-icon"><svg viewBox="0 0 24 24" aria-hidden="true"><rect x="5" y="3" width="14" height="18" rx="2"/><path d="m8 7 1 1m6-1 1 1M10 17h4"/></svg></div><strong>Android</strong><span>Мобильное приложение</span><b>Скоро</b></article>
+        </div>
+        <div class="vg-apps-web"><div><strong>Vibegram Web</strong><span>Уже доступен в браузере. Можно установить как PWA на поддерживаемых устройствах.</span></div><button type="button" class="vg-primary" id="vgAppsInstallBtn">Установить веб-версию</button></div>
+      </div>
+    </section>
   </div>
 
   <!-- Vibegram productivity and communication features -->
@@ -1856,16 +2057,16 @@
           <select id="vgCallOutputSelect" aria-label="Выбрать устройство вывода"><option value="">Системное устройство</option></select>
         </label>
         <div class="vg-call-device-note" id="vgCallDeviceHint" role="status">Выбор устройств появится после разрешения доступа к микрофону.</div>
-        <button type="button" class="vg-call-pick-output" id="vgCallPickOutputBtn" hidden>🎧 Выбрать устройство вывода…</button>
+        <button type="button" class="vg-call-pick-output" id="vgCallPickOutputBtn" hidden><svg class="vg-menu-icon" viewBox="0 0 24 24" aria-hidden="true"><path d="M4 14v-3a8 8 0 0 1 16 0v3M3 12h4v7H5a2 2 0 0 1-2-2v-5ZM17 12h4v5a2 2 0 0 1-2 2h-2v-7Z"/></svg>Выбрать устройство вывода…</button>
       </div>
       <div class="vg-call-actions vg-call-incoming-actions" id="vgIncomingCallActions" style="display:none;">
-        <button class="vg-call-action vg-call-accept" type="button" id="vgAcceptCallBtn"><span class="vg-call-action-icon">✓</span><span>Принять</span></button>
-        <button class="vg-call-action vg-call-reject" type="button" id="vgRejectCallBtn"><span class="vg-call-action-icon">×</span><span>Отклонить</span></button>
+        <button class="vg-call-action vg-call-accept" type="button" id="vgAcceptCallBtn"><span class="vg-call-action-icon"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="m5 12 4 4L19 6"/></svg></span><span>Принять</span></button>
+        <button class="vg-call-action vg-call-reject" type="button" id="vgRejectCallBtn"><span class="vg-call-action-icon"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="m6 6 12 12M18 6 6 18"/></svg></span><span>Отклонить</span></button>
       </div>
       <div class="vg-call-actions vg-call-active-actions" id="vgActiveCallActions" style="display:none;">
-        <button class="vg-call-action" type="button" id="vgMuteCallBtn"><span class="vg-call-action-icon">♩</span><span>Микрофон</span></button>
-        <button class="vg-call-action" type="button" id="vgCameraCallBtn"><span class="vg-call-action-icon">▣</span><span>Камера</span></button>
-        <button class="vg-call-action vg-call-hangup" type="button" id="vgHangupCallBtn"><span class="vg-call-action-icon">⌕</span><span>Завершить</span></button>
+        <button class="vg-call-action" type="button" id="vgMuteCallBtn"><span class="vg-call-action-icon"><svg viewBox="0 0 24 24" aria-hidden="true"><rect x="9" y="3" width="6" height="12" rx="3"/><path d="M5 11a7 7 0 0 0 14 0M12 18v3m-4 0h8"/></svg></span><span>Микрофон</span></button>
+        <button class="vg-call-action" type="button" id="vgCameraCallBtn"><span class="vg-call-action-icon"><svg viewBox="0 0 24 24" aria-hidden="true"><rect x="3" y="6" width="13" height="12" rx="2"/><path d="m16 10 5-3v10l-5-3"/></svg></span><span>Камера</span></button>
+        <button class="vg-call-action vg-call-hangup" type="button" id="vgHangupCallBtn"><span class="vg-call-action-icon"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 13c4-3 12-3 16 0l-2 4-4-1v-2a12 12 0 0 0-4 0v2l-4 1Z"/></svg></span><span>Завершить</span></button>
       </div>
       <div class="vg-call-footer" id="vgCallFooter">Для звонка разреши доступ к микрофону. Видеозвонок также использует камеру.</div>
     </section>
@@ -1889,7 +2090,7 @@
           </svg>
         </button>
         <div class="search-wrapper">
-          <input type="text" id="searchInput" class="search-input" placeholder="Поиск @юзеров и каналов...">
+          <input type="text" id="searchInput" class="search-input" placeholder="Поиск людей, групп и каналов…">
           <button class="clear-search" id="clearSearchBtn">&times;</button>
         </div>
       </div>
@@ -1897,7 +2098,7 @@
         <button type="button" class="vg-folder-chip active" data-vg-filter="all">Все чаты</button>
         <button type="button" class="vg-folder-chip" data-vg-filter="unread">Непрочитанные</button>
         <button type="button" class="vg-folder-chip" data-vg-filter="archive">Архив</button>
-        <button type="button" class="vg-folder-add" id="vgCreateGroupBtn" title="Создать группу">👥</button>
+        <button type="button" class="vg-folder-add" id="vgCreateGroupBtn" title="Создать группу" aria-label="Создать группу"><svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="9" cy="8" r="3"/><circle cx="17" cy="9" r="2.3"/><path d="M3 20v-1a6 6 0 0 1 12 0v1M16 15a4 4 0 0 1 5 4v1M20 3v6M17 6h6"/></svg></button>
         <button type="button" class="vg-folder-add" id="vgAddFolderBtn" title="Создать папку">+</button>
       </div>
       <div class="chat-list" id="chatList"></div>
@@ -1917,10 +2118,10 @@
             <div class="chat-header-status" id="activeChatStatus"></div>
           </div>
           <div class="vg-header-tools">
-            <button type="button" class="vg-header-tool" id="vgSearchMessagesBtn" title="Поиск по сообщениям" aria-label="Поиск по сообщениям">⌕</button>
-            <button type="button" class="vg-header-tool" id="vgScheduledBtn" title="Отложенные сообщения" aria-label="Отложенные сообщения">◷</button>
-            <button type="button" class="vg-header-tool" id="vgVoiceCallBtn" title="Голосовой звонок" aria-label="Голосовой звонок">☎</button>
-            <button type="button" class="vg-header-tool" id="vgVideoCallBtn" title="Видеозвонок" aria-label="Видеозвонок">▣</button>
+            <button type="button" class="vg-header-tool" id="vgSearchMessagesBtn" title="Поиск по сообщениям" aria-label="Поиск по сообщениям"><svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="10.5" cy="10.5" r="6.5"/><path d="m16 16 5 5"/></svg></button>
+            <button type="button" class="vg-header-tool" id="vgScheduledBtn" title="Отложенные сообщения" aria-label="Отложенные сообщения"><svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="9"/><path d="M12 7v5l3 2"/></svg></button>
+            <button type="button" class="vg-header-tool" id="vgVoiceCallBtn" title="Голосовой звонок" aria-label="Голосовой звонок"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M7 3H4a1 1 0 0 0-1 1c0 9.4 7.6 17 17 17a1 1 0 0 0 1-1v-3l-5-2-2 3a14 14 0 0 1-6-6l3-2-2-5Z"/></svg></button>
+            <button type="button" class="vg-header-tool" id="vgVideoCallBtn" title="Видеозвонок" aria-label="Видеозвонок"><svg viewBox="0 0 24 24" aria-hidden="true"><rect x="3" y="6" width="13" height="12" rx="2"/><path d="m16 10 5-3v10l-5-3"/></svg></button>
           </div>
           <button type="button" class="header-sub-pill" id="headerSubBtn" style="display:none;">Подписаться</button>
         </header>
@@ -1954,11 +2155,11 @@
             <div class="sticker-send-title">Стикеры Vibegram</div>
             <div class="sticker-send-grid" id="stickerSendGrid"></div>
           </div>
-          <button type="button" class="sticker-send-btn" id="stickerSendBtn" title="Стикеры" aria-label="Открыть стикеры" aria-expanded="false">▧</button>
-          <button type="button" class="attach-btn" id="attachMediaBtn" title="Фото или Видео">📎</button>
-          <button type="button" class="vg-composer-tool" id="vgPollBtn" title="Создать опрос" aria-label="Создать опрос">▤</button>
-          <button type="button" class="vg-composer-tool" id="vgScheduleBtn" title="Отправить позже" aria-label="Отправить позже">◷</button>
-          <button type="button" class="vg-composer-tool" id="vgVoiceRecordBtn" title="Записать голосовое сообщение" aria-label="Записать голосовое сообщение">🎙</button>
+          <button type="button" class="sticker-send-btn" id="stickerSendBtn" title="Стикеры" aria-label="Открыть стикеры" aria-expanded="false"><svg viewBox="0 0 24 24" aria-hidden="true"><rect x="3" y="3" width="18" height="18" rx="4"/><path d="M13 3v6h8M7 8h2M7 12h6"/></svg></button>
+          <button type="button" class="attach-btn" id="attachMediaBtn" title="Фото или видео" aria-label="Прикрепить фото или видео"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="m8 12.5 6.9-6.9a3.5 3.5 0 0 1 5 5L10 20.5a5 5 0 0 1-7.1-7.1L13.3 3"/></svg></button>
+          <button type="button" class="vg-composer-tool" id="vgPollBtn" title="Создать опрос" aria-label="Создать опрос"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M9 6h11M9 12h11M9 18h11"/><circle cx="4" cy="6" r="1"/><circle cx="4" cy="12" r="1"/><circle cx="4" cy="18" r="1"/></svg></button>
+          <button type="button" class="vg-composer-tool" id="vgScheduleBtn" title="Отправить позже" aria-label="Отправить позже"><svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="9"/><path d="M12 7v5l3 2"/></svg></button>
+          <button type="button" class="vg-composer-tool" id="vgVoiceRecordBtn" title="Записать голосовое сообщение" aria-label="Записать голосовое сообщение"><svg viewBox="0 0 24 24" aria-hidden="true"><rect x="9" y="3" width="6" height="12" rx="3"/><path d="M5 11a7 7 0 0 0 14 0M12 18v3m-4 0h8"/></svg></button>
           <input type="text" id="messageInput" class="msg-input" placeholder="Сообщение..." autocomplete="off">
           <button type="submit" class="send-btn" title="Отправить">↑</button>
         </form>
@@ -1980,7 +2181,7 @@
         </div>
         <div class="tg-avatar-container" id="myProfileAvatarWrap">
           <div class="tg-avatar-main" id="myProfileAvatarPreview"></div>
-          <div class="tg-cam-fab">📷</div>
+          <div class="tg-cam-fab"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 7h3l1.5-2h7L17 7h3v12H4z"/><circle cx="12" cy="13" r="3.5"/></svg></div>
           <input type="file" id="avatarFileInput" accept="image/*" style="display:none;">
         </div>
         <div style="font-size:18px;font-weight:800;color:#fff;display:flex;align-items:center;gap:6px;" id="tgHeroLiveName"></div>
@@ -1988,11 +2189,17 @@
         <div class="color-picker-row" id="colorPickerRow"></div>
       </div>
 
+      <nav class="vg-profile-tabs" id="vgProfileTabs" aria-label="Разделы настроек профиля">
+        <button type="button" class="active" data-profile-tab="profile"><svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="8" r="4"/><path d="M4 21a8 8 0 0 1 16 0"/></svg>Профиль</button>
+        <button type="button" data-profile-tab="privacy"><svg viewBox="0 0 24 24" aria-hidden="true"><rect x="4" y="10" width="16" height="11" rx="2"/><path d="M8 10V7a4 4 0 0 1 8 0v3"/></svg>Приватность</button>
+        <button type="button" data-profile-tab="app"><svg viewBox="0 0 24 24" aria-hidden="true"><rect x="3" y="4" width="18" height="12" rx="2"/><path d="M8 20h8M12 16v4"/></svg>Приложение</button>
+        <button type="button" data-profile-tab="status"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="m12 3 2.5 5.3 5.8.8-4.2 4.1 1 5.8-5.1-2.7-5.1 2.7 1-5.8-4.2-4.1 5.8-.8L12 3Z"/></svg>Статус</button>
+      </nav>
       <div class="tg-settings-scroll">
-        <div class="tg-section-box">
+        <div class="tg-section-box" data-profile-panel="profile" id="vgProfileDataPanel">
           <div class="tg-section-header">Личные данные (Уникальный @username)</div>
           <div class="tg-row-item">
-            <div class="tg-row-icon" style="background:#0a84ff;">👤</div>
+            <div class="tg-row-icon" style="background:#0a84ff;"><svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="8" r="4"/><path d="M4 21a8 8 0 0 1 16 0"/></svg></div>
             <div class="tg-row-body">
               <input type="text" id="myNameInput" class="tg-inline-input" placeholder="Ваше имя">
               <div class="tg-row-hint">Отображаемое имя</div>
@@ -2003,20 +2210,20 @@
             <div class="tg-row-body">
               <div style="display:flex;align-items:center;gap:6px;">
                 <input type="text" id="myUsernameInput" class="tg-inline-input" placeholder="@username" style="flex:1;">
-                <button type="button" class="tool-chip" id="copyMyUsernameBtn" style="padding:3px 8px;font-size:11px;">📋 Копировать</button>
+                <button type="button" class="tool-chip vg-inline-action" id="copyMyUsernameBtn" style="padding:3px 8px;font-size:11px;"><svg viewBox="0 0 24 24" aria-hidden="true"><rect x="8" y="8" width="12" height="12" rx="2"/><path d="M16 8V5a2 2 0 0 0-2-2H5a2 2 0 0 0-2 2v9a2 2 0 0 0 2 2h3"/></svg>Копировать</button>
               </div>
               <div class="tg-row-hint">Уникальный юзернейм (@paveldurov всегда имеет ID: 1)</div>
             </div>
           </div>
           <div class="tg-row-item">
-            <div class="tg-row-icon" style="background:#30d158;">📞</div>
+            <div class="tg-row-icon" style="background:#30d158;"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M6 3h4l2 5-3 2a15 15 0 0 0 5 5l2-3 5 2v4c0 1-1 2-2 2C10 20 4 14 4 5c0-1 1-2 2-2Z"/></svg></div>
             <div class="tg-row-body">
               <input type="text" id="myPhoneInput" class="tg-inline-input" placeholder="+375 (29) 000-00-00">
               <div class="tg-row-hint">Телефон</div>
             </div>
           </div>
           <div class="tg-row-item">
-            <div class="tg-row-icon" style="background:#ff9f0a;">ℹ️</div>
+            <div class="tg-row-icon" style="background:#ff9f0a;"><svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="9"/><path d="M12 11v5M12 7h.01"/></svg></div>
             <div class="tg-row-body">
               <input type="text" id="myBioInput" class="tg-inline-input" placeholder="О себе">
               <div class="tg-row-hint">Описание профиля</div>
@@ -2024,7 +2231,7 @@
           </div>
         </div>
 
-        <div class="tg-section-box">
+        <div class="tg-section-box" data-profile-panel="status">
           <div class="tg-section-header">Telegram Premium SVG Эмодзи-статус</div>
           <div class="sticker-picker-grid" id="stickerPickerGrid"></div>
           <div style="padding:4px 16px 8px;">
@@ -2032,7 +2239,7 @@
           </div>
         </div>
 
-        <div class="tg-section-box">
+        <div class="tg-section-box" data-profile-panel="status">
           <div class="tg-section-header">Заявка на верификацию аккаунта (Через @verify_bot)</div>
           <div style="padding: 4px 16px 6px; font-size: 12px; color: var(--text-secondary);" id="myProfileVerifyStateInfo"></div>
           <div class="tg-row-item">
@@ -2048,7 +2255,7 @@
             </div>
           </div>
           <div class="tg-row-item">
-            <div class="tg-row-icon" style="background:#64d2ff;color:#000;">📜</div>
+            <div class="tg-row-icon" style="background:#64d2ff;color:#000;"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M6 3h12v18l-6-3-6 3V3Z"/><path d="M9 8h6M9 12h6"/></svg></div>
             <div class="tg-row-body">
               <input type="text" id="myVerifyReasonInput" class="tg-inline-input" placeholder="За что выдается галочка...">
               <div class="tg-row-hint">Описание для модерации (видно при клике на галочку после одобрения)</div>
@@ -2061,7 +2268,7 @@
           </div>
         </div>
 
-        <div class="tg-section-box" id="pwaSettingsBox">
+        <div class="tg-section-box" data-profile-panel="app" id="pwaSettingsBox">
           <div class="tg-section-header">Приложение Vibegram</div>
           <div style="padding:4px 16px 9px;display:flex;flex-direction:column;gap:8px;">
             <div style="font-size:12px;line-height:1.5;color:var(--text-secondary);">Установи Vibegram на экран «Домой», чтобы открывать его отдельным приложением. После настройки Web Push новые сообщения смогут приходить даже при закрытом сайте.</div>
@@ -2071,10 +2278,10 @@
           </div>
         </div>
 
-        <div class="tg-section-box">
+        <div class="tg-section-box" data-profile-panel="privacy">
           <div class="tg-section-header">Конфиденциальность</div>
           <div class="tg-row-item">
-            <div class="tg-row-icon" style="background:#ff9f0a;">🔒</div>
+            <div class="tg-row-icon" style="background:#ff9f0a;"><svg viewBox="0 0 24 24" aria-hidden="true"><rect x="4" y="10" width="16" height="11" rx="2"/><path d="M8 10V7a4 4 0 0 1 8 0v3"/></svg></div>
             <div class="tg-row-body">
               <select id="myPrivacySelect" class="tg-inline-select">
                 <option value="everyone">Все («в сети» и точное время)</option>
@@ -2084,7 +2291,7 @@
           </div>
         </div>
 
-        <div class="tg-section-box" id="profileChannelsSettingsBox">
+        <div class="tg-section-box" data-profile-panel="status" id="profileChannelsSettingsBox">
           <div class="tg-section-header">Каналы в профиле</div>
           <div style="padding:3px 16px 5px;font-size:12px;line-height:1.45;color:var(--text-secondary);">Выбери каналы, которые будут показываться в твоём публичном профиле. Доступны каналы, на которые ты подписан, которыми управляешь или владеешь. Посетители увидят аватар, название, статус, число подписчиков и последнее сообщение.</div>
           <div class="profile-channels-picker" id="profileChannelsPicker"><div class="profile-channel-empty">Загружаем доступные каналы…</div></div>
@@ -2107,11 +2314,13 @@
         <div style="font-size:13px;color:var(--text-secondary);margin-top:2px;" id="peerProfileStatus"></div>
 
         <div class="ios-actions-grid">
-          <button type="button" class="ios-action-btn" id="iosMuteQuickBtn">🔔<span id="iosMuteLabel">звук</span></button>
-          <button type="button" class="ios-action-btn" id="iosCopyPeerUsernameBtn">📋<span>скопировать @</span></button>
-          <button type="button" class="ios-action-btn" id="iosEditChannelQuickBtn" style="display:none;">⚙️<span>управление</span></button>
-          <button type="button" class="ios-action-btn" id="iosSendMediaQuickBtn">🖼<span>медиа</span></button>
-          <button type="button" class="ios-action-btn danger-btn" id="deleteChatBtn">🗑<span id="deleteChatBtnLabel">очистить</span></button>
+          <button type="button" class="ios-action-btn" id="iosMuteQuickBtn"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M18 8a6 6 0 0 0-12 0c0 7-3 7-3 9h18c0-2-3-2-3-9M10 21h4"/></svg><span id="iosMuteLabel">звук</span></button>
+          <button type="button" class="ios-action-btn" id="iosCopyPeerUsernameBtn"><svg viewBox="0 0 24 24" aria-hidden="true"><rect x="8" y="8" width="12" height="12" rx="2"/><path d="M16 8V5a2 2 0 0 0-2-2H5a2 2 0 0 0-2 2v9a2 2 0 0 0 2 2h3"/></svg><span>скопировать @</span></button>
+          <button type="button" class="ios-action-btn" id="iosEditChannelQuickBtn" style="display:none;"><svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="3"/><path d="m19 13 2 1-2 4-2-1a8 8 0 0 1-2 1l-.3 2h-4L10 18a8 8 0 0 1-2-1l-2 1-2-4 2-1a8 8 0 0 1 0-2l-2-1 2-4 2 1a8 8 0 0 1 2-1l.3-2h4L15 6a8 8 0 0 1 2 1l2-1 2 4-2 1a8 8 0 0 1 0 2Z"/></svg><span>управление каналом</span></button>
+          <button type="button" class="ios-action-btn" id="iosManageGroupQuickBtn" style="display:none;"><svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="9" cy="8" r="3"/><circle cx="17" cy="9" r="2.3"/><path d="M3 20v-1a6 6 0 0 1 12 0v1M16 15a4 4 0 0 1 5 4v1"/></svg><span>управление группой</span></button>
+          <button type="button" class="ios-action-btn" id="iosJoinGroupQuickBtn" style="display:none;"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 5v14M5 12h14"/></svg><span>вступить</span></button>
+          <button type="button" class="ios-action-btn" id="iosSendMediaQuickBtn"><svg viewBox="0 0 24 24" aria-hidden="true"><rect x="3" y="3" width="18" height="18" rx="3"/><circle cx="8.5" cy="8.5" r="1.5"/><path d="m21 15-5-5L5 21"/></svg><span>медиа</span></button>
+          <button type="button" class="ios-action-btn danger-btn" id="deleteChatBtn"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 7h16M10 11v6M14 11v6M6 7l1 14h10l1-14M9 7V4h6v3"/></svg><span id="deleteChatBtnLabel">очистить</span></button>
         </div>
       </div>
 
@@ -2141,6 +2350,10 @@
         <div class="profile-linked-channels" id="profileLinkedChannelsSection" style="display:none;">
           <div class="profile-linked-channels-title">Каналы профиля</div>
           <div id="profileLinkedChannelsList" style="display:flex;flex-direction:column;gap:9px;"></div>
+        </div>
+        <div class="vg-created-entities" id="profileCreatedEntitiesSection" style="display:none;">
+          <div class="profile-linked-channels-title">Проекты и сообщества</div>
+          <div class="vg-created-entities-list" id="profileCreatedEntitiesList"></div>
         </div>
 
         <button type="button" class="btn-primary" id="applyVerifyBtn" style="display:none;background:linear-gradient(135deg,#0a84ff,#5e5ce6);">
@@ -2496,36 +2709,27 @@
         return;
       }
 
-      // Mobile messenger navigation: a tap anywhere on a chat/search-result row
-      // opens that conversation. Previously, taps on the avatar/name were caught
-      // first by profile navigation, making rows feel like they could not be opened.
-      const mobileChatRow = ev.target.closest('.chat-item[data-chat-username]');
-      if (mobileChatRow && window.matchMedia('(max-width: 768px)').matches) {
-        const handle = mobileChatRow.dataset.chatUsername;
-        if (handle) {
-          ev.preventDefault();
-          ev.stopPropagation();
-          openChatWith(handle);
-          return;
-        }
-      }
-
-      // On larger screens avatars and usernames are direct profile links.
+      // Explicit avatar/name links always open the corresponding entity profile
+      // (person, group or channel) on desktop and mobile. Taps on the rest of a
+      // chat row still open the conversation, so mobile navigation remains easy.
       const avatarLink = ev.target.closest('[data-avatar-user]');
       if (avatarLink) {
-        ev.preventDefault();
-        ev.stopPropagation();
+        ev.preventDefault(); ev.stopPropagation();
         const handle = avatarLink.getAttribute('data-avatar-user');
         if (handle) openUserProfile(handle);
         return;
       }
       const userLink = ev.target.closest('[data-open-user]');
       if (userLink && !ev.target.closest('[data-ver-user]')) {
-        ev.preventDefault();
-        ev.stopPropagation();
+        ev.preventDefault(); ev.stopPropagation();
         const handle = userLink.getAttribute('data-open-user');
         if (handle) openUserProfile(handle);
         return;
+      }
+      const mobileChatRow = ev.target.closest('.chat-item[data-chat-username]');
+      if (mobileChatRow && window.matchMedia('(max-width: 768px)').matches) {
+        const handle = mobileChatRow.dataset.chatUsername;
+        if (handle) { ev.preventDefault(); ev.stopPropagation(); openChatWith(handle); return; }
       }
       msgContextWrap.classList.remove('open');
       document.getElementById('commentSendAsPopup').classList.remove('open');
@@ -2673,6 +2877,9 @@
        ========================================================================= */
     const sideDrawer = document.getElementById('sideDrawer');
     const drawerOverlay = document.getElementById('drawerOverlay');
+    document.querySelectorAll('button.icon-btn,button.vg-header-tool,button.vg-composer-tool,button.vg-folder-add').forEach(btn=>{
+      if(!btn.getAttribute('aria-label') && btn.title) btn.setAttribute('aria-label',btn.title);
+    });
 
     function openDrawer() {
       updateDrawerInfo();
@@ -2683,6 +2890,40 @@
     function closeDrawer() {
       drawerOverlay.classList.remove('open');
       sideDrawer.classList.remove('open');
+    }
+
+    function renderDrawerCommunities() {
+      const root = document.getElementById('drawerCommunitiesList');
+      const count = document.getElementById('drawerCommunitiesCount');
+      if (!root || !myProfile) return;
+      const me = String(myProfile.username || '').toLowerCase();
+      const items = Object.values(usersMap || {}).filter(entity => {
+        if (!entity || (!entity.is_group && !entity.is_channel)) return false;
+        if (entity.is_group) return entity.owner === me || (Array.isArray(entity.members) && entity.members.includes(me));
+        const admins = entity.admins && typeof entity.admins === 'object' ? entity.admins : {};
+        return entity.owner === me || (Array.isArray(entity.subscribers) && entity.subscribers.includes(me)) || Boolean(admins[me]);
+      }).sort((a,b) => {
+        const aOwner = a.owner === me ? 1 : 0, bOwner = b.owner === me ? 1 : 0;
+        return bOwner-aOwner || String(a.name||a.username).localeCompare(String(b.name||b.username),'ru');
+      });
+      if (count) count.textContent = String(items.length);
+      root.innerHTML = '';
+      if (!items.length) {
+        const empty = document.createElement('div'); empty.className = 'vg-drawer-empty'; empty.textContent = 'Создай группу или подпишись на канал — они появятся здесь.'; root.appendChild(empty); return;
+      }
+      items.slice(0, 12).forEach(entity => {
+        const row = document.createElement('div'); row.className = 'vg-drawer-entity'; row.dataset.drawerEntity = entity.username;
+        const avatar = document.createElement('div'); avatar.className = 'vg-drawer-entity-avatar'; avatar.setAttribute('data-avatar-user',entity.username); avatar.setAttribute('role','button'); avatar.setAttribute('tabindex','0'); avatar.setAttribute('aria-label','Профиль '+(entity.name||entity.username)); avatar.style.backgroundColor = entity.color || '#2aabee';
+        if (entity.avatar) { avatar.style.backgroundImage = `url("${entity.avatar}")`; avatar.textContent = ''; }
+        else { avatar.innerHTML = entity.is_group ? '<svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="9" cy="8" r="3"/><circle cx="17" cy="9" r="2.3"/><path d="M3 20v-1a6 6 0 0 1 12 0v1M16 15a4 4 0 0 1 5 4v1"/></svg>' : '<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 5h16v14H4zM8 9h8M8 13h5"/></svg>'; }
+        const body = document.createElement('div'); body.className = 'vg-drawer-entity-body';
+        const name = document.createElement('button'); name.type='button';name.className='vg-drawer-entity-name';name.dataset.openUser=entity.username;name.textContent=entity.name||entity.username;
+        const meta = document.createElement('span'); meta.className='vg-drawer-entity-meta'; meta.textContent = `${entity.is_group?'Группа':'Канал'} · @${entity.username}`;
+        body.append(name,meta);
+        const open = document.createElement('button');open.type='button';open.className='vg-drawer-entity-open';open.title='Открыть чат';open.setAttribute('aria-label','Открыть '+(entity.name||entity.username));open.innerHTML='<svg viewBox="0 0 24 24" aria-hidden="true"><path d="m9 5 7 7-7 7"/></svg>';open.addEventListener('click',ev=>{ev.stopPropagation();closeDrawer();openChatWith(entity.username);});
+        row.append(avatar,body,open);row.addEventListener('click',ev=>{if(ev.target.closest('[data-avatar-user],[data-open-user],.vg-drawer-entity-open'))return;closeDrawer();openChatWith(entity.username);});root.appendChild(row);
+      });
+      if (items.length > 12) { const more=document.createElement('button');more.type='button';more.className='vg-drawer-more';more.textContent=`Показать все · ${items.length}`;more.addEventListener('click',()=>{closeDrawer();vgOpenDirectory('all');});root.appendChild(more); }
     }
 
     function updateDrawerInfo() {
@@ -2703,7 +2944,7 @@
       }
       document.getElementById('drawerUserIdPill').textContent = `ID: ${enriched.uid}`;
       document.getElementById('drawerUserName').innerHTML = `<span>${escapeHtml(enriched.name)}</span> ${renderBadgesHtml(enriched)}`;
-      document.getElementById('drawerCopyUsernameBtn').innerHTML = `@${escapeHtml(enriched.username)} <span style="font-size:11px;opacity:0.8;">📋</span>`;
+      document.getElementById('drawerCopyUsernameBtn').innerHTML = `@${escapeHtml(enriched.username)} <svg class="vg-copy-mini-icon" viewBox="0 0 24 24" aria-hidden="true"><rect x="8" y="8" width="12" height="12" rx="2"/><path d="M16 8V5a2 2 0 0 0-2-2H5a2 2 0 0 0-2 2v9a2 2 0 0 0 2 2h3"/></svg>`;
       document.getElementById('drawerUserMeta').textContent = `${enriched.phone} • ${enriched.email}`;
 
       // Отрисовка всех добавленных аккаунтов
@@ -2731,6 +2972,7 @@
         });
         accContainer.appendChild(row);
       });
+      renderDrawerCommunities();
     }
 
     document.getElementById('drawerCopyUsernameBtn').addEventListener('click', () => {
@@ -2753,10 +2995,27 @@
     drawerOverlay.addEventListener('click', closeDrawer);
     document.getElementById('drawerAvatar').addEventListener('click', () => { closeDrawer(); openMyProfileModal(); });
     document.getElementById('drawerMyProfileBtn').addEventListener('click', () => { closeDrawer(); openMyProfileModal(); });
+    document.getElementById('drawerCreateGroupBtn').addEventListener('click', () => { closeDrawer(); vgOpenCreateGroupModal(); });
     document.getElementById('drawerCreateChannelBtn').addEventListener('click', () => { closeDrawer(); openChannelModal(null); });
+    document.getElementById('drawerAppsBtn').addEventListener('click', () => { closeDrawer(); vgOpenModal('vgApplicationsModal'); });
+    document.getElementById('drawerBrowseCommunitiesBtn').addEventListener('click', () => { closeDrawer(); vgOpenDirectory('all'); });
+    document.getElementById('vgAppsInstallBtn').addEventListener('click', () => { vgCloseModal('vgApplicationsModal'); const installBtn=document.getElementById('installPwaBtn'); if(installBtn) installBtn.click(); else vgToast('Установка','Открой меню браузера и выбери «Установить приложение» или «Добавить на экран Домой».'); });
     document.getElementById('drawerSavedMsgsBtn').addEventListener('click', () => { closeDrawer(); if (myProfile) openChatWith(myProfile.username); });
     document.getElementById('drawerOpenVerifyBotBtn').addEventListener('click', () => { closeDrawer(); openChatWith('verify_bot'); });
-    document.getElementById('drawerPremiumBtn').addEventListener('click', () => { closeDrawer(); openMyProfileModal(); });
+    document.getElementById('drawerPremiumBtn').addEventListener('click', () => { closeDrawer(); vgSetProfileSettingsTab('status'); openMyProfileModal(); vgSetProfileSettingsTab('status'); });
+    document.getElementById('vgProfileTabs')?.addEventListener('click', ev => {
+      const tab = ev.target.closest('[data-profile-tab]'); if (!tab) return;
+      const target = tab.dataset.profileTab;
+      document.querySelectorAll('#vgProfileTabs [data-profile-tab]').forEach(b=>b.classList.toggle('active',b===tab));
+      document.querySelectorAll('#myProfileModal [data-profile-panel]').forEach(panel=>{panel.hidden=panel.dataset.profilePanel!==target;});
+      const scroll=document.querySelector('#myProfileModal .tg-settings-scroll'); if(scroll) scroll.scrollTop=0;
+    });
+    function vgSetProfileSettingsTab(tabName='profile') {
+      const root=document.getElementById('vgProfileTabs'); if(!root) return;
+      root.querySelectorAll('[data-profile-tab]').forEach(b=>b.classList.toggle('active',b.dataset.profileTab===tabName));
+      document.querySelectorAll('#myProfileModal [data-profile-panel]').forEach(panel=>{panel.hidden=panel.dataset.profilePanel!==tabName;});
+    }
+    document.getElementById('drawerMyProfileBtn').addEventListener('click', () => vgSetProfileSettingsTab('profile'));
 
     document.getElementById('drawerWipeServerBtn').addEventListener('click', async () => {
       if (!confirm('Очистить все чаты и каналы? Ваши аккаунты останутся.')) return;
@@ -2846,7 +3105,7 @@
       } else {
         btn.style.backgroundImage = 'none';
         btn.style.backgroundColor = ident.color || '#0a84ff';
-        btn.textContent = ident.is_channel ? '📢' : getInitials(ident.name);
+        btn.innerHTML = ident.is_channel ? '<svg class="vg-avatar-type-glyph" viewBox="0 0 24 24" aria-hidden="true"><path d="M4 5h16v14H4zM8 9h8M8 13h5"/></svg>' : escapeHtml(getInitials(ident.name));
       }
     }
 
@@ -2860,7 +3119,7 @@
         row.className = 'send-as-option' + (ident.username === currentCommentSendAsUsername ? ' selected' : '');
         const avBg = ident.avatar ? `background-image:url('${ident.avatar}')` : `background-color:${ident.color || '#0a84ff'}`;
         row.innerHTML = `
-          <div class="avatar" style="width:30px;height:30px;font-size:12px;${avBg}">${ident.avatar ? '' : (ident.is_channel ? '📢' : getInitials(ident.name))}</div>
+          <div class="avatar" style="width:30px;height:30px;font-size:12px;${avBg}">${ident.avatar ? '' : (ident.is_channel ? '<svg class="vg-avatar-type-glyph" viewBox="0 0 24 24" aria-hidden="true"><path d="M4 5h16v14H4zM8 9h8M8 13h5"/></svg>' : escapeHtml(getInitials(ident.name)))}</div>
           <div style="flex:1;min-width:0;">
             <div style="font-size:13px;font-weight:700;color:#fff;display:flex;align-items:center;gap:4px;"><span>${escapeHtml(ident.name)}</span>${renderBadgesHtml(ident)}</div>
             <div style="font-size:11px;color:var(--text-secondary);">${ident.is_channel ? 'Канал' : 'Личный аккаунт'} • @${escapeHtml(ident.username)}</div>
@@ -2942,7 +3201,7 @@
       const fallback = document.createElement('div');
       fallback.className = 'ios-toast-avatar';
       fallback.style.backgroundColor = senderProfile?.color || '#5e5ce6';
-      fallback.textContent = senderProfile?.is_channel ? '📢' : getInitials(senderProfile?.name || title);
+      fallback.innerHTML = senderProfile?.is_channel ? '<svg class="vg-avatar-type-glyph" viewBox="0 0 24 24" aria-hidden="true"><path d="M4 5h16v14H4zM8 9h8M8 13h5"/></svg>' : escapeHtml(getInitials(senderProfile?.name || title));
       return fallback;
     }
 
@@ -3542,7 +3801,7 @@
         const isSelf = peer.username === me;
         const online = !isSelf && !peer.is_channel && peer.privacy !== 'nobody' && (Date.now() - Number(peer.last_seen || 0)) < 6500;
         const avatarBg = peer.avatar ? `background-image:url('${peer.avatar}')` : `background-color:${peer.color}`;
-        const defaultIcon = isSelf ? '🔖' : (peer.is_bot ? '🤖' : (peer.is_channel ? '📢' : (peer.is_group ? '👥' : getInitials(peer.name))));
+        const defaultIcon = isSelf ? '☆' : getInitials(peer.name || peer.username);
 
         let outTicks = '';
         if (lastMsg && !peer.is_channel && lastMsg.sender === me) {
@@ -3559,7 +3818,7 @@
           <div class="chat-info">
             <div class="chat-top">
               <div class="chat-name">
-                ${peer.is_channel ? '<span>📢</span>' : ''}
+                ${peer.is_channel ? '<span class="vg-entity-type-icon" title="Канал"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 5h16v14H4zM8 9h8M8 13h5"/></svg></span>' : peer.is_group ? '<span class="vg-entity-type-icon" title="Группа"><svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="9" cy="8" r="3"/><circle cx="17" cy="9" r="2.3"/><path d="M3 20v-1a6 6 0 0 1 12 0v1M16 15a4 4 0 0 1 5 4v1"/></svg></span>' : ''}
                 <span class="user-nav-link" data-open-user="${escapeHtml(peer.username)}" title="Открыть профиль">${escapeHtml(peer.name)}</span>
                 ${renderBadgesHtml(peer)} ${(pinsMap[`chatlist:${me}`] || []).includes(peer.username) ? '<span title="Закреплённый чат">📌</span>' : ''}
               </div>
@@ -3583,6 +3842,9 @@
         chatListEl.appendChild(item);
       });
 
+      renderDrawerCommunities();
+      if (document.getElementById('vgDirectoryModal')?.classList.contains('open')) renderVgDirectory();
+
       if (cleanQuery.length >= 2) {
         const globalMatches = Object.values(usersMap).map(enrichEntity).filter(u =>
           !conversations.some(c => c.peer.username === u.username) &&
@@ -3601,9 +3863,9 @@
             gItem.dataset.chatUsername = u.username;
             const avatarBg = u.avatar ? `background-image:url('${u.avatar}')` : `background-color:${u.color}`;
             gItem.innerHTML = `
-              <div class="avatar clickable-avatar" data-avatar-user="${escapeHtml(u.username)}" role="button" tabindex="0" aria-label="Открыть профиль @${escapeHtml(u.username)}" style="${avatarBg}">${u.avatar ? '' : (u.is_channel ? '📢' : getInitials(u.name))}</div>
+              <div class="avatar clickable-avatar" data-avatar-user="${escapeHtml(u.username)}" role="button" tabindex="0" aria-label="Открыть профиль @${escapeHtml(u.username)}" style="${avatarBg}">${u.avatar ? '' : getInitials(u.name || u.username)}</div>
               <div class="chat-info">
-                <div class="chat-name"><span class="user-nav-link" data-open-user="${escapeHtml(u.username)}" title="Открыть профиль">${u.is_channel ? '📢 ' : ''}${escapeHtml(u.name)}</span> ${renderBadgesHtml(u)}</div>
+                <div class="chat-name"><span class="user-nav-link" data-open-user="${escapeHtml(u.username)}" title="Открыть профиль">${u.is_channel ? '<span class="vg-entity-type-icon" title="Канал"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 5h16v14H4zM8 9h8M8 13h5"/></svg></span>' : u.is_group ? '<span class="vg-entity-type-icon" title="Группа"><svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="9" cy="8" r="3"/><circle cx="17" cy="9" r="2.3"/><path d="M3 20v-1a6 6 0 0 1 12 0v1M16 15a4 4 0 0 1 5 4v1"/></svg></span>' : ''}${escapeHtml(u.name)}</span> ${renderBadgesHtml(u)}</div>
                 <div class="chat-preview"><span class="user-nav-link" data-open-user="${escapeHtml(u.username)}">@${escapeHtml(u.username)}</span> • ID: ${u.uid}</div>
               </div>
             `;
@@ -3622,8 +3884,11 @@
     function openChatWith(peerUsername) {
       const u = String(peerUsername || '').trim().toLowerCase().replace(/^@+/, '');
       if (!u) return;
+      const targetEntity=usersMap[u];
+      const viewer=String(myProfile?.username||'').toLowerCase();
+      if(targetEntity?.is_group && !(targetEntity.owner===viewer || (targetEntity.members||[]).includes(viewer))){openUserProfile(u);return;}
       if (u !== 'verify_bot' && (!usersMap[u] && u !== (myProfile?.username || '').toLowerCase())) {
-        showCustomIosBanner('Не найдено', `Пользователь или канал @${u} не найден`);
+        showCustomIosBanner('Не найдено', `Пользователь, группа или канал @${u} не найден`);
         return;
       }
       if (!openedPeers.includes(u)) openedPeers.push(u);
@@ -3653,9 +3918,9 @@
 
       const avatarBg = peer.avatar ? `background-image:url('${peer.avatar}')` : `background-color:${peer.color}`;
       activeChatAvatar.style.cssText = `width:38px;height:38px;font-size:15px;cursor:pointer;${avatarBg}`;
-      activeChatAvatar.textContent = peer.avatar ? '' : (isBotChat ? '🤖' : (peer.is_channel ? '📢' : getInitials(peer.name)));
+      activeChatAvatar.textContent = peer.avatar ? '' : getInitials(peer.name || peer.username);
 
-      activeChatName.innerHTML = `${peer.is_channel ? '<span>📢</span>' : (peer.is_group ? '<span>👥</span>' : '')}<span class="user-nav-link" data-open-user="${escapeHtml(peer.username)}" title="Открыть профиль">${escapeHtml(peer.name)}</span> ${renderBadgesHtml(peer)}`;
+      activeChatName.innerHTML = `${peer.is_channel ? '<span class="vg-entity-type-icon" title="Канал"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 5h16v14H4zM8 9h8M8 13h5"/></svg></span>' : (peer.is_group ? '<span class="vg-entity-type-icon" title="Группа"><svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="9" cy="8" r="3"/><circle cx="17" cy="9" r="2.3"/><path d="M3 20v-1a6 6 0 0 1 12 0v1M16 15a4 4 0 0 1 5 4v1"/></svg></span>' : '')}<span class="user-nav-link" data-open-user="${escapeHtml(peer.username)}" title="Открыть профиль">${escapeHtml(peer.name)}</span> ${renderBadgesHtml(peer)}`;
       const peerTypingNow = !peer.is_channel && !isBotChat && peer.typing_to === me && (Date.now() - Number(peer.typing_time || 0) < 5000);
       activeChatStatus.textContent = peerTypingNow
         ? 'печатает…'
@@ -3673,7 +3938,12 @@
         verifyBotPanel.classList.remove('active');
       }
 
-      if (peer.is_channel) {
+      const isGroupMember = Boolean(peer.is_group && ((peer.members || []).includes(me) || peer.owner === me));
+      if (peer.is_group && !isGroupMember) {
+        headerSubBtn.style.display='none';messageForm.style.display='none';channelReadonlyBar.style.display='flex';
+        bottomChannelSubBtn.textContent=`Вступить в группу «${peer.name}»`;
+        messageInput.placeholder='Вступи в группу, чтобы отправлять сообщения';
+      } else if (peer.is_channel) {
         const myPerms = getChannelAdminPerms(peer, me);
         const canPost = Boolean(myPerms && myPerms.can_post);
         const isSub = (peer.subscribers || []).includes(me) || peer.owner === me;
@@ -3747,7 +4017,7 @@
         if (peer.is_group && !isOut) {
           const senderProfile = getPeerObject(msg.sender);
           const senderBg = senderProfile.avatar ? `background-image:url('${senderProfile.avatar}')` : `background-color:${senderProfile.color}`;
-          groupHeaderHtml = `<div class="vg-group-sender"><span class="avatar" data-avatar-user="${escapeHtml(senderProfile.username)}" style="${senderBg};width:21px;height:21px;font-size:9px;display:inline-flex;vertical-align:middle;margin-right:5px;cursor:pointer;">${senderProfile.avatar ? '' : escapeHtml(senderProfile.is_channel?'📢':getInitials(senderProfile.name))}</span><span data-open-user="${escapeHtml(senderProfile.username)}" class="user-nav-link">${escapeHtml(senderProfile.name)}</span>${(peer.admins||{})[msg.sender] ? '<span class="vg-group-admin-tag">админ</span>' : ''}</div>`;
+          groupHeaderHtml = `<div class="vg-group-sender"><span class="avatar" data-avatar-user="${escapeHtml(senderProfile.username)}" style="${senderBg};width:21px;height:21px;font-size:9px;display:inline-flex;vertical-align:middle;margin-right:5px;cursor:pointer;">${senderProfile.avatar ? '' : escapeHtml(getInitials(senderProfile.name || senderProfile.username))}</span><span data-open-user="${escapeHtml(senderProfile.username)}" class="user-nav-link">${escapeHtml(senderProfile.name)}</span>${(peer.admins||{})[msg.sender] ? '<span class="vg-group-admin-tag">админ</span>' : ''}</div>`;
         }
 
         let replyQuoteHtml = '';
@@ -3948,7 +4218,7 @@
           chAv.tabIndex = 0;
           chAv.setAttribute('aria-label', `Открыть профиль @${peer.username}`);
           chAv.style.cssText = `width:36px;height:36px;font-size:14px;cursor:pointer;${avatarBg}`;
-          chAv.textContent = peer.avatar ? '' : '📢';
+          chAv.textContent = peer.avatar ? '' : getInitials(peer.name || peer.username);
           rowWrap.appendChild(chAv);
           rowWrap.appendChild(el);
           messagesContainer.appendChild(rowWrap);
@@ -4004,9 +4274,9 @@
       const originCard = document.createElement('div');
       originCard.style.cssText = 'display:flex;gap:10px;align-items:center;padding:9px 12px;background:rgba(10,132,255,0.1);border-left:3px solid #0a84ff;border-radius:12px;margin-bottom:6px;';
       originCard.innerHTML = `
-        <div class="avatar clickable-avatar" data-avatar-user="${escapeHtml(chObj.username)}" role="button" tabindex="0" aria-label="Открыть профиль канала @${escapeHtml(chObj.username)}" style="width:34px;height:34px;font-size:13px;cursor:pointer;${chAvBg}">${chObj.avatar ? '' : '📢'}</div>
+        <div class="avatar clickable-avatar" data-avatar-user="${escapeHtml(chObj.username)}" role="button" tabindex="0" aria-label="Открыть профиль канала @${escapeHtml(chObj.username)}" style="width:34px;height:34px;font-size:13px;cursor:pointer;${chAvBg}">${chObj.avatar ? '' : getInitials(chObj.name || chObj.username)}</div>
         <div style="flex:1;min-width:0;">
-          <div style="font-size:12.5px;font-weight:700;color:#64d2ff;display:flex;align-items:center;gap:4px;"><span class="user-nav-link" data-open-user="${escapeHtml(chObj.username)}">📢 ${escapeHtml(chObj.name)}</span>${renderBadgesHtml(chObj)}</div>
+          <div style="font-size:12.5px;font-weight:700;color:#64d2ff;display:flex;align-items:center;gap:4px;"><span class="user-nav-link" data-open-user="${escapeHtml(chObj.username)}"><span class="vg-entity-type-icon"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 5h16v14H4zM8 9h8M8 13h5"/></svg></span>${escapeHtml(chObj.name)}</span>${renderBadgesHtml(chObj)}</div>
           <div style="font-size:12px;color:#dfe6e9;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">${escapeHtml(post.text || 'Медиа-пост канала')}</div>
         </div>
       `;
@@ -4018,10 +4288,10 @@
         const row = document.createElement('div');
         row.className = 'comment-bubble';
         row.innerHTML = `
-          <div class="avatar clickable-avatar" data-avatar-user="${escapeHtml(senderObj.username)}" role="button" tabindex="0" aria-label="Открыть профиль @${escapeHtml(senderObj.username)}" style="width:34px;height:34px;font-size:12px;cursor:pointer;${avBg}">${senderObj.avatar ? '' : (senderObj.is_channel ? '📢' : getInitials(senderObj.name))}</div>
+          <div class="avatar clickable-avatar" data-avatar-user="${escapeHtml(senderObj.username)}" role="button" tabindex="0" aria-label="Открыть профиль @${escapeHtml(senderObj.username)}" style="width:34px;height:34px;font-size:12px;cursor:pointer;${avBg}">${senderObj.avatar ? '' : getInitials(senderObj.name || senderObj.username)}</div>
           <div class="comment-card">
             <div class="comment-author">
-              ${senderObj.is_channel ? '<span>📢</span>' : ''}
+              ${senderObj.is_channel ? '<span class="vg-entity-type-icon"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 5h16v14H4zM8 9h8M8 13h5"/></svg></span>' : ''}
               <span class="user-nav-link" data-open-user="${escapeHtml(senderObj.username)}">${escapeHtml(senderObj.name)}</span>
               ${renderBadgesHtml(senderObj)}
               <span style="margin-left:auto;font-size:10.5px;color:var(--text-secondary);">${formatTime(c.time)}</span>
@@ -4105,7 +4375,7 @@
         chAvatarPreview.style.backgroundImage = 'none';
         chAvatarPreview.style.backgroundColor = selectedChColor;
         const nm = chNameInput.value.trim();
-        chAvatarPreview.textContent = nm ? getInitials(nm) : '📢';
+        if (nm) chAvatarPreview.textContent = getInitials(nm); else chAvatarPreview.innerHTML = '<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 5h16v14H4zM8 9h8M8 13h5"/></svg>';
       }
     }
 
@@ -4395,7 +4665,16 @@
       await pollServer();
     });
 
-    bottomChannelSubBtn.addEventListener('click', () => headerSubBtn.click());
+    bottomChannelSubBtn.addEventListener('click', async () => {
+      const peer=activePeer?usersMap[activePeer]:null;
+      if(peer?.is_group){
+        if(peer.is_public===false){vgToast('Группа приватная','Нужна ссылка-приглашение от участника.');return;}
+        const r=await fetch('/api/group/join',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({username:myProfile.username,group:activePeer})});
+        const d=await r.json().catch(()=>({}));if(!r.ok){vgToast('Не удалось вступить',d.error||'');return;}
+        await pollServer();openChatWith(activePeer);vgToast('Ты вступил в группу',d.group?.name||'');return;
+      }
+      headerSubBtn.click();
+    });
 
     function openMsgContextMenu(x, y, msg) {
       selectedContextMsg = msg;
@@ -4670,7 +4949,7 @@
         is_verified: actuallyVerified
       };
       tgHeroLiveName.innerHTML = `<span>${escapeHtml(displayName)}</span> ${renderBadgesHtml(tempObj)}`;
-      tgHeroPhoneEmail.innerHTML = `@${escapeHtml(myProfile.username)} 📋 • ID: ${myProfile.uid} • ${escapeHtml(myPhoneInput.value.trim())}`;
+      tgHeroPhoneEmail.innerHTML = `@${escapeHtml(myProfile.username)} <svg class="vg-copy-mini-icon" viewBox="0 0 24 24" aria-hidden="true"><rect x="8" y="8" width="12" height="12" rx="2"/><path d="M16 8V5a2 2 0 0 0-2-2H5a2 2 0 0 0-2 2v9a2 2 0 0 0 2 2h3"/></svg> • ID: ${myProfile.uid} • ${escapeHtml(myPhoneInput.value.trim())}`;
 
       if (actuallyVerified) {
         myProfileVerifyStateInfo.innerHTML = `<span style="color:#30d158;font-weight:700;">✅ Ваш аккаунт официально верифицирован!</span>`;
@@ -4728,7 +5007,7 @@
         const avatar = document.createElement(channel.avatar ? 'img' : 'div');
         avatar.className = 'profile-channel-option-avatar';
         if (channel.avatar) { avatar.src = channel.avatar; avatar.alt = ''; avatar.loading = 'lazy'; }
-        else avatar.textContent = '📢';
+        else avatar.textContent = getInitials(channel.name || channel.username);
         const main = document.createElement('div');
         main.className = 'profile-channel-option-main';
         const name = document.createElement('div');
@@ -4748,6 +5027,16 @@
       });
     }
 
+    function renderProfileCreatedEntities(profile) {
+      const section=document.getElementById('profileCreatedEntitiesSection');const root=document.getElementById('profileCreatedEntitiesList');
+      if(!section||!root)return;
+      if(!profile||profile.is_channel||profile.is_group||profile.is_bot){section.style.display='none';root.innerHTML='';return;}
+      const owner=String(profile.username||'').toLowerCase();
+      const items=Object.values(usersMap).filter(obj=>obj&&(obj.is_channel||obj.is_group)&&String(obj.owner||'').toLowerCase()===owner).sort((a,b)=>String(a.name||'').localeCompare(String(b.name||''),'ru'));
+      if(!items.length){section.style.display='none';root.innerHTML='';return;}
+      section.style.display='block';root.innerHTML='';
+      items.forEach(entity=>{const row=document.createElement('button');row.type='button';row.className='vg-created-entity-row';const av=document.createElement('span');av.className='vg-created-entity-avatar';av.style.backgroundColor=entity.color||'#2aabee';if(entity.avatar){av.style.backgroundImage=`url("${entity.avatar}")`;av.textContent='';}else av.innerHTML=entity.is_group?'<svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="9" cy="8" r="3"/><circle cx="17" cy="9" r="2.3"/><path d="M3 20v-1a6 6 0 0 1 12 0v1M16 15a4 4 0 0 1 5 4v1"/></svg>':'<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 5h16v14H4zM8 9h8M8 13h5"/></svg>';const info=document.createElement('span');info.className='vg-created-entity-info';const title=document.createElement('strong');title.textContent=entity.name||entity.username;const meta=document.createElement('small');meta.textContent=`${entity.is_group?'Группа':'Канал'} · @${entity.username} · ${entity.is_group?`${entity.member_count??(entity.members||[]).length} участников`:`${(entity.subscribers||[]).length} подписчиков`}`;info.append(title,meta);const arrow=document.createElement('span');arrow.className='vg-created-entity-arrow';arrow.textContent='›';row.append(av,info,arrow);row.addEventListener('click',()=>{peerProfileModal.classList.remove('open');openUserProfile(entity.username);});root.appendChild(row);});
+    }
     function renderProfileLinkedChannels(profile) {
       const section = document.getElementById('profileLinkedChannelsSection');
       const root = document.getElementById('profileLinkedChannelsList');
@@ -4772,7 +5061,7 @@
         const avatar = document.createElement(channel.avatar ? 'img' : 'div');
         avatar.className = 'profile-linked-channel-avatar';
         if (channel.avatar) { avatar.src = channel.avatar; avatar.alt = ''; avatar.loading = 'lazy'; }
-        else avatar.textContent = '📢';
+        else avatar.textContent = getInitials(channel.name || channel.username);
         const main = document.createElement('div');
         main.className = 'profile-linked-channel-main';
         const name = document.createElement('div');
@@ -4814,6 +5103,7 @@
 
     function openMyProfileModal() {
       if (!myProfile) return;
+      if (typeof vgSetProfileSettingsTab === 'function') vgSetProfileSettingsTab('profile');
       selectedProfileColor = myProfile.color || '#0a84ff';
       selectedBase64Avatar = myProfile.avatar || '';
       selectedSticker = myProfile.sticker || 'star';
@@ -4944,6 +5234,8 @@
     // Профиль собеседника или канала (с копированием @username)
     const peerProfileModal = document.getElementById('peerProfileModal');
 
+    let vgProfilePreviewOnly = false;
+    let vgPreviewPreviousPeer = null;
     function openPeerProfile() {
       if (!activePeer || !myProfile) return;
       const me = myProfile.username.toLowerCase();
@@ -4958,14 +5250,27 @@
       } else {
         avatarEl.style.backgroundImage = 'none';
         avatarEl.style.backgroundColor = peer.color;
-        avatarEl.textContent = peer.is_channel ? '📢' : getInitials(peer.name);
+        avatarEl.textContent = getInitials(peer.name || peer.username);
       }
 
       document.getElementById('peerProfileName').innerHTML = `<span>${escapeHtml(peer.name)}</span> ${renderBadgesHtml(peer)}`;
-      document.getElementById('peerProfileUsername').textContent = `@${peer.username} • ID: ${peer.uid}`;
+      const entityKind = peer.is_group ? 'Группа' : peer.is_channel ? 'Канал' : peer.is_bot ? 'Бот' : 'Аккаунт';
+      document.getElementById('peerProfileUsername').textContent = `${entityKind} · @${peer.username} · ID: ${peer.uid}`;
+      document.getElementById('peerUsernameLabel').textContent = `${entityKind} · имя пользователя и ID (нажмите для копирования)`;
+      document.getElementById('peerBioLabel').textContent = peer.is_group ? 'описание группы' : peer.is_channel ? 'описание канала' : 'о себе';
       document.getElementById('peerProfileBio').textContent = peer.cleanBio || peer.bio;
-      document.getElementById('peerProfileStatus').textContent = getPresenceLabel(peer, me);
+      const phoneRow=document.getElementById('peerPhoneRow');
+      if(phoneRow){const safePhone=(!peer.is_group&&!peer.is_channel&&peer.privacy!=='nobody'&&peer.phone&&peer.username!==me);phoneRow.style.display=safePhone?'block':'none';document.getElementById('peerProfilePhone').textContent=safePhone?peer.phone:'';}
+      if(peer.is_group) document.getElementById('peerProfileStatus').textContent = `${peer.is_public===false?'Приватная':'Публичная'} группа · ${peer.member_count??(peer.members||[]).length} участников`;
+      else if(peer.is_channel) document.getElementById('peerProfileStatus').textContent = `Канал · ${(peer.subscribers||[]).length} подписчиков`;
+      else document.getElementById('peerProfileStatus').textContent = getPresenceLabel(peer, me);
+      const isGroupMember=Boolean(peer.is_group && ((peer.members||[]).includes(me)||peer.owner===me));
+      const manageGroup=Boolean(peer.is_group&&vgCanManageGroup(peer));
+      document.getElementById('iosManageGroupQuickBtn').style.display=manageGroup?'flex':'none';
+      document.getElementById('iosJoinGroupQuickBtn').style.display=peer.is_group&&!isGroupMember&&peer.is_public!==false?'flex':'none';
+      document.getElementById('iosEditChannelQuickBtn').style.display='none';
       renderProfileLinkedChannels(peer);
+      renderProfileCreatedEntities(peer);
 
       const verRow = document.getElementById('peerVerifiedRow');
       const isVer = Boolean(peer.is_verified);
@@ -4981,8 +5286,8 @@
         verRow.style.display = 'none';
       }
 
-      document.getElementById('iosEditChannelQuickBtn').style.display = canManage ? 'flex' : 'none';
-      document.getElementById('applyVerifyBtn').style.display = (canManage && !isVer) ? 'block' : 'none';
+      document.getElementById('iosEditChannelQuickBtn').style.display = peer.is_channel && canManage ? 'flex' : 'none';
+      document.getElementById('applyVerifyBtn').style.display = (peer.is_channel && canManage && !isVer) ? 'block' : 'none';
       peerProfileModal.classList.add('open');
     }
 
@@ -4990,24 +5295,14 @@
       const handle = String(username || '').trim().toLowerCase().replace(/^@+/, '');
       if (!handle || !myProfile) return;
       const me = String(myProfile.username || '').toLowerCase();
-      if (handle === me) {
-        peerProfileModal.classList.remove('open');
-        openMyProfileModal();
-        return;
-      }
-      if (!usersMap[handle]) {
-        await pollServer();
-      }
-      if (!usersMap[handle] && handle !== 'verify_bot') {
-        showCustomIosBanner('Профиль не найден', `Аккаунт или канал @${handle} не найден на сервере.`);
-        return;
-      }
-      // Keep existing navigation semantics: open the selected conversation in the
-      // background, then present its profile on top, consistent on desktop and iOS.
-      const commentsOverlay = document.getElementById('commentsModal');
-      commentsOverlay?.classList.remove('open');
-      openChatWith(handle);
-      openPeerProfile();
+      if (handle === me) { peerProfileModal.classList.remove('open'); vgSetProfileSettingsTab('profile'); openMyProfileModal(); return; }
+      if (!usersMap[handle]) await pollServer();
+      const entity=usersMap[handle];
+      if (!entity && handle !== 'verify_bot') { showCustomIosBanner('Профиль не найден', `Аккаунт, группа или канал @${handle} не найден на сервере.`); return; }
+      const commentsOverlay = document.getElementById('commentsModal'); commentsOverlay?.classList.remove('open');
+      const isNonMemberPublicGroup=Boolean(entity?.is_group && !(entity.members||[]).includes(me) && entity.owner!==me);
+      if(isNonMemberPublicGroup){vgProfilePreviewOnly=true;vgPreviewPreviousPeer=activePeer;activePeer=handle;openPeerProfile();return;}
+      vgProfilePreviewOnly=false;vgPreviewPreviousPeer=null;openChatWith(handle);openPeerProfile();
     }
 
     document.getElementById('peerUsernameCell').addEventListener('click', () => {
@@ -5019,7 +5314,11 @@
 
     document.getElementById('openPeerProfileBtn').addEventListener('click', openPeerProfile);
     activeChatAvatar.addEventListener('click', openPeerProfile);
-    document.getElementById('closePeerProfileBtn').addEventListener('click', () => peerProfileModal.classList.remove('open'));
+    function vgClosePeerProfile() { peerProfileModal.classList.remove('open'); if(vgProfilePreviewOnly){activePeer=vgPreviewPreviousPeer;vgProfilePreviewOnly=false;vgPreviewPreviousPeer=null;if(activePeer)renderActiveChat(true);} }
+    document.getElementById('closePeerProfileBtn').addEventListener('click', vgClosePeerProfile);
+    peerProfileModal.addEventListener('click',ev=>{if(ev.target===peerProfileModal)vgClosePeerProfile();});
+    document.getElementById('iosManageGroupQuickBtn').addEventListener('click',()=>{const h=activePeer;peerProfileModal.classList.remove('open');vgOpenGroupManager(h);});
+    document.getElementById('iosJoinGroupQuickBtn').addEventListener('click',async()=>{const handle=activePeer;if(!myProfile||!handle)return;const r=await fetch('/api/group/join',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({username:myProfile.username,group:handle})});const d=await r.json().catch(()=>({}));if(!r.ok){vgToast('Не удалось вступить',d.error||'');return;}vgProfilePreviewOnly=false;vgPreviewPreviousPeer=null;peerProfileModal.classList.remove('open');await pollServer();openedPeers.push(handle);openChatWith(handle);vgToast('Ты вступил в группу',d.group?.name||'');});
 
     document.getElementById('iosEditChannelQuickBtn').addEventListener('click', () => {
       peerProfileModal.classList.remove('open');
@@ -5425,10 +5724,15 @@
         ['Открыть отложенные сообщения', async()=>{await vgRenderScheduled(); vgOpenModal('vgScheduledListModal');}]
       ];
       const chatPeer = getPeerObject(handle);
+      rows.unshift(['Открыть профиль / информацию', async()=>{openUserProfile(handle);}]);
       if (chatPeer.is_group) {
         rows.unshift(['Ссылка-приглашение', async()=>{if(!chatPeer.invite_token){vgToast('Ссылка недоступна','Проверь серверные права.');return;}const link=location.origin+location.pathname+'?joinGroup='+encodeURIComponent(chatPeer.invite_token);try{await navigator.clipboard.writeText(link);vgToast('Ссылка скопирована',link);}catch(_){prompt('Ссылка-приглашение',link);}}]);
         rows.unshift(['Управление группой…', async()=>{await vgManageGroup(handle);}]);
-        rows.unshift(['Покинуть группу', async()=>{if(!confirm('Покинуть эту группу?'))return;await fetch('/api/delete_chat',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({me:myProfile.username,peer:handle})});if(activePeer===handle){activePeer=null;appEl.classList.remove('mobile-chat-open');}await pollServer();}]);
+        if (chatPeer.owner === String(myProfile?.username||'').toLowerCase()) {
+          rows.unshift(['Удалить группу…', async()=>{if(!confirm('Удалить группу навсегда? Все сообщения этой группы будут удалены.'))return;const r=await fetch('/api/group/delete',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({actor:myProfile.username,group:handle})});const d=await r.json().catch(()=>({}));if(!r.ok){vgToast('Не удалось удалить группу',d.error||'');return;}openedPeers=openedPeers.filter(x=>x!==handle);if(activePeer===handle){activePeer=null;appEl.classList.remove('mobile-chat-open');}await pollServer();vgToast('Группа удалена','@'+handle);}]);
+        } else {
+          rows.unshift(['Покинуть группу', async()=>{if(!confirm('Покинуть эту группу?'))return;const r=await fetch('/api/group/leave',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({actor:myProfile.username,group:handle})});const d=await r.json().catch(()=>({}));if(!r.ok){vgToast('Не удалось покинуть группу',d.error||'');return;}if(activePeer===handle){activePeer=null;appEl.classList.remove('mobile-chat-open');}openedPeers=openedPeers.filter(x=>x!==handle);await pollServer();vgToast('Ты покинул группу','@'+handle);}]);
+        }
       }
       rows.forEach(([label,fn])=>{const b=document.createElement('button');b.type='button';b.textContent=label;b.addEventListener('click',async ev=>{ev.stopPropagation();pop.remove();vgContextPopover=null;await fn();});pop.appendChild(b);});
       document.body.appendChild(pop);
@@ -5973,37 +6277,150 @@
     document.getElementById('vgCallMinimizeBtn').addEventListener('click',vgMinimizeCall);
     vgCallFloatBtn.addEventListener('click',vgOpenCallModal);
     document.getElementById('vgCallEnableAudio').addEventListener('click',async()=>{try{if(vgCall.kind==='video')await vgRemoteVideo.play();else await vgRemoteAudio.play();document.getElementById('vgCallEnableAudio').hidden=true;}catch(_){vgToast('Не удалось включить звук','Проверь звук устройства и разрешения браузера.');}});
-    document.getElementById('vgMuteCallBtn').addEventListener('click',()=>{const tracks=vgCall.stream?.getAudioTracks()||[];if(!tracks.length)return;const next=tracks.some(t=>t.enabled);tracks.forEach(t=>t.enabled=!next);const b=document.getElementById('vgMuteCallBtn');b.classList.toggle('is-off',next);b.querySelector('span:last-child').textContent=next?'Включить микрофон':'Микрофон';b.querySelector('.vg-call-action-icon').textContent=next?'×':'♩';});
-    document.getElementById('vgCameraCallBtn').addEventListener('click',()=>{const tracks=vgCall.stream?.getVideoTracks()||[];if(!tracks.length){vgToast('Это голосовой звонок','Чтобы использовать камеру, начни видеозвонок.');return;}const next=tracks.some(t=>t.enabled);tracks.forEach(t=>t.enabled=!next);const b=document.getElementById('vgCameraCallBtn');b.classList.toggle('is-off',next);b.querySelector('span:last-child').textContent=next?'Включить камеру':'Камера';b.querySelector('.vg-call-action-icon').textContent=next?'×':'▣';});
+    function vgCallActionGlyph(kind,disabled=false){const common='viewBox="0 0 24 24" aria-hidden="true"';if(kind==='mic')return `<svg ${common}>${disabled?'<path d="m3 3 18 18"/>':''}<rect x="9" y="3" width="6" height="12" rx="3"/><path d="M5 11a7 7 0 0 0 14 0M12 18v3m-4 0h8"/></svg>`;if(kind==='camera')return `<svg ${common}>${disabled?'<path d="m3 3 18 18"/>':''}<rect x="3" y="6" width="13" height="12" rx="2"/><path d="m16 10 5-3v10l-5-3"/></svg>`;return '';}
+    document.getElementById('vgMuteCallBtn').addEventListener('click',()=>{const tracks=vgCall.stream?.getAudioTracks()||[];if(!tracks.length)return;const next=tracks.some(t=>t.enabled);tracks.forEach(t=>t.enabled=!next);const b=document.getElementById('vgMuteCallBtn');b.classList.toggle('is-off',next);b.querySelector('span:last-child').textContent=next?'Включить микрофон':'Микрофон';b.querySelector('.vg-call-action-icon').innerHTML=vgCallActionGlyph('mic',next);});
+    document.getElementById('vgCameraCallBtn').addEventListener('click',()=>{const tracks=vgCall.stream?.getVideoTracks()||[];if(!tracks.length){vgToast('Это голосовой звонок','Чтобы использовать камеру, начни видеозвонок.');return;}const next=tracks.some(t=>t.enabled);tracks.forEach(t=>t.enabled=!next);const b=document.getElementById('vgCameraCallBtn');b.classList.toggle('is-off',next);b.querySelector('span:last-child').textContent=next?'Включить камеру':'Камера';b.querySelector('.vg-call-action-icon').innerHTML=vgCallActionGlyph('camera',next);});
     if(!vgCallPollTimer){vgPollCallSignals();vgCallPollTimer=setInterval(vgPollCallSignals,900);}
 
-    // Group chat creation, owner/admin tools, membership and invite-link join flow.
-    async function vgCreateGroupFlow() {
-      if (!myProfile) return;
-      const name = prompt('Название группы:'); if (!name || !name.trim()) return;
-      const defaultHandle = 'vg_group_' + Date.now().toString(36).replace(/[^a-z0-9]/g,'').slice(-12);
-      const handleInput = prompt('Username группы (латиница, цифры, _):', defaultHandle); if (!handleInput) return;
-      const handle = handleInput.trim().toLowerCase().replace(/^@+/, '');
-      const description = prompt('Описание группы (необязательно):', '') || '';
-      const memberText = prompt('Добавь участников через запятую (@username). Можно оставить пустым:', '') || '';
-      const members = memberText.split(/[\s,;]+/).map(x=>x.trim().replace(/^@+/, '').toLowerCase()).filter(Boolean);
-      const r = await fetch('/api/group/create',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({owner:myProfile.username,username:handle,name:name.trim(),description,members})});
-      const d = await r.json().catch(()=>({}));
-      if (!r.ok) { vgToast('Не удалось создать группу',d.error||'Проверь название и username.'); return; }
-      openedPeers.push(handle); await pollServer(); openChatWith(handle); vgToast('Группа создана','Ссылка-приглашение доступна в меню чата.');
+    // Public directory: shared navigation for user profiles, groups and channels.
+    let vgDirectoryFilter = 'all';
+    function vgOpenDirectory(filter='all') {
+      vgDirectoryFilter = filter;
+      document.querySelectorAll('#vgDirectoryFilters [data-directory-filter]').forEach(b=>b.classList.toggle('active',b.dataset.directoryFilter===filter));
+      const input=document.getElementById('vgDirectorySearch'); if(input) input.value='';
+      renderVgDirectory(); vgOpenModal('vgDirectoryModal');
+      setTimeout(()=>input?.focus({preventScroll:true}),80);
     }
+    function renderVgDirectory() {
+      const root=document.getElementById('vgDirectoryResults'); const summary=document.getElementById('vgDirectorySummary'); if(!root)return;
+      const query=String(document.getElementById('vgDirectorySearch')?.value||'').trim().toLowerCase().replace(/^@+/,'');
+      const me=String(myProfile?.username||'').toLowerCase();
+      const entities=Object.values(usersMap||{}).filter(entity=>{
+        if(!entity||!entity.username||entity.username==='verify_bot'&&vgDirectoryFilter==='person')return false;
+        const kind=entity.is_group?'group':entity.is_channel?'channel':'person';
+        if(vgDirectoryFilter!=='all'&&kind!==vgDirectoryFilter)return false;
+        if(entity.is_group&&entity.is_public===false&&entity.owner!==me&&!(entity.members||[]).includes(me))return false;
+        return !query || String(entity.username).toLowerCase().includes(query)||String(entity.name||'').toLowerCase().includes(query)||String(entity.cleanBio||entity.bio||'').toLowerCase().includes(query);
+      }).sort((a,b)=>{
+        const ak=a.is_group?'2':a.is_channel?'1':'0',bk=b.is_group?'2':b.is_channel?'1':'0';
+        return ak.localeCompare(bk)||String(a.name||a.username).localeCompare(String(b.name||b.username),'ru');
+      });
+      if(summary)summary.textContent=`Найдено: ${entities.length} · ${vgDirectoryFilter==='all'?'все типы':vgDirectoryFilter==='person'?'аккаунты':vgDirectoryFilter==='group'?'группы':'каналы'}`;
+      root.innerHTML='';
+      if(!entities.length){const empty=document.createElement('div');empty.className='vg-directory-empty';empty.innerHTML='<svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="10.5" cy="10.5" r="6.5"/><path d="m16 16 5 5"/></svg><strong>Ничего не найдено</strong><span>Измени запрос или выбери другой тип.</span>';root.appendChild(empty);return;}
+      entities.slice(0,100).forEach(entity=>{
+        const row=document.createElement('article');row.className='vg-directory-row';
+        const av=document.createElement('div');av.className='vg-directory-avatar';av.setAttribute('data-avatar-user',entity.username);av.setAttribute('role','button');av.setAttribute('tabindex','0');av.style.backgroundColor=entity.color||'#2aabee';
+        if(entity.avatar){av.style.backgroundImage=`url("${entity.avatar}")`;av.textContent='';}else {av.textContent=getInitials(entity.name||entity.username);}
+        const info=document.createElement('button');info.type='button';info.className='vg-directory-info';info.dataset.openUser=entity.username;
+        const title=document.createElement('strong');title.textContent=entity.name||entity.username;
+        const badge=document.createElement('span');badge.className='vg-directory-kind';badge.textContent=entity.is_group?'Группа':entity.is_channel?'Канал':'Аккаунт';
+        const meta=document.createElement('small');meta.textContent=`@${entity.username}${entity.is_group?` · ${entity.member_count??(entity.members||[]).length} участников`:entity.is_channel?` · ${(entity.subscribers||[]).length} подписчиков`:entity.uid?` · ID ${entity.uid}`:''}`;
+        info.append(title,badge,meta);
+        const action=document.createElement('button');action.type='button';action.className='vg-directory-action';
+        const isGroupMember=entity.is_group&&(entity.owner===me||(entity.members||[]).includes(me));
+        if(entity.is_group&&entity.is_public!==false&&!isGroupMember){action.textContent='Вступить';action.classList.add('primary');action.addEventListener('click',async()=>{action.disabled=true;try{const r=await fetch('/api/group/join',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({username:myProfile.username,group:entity.username})});const d=await r.json().catch(()=>({}));if(!r.ok)throw new Error(d.error||'Не удалось вступить');await pollServer();vgCloseModal('vgDirectoryModal');openedPeers.push(entity.username);openChatWith(entity.username);vgToast('Ты вступил в группу',entity.name||entity.username);}catch(e){vgToast('Не удалось вступить',e.message);}finally{action.disabled=false;}});}
+        else {action.textContent=entity.username===me?'Мой профиль':entity.is_group||entity.is_channel?'Открыть':'Написать';action.addEventListener('click',()=>{vgCloseModal('vgDirectoryModal');if(entity.username===me){openMyProfileModal();}else if(entity.is_group&&!isGroupMember){openUserProfile(entity.username);}else openChatWith(entity.username);});}
+        row.append(av,info,action);root.appendChild(row);
+      });
+      if(entities.length>100){const more=document.createElement('div');more.className='vg-directory-summary';more.textContent='Показаны первые 100 результатов. Уточни поиск для более точного списка.';root.appendChild(more);}
+    }
+    document.getElementById('vgDirectorySearch').addEventListener('input',renderVgDirectory);
+    document.getElementById('vgDirectoryFilters').addEventListener('click',ev=>{const b=ev.target.closest('[data-directory-filter]');if(!b)return;vgDirectoryFilter=b.dataset.directoryFilter;document.querySelectorAll('#vgDirectoryFilters [data-directory-filter]').forEach(x=>x.classList.toggle('active',x===b));renderVgDirectory();});
+
+    // Group chat creation, owner/admin tools, membership and invite-link join flow.
+    let vgCreateGroupAvatarData = '';
+    let vgManageGroupHandle = '';
+    let vgManageGroupAvatarData = '';
+    function vgOpenCreateGroupModal() {
+      if (!myProfile) return;
+      vgCreateGroupAvatarData='';
+      document.getElementById('vgCreateGroupForm').reset();
+      document.getElementById('vgCreateGroupAvatarPreview').innerHTML='<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 5v14M5 12h14"/></svg>';
+      document.getElementById('vgCreateGroupAvatarPreview').style.backgroundImage='none';
+      document.getElementById('vgCreateGroupUsername').value='vibe_group_'+Math.random().toString(36).slice(2,9);
+      vgOpenModal('vgCreateGroupModal');
+    }
+    async function vgReadOptimizedAvatar(file) {
+      if(!file || !/^image\/(png|jpeg|webp)$/.test(file.type)) throw new Error('Выбери изображение PNG, JPG или WEBP.');
+      const original=await new Promise((resolve,reject)=>{const reader=new FileReader();reader.onload=()=>resolve(String(reader.result||''));reader.onerror=()=>reject(new Error('Не удалось прочитать изображение.'));reader.readAsDataURL(file);});
+      const image=await new Promise((resolve,reject)=>{const img=new Image();img.onload=()=>resolve(img);img.onerror=()=>reject(new Error('Файл не является корректным изображением.'));img.src=original;});
+      const max=512, scale=Math.min(1,max/Math.max(image.width,image.height));
+      const canvas=document.createElement('canvas');canvas.width=Math.max(1,Math.round(image.width*scale));canvas.height=Math.max(1,Math.round(image.height*scale));
+      canvas.getContext('2d').drawImage(image,0,0,canvas.width,canvas.height);
+      const out=canvas.toDataURL('image/jpeg',0.86);
+      if(out.length>1_350_000) throw new Error('Изображение слишком большое. Выбери другое.');
+      return out;
+    }
+    document.getElementById('vgCreateGroupAvatarBtn').addEventListener('click',()=>document.getElementById('vgCreateGroupAvatarFile').click());
+    document.getElementById('vgCreateGroupAvatarFile').addEventListener('change',async ev=>{const file=ev.target.files?.[0];if(!file)return;try{vgCreateGroupAvatarData=await vgReadOptimizedAvatar(file);const el=document.getElementById('vgCreateGroupAvatarPreview');el.textContent='';el.style.backgroundImage=`url("${vgCreateGroupAvatarData}")`;}catch(e){vgToast('Не удалось установить аватар',e.message);}ev.target.value='';});
+    document.getElementById('vgCreateGroupUsername').addEventListener('input',ev=>{ev.target.value=ev.target.value.toLowerCase().replace(/[^a-z0-9_]/g,'').slice(0,32);});
+    document.getElementById('vgCreateGroupForm').addEventListener('submit',async ev=>{
+      ev.preventDefault();if(!myProfile)return;
+      const name=document.getElementById('vgCreateGroupName').value.trim();
+      const handle=document.getElementById('vgCreateGroupUsername').value.trim().toLowerCase().replace(/^@+/,'');
+      const description=document.getElementById('vgCreateGroupDescription').value.trim();
+      const memberText=document.getElementById('vgCreateGroupMembers').value;
+      const members=[...new Set(memberText.split(/[\s,;]+/).map(x=>x.trim().replace(/^@+/,'').toLowerCase()).filter(Boolean))];
+      if(!name||!/^[a-z0-9_]{3,32}$/.test(handle)){vgToast('Проверь данные','Название обязательно; username — 3–32 символа, латиница, цифры и _.');return;}
+      const button=document.getElementById('vgCreateGroupSubmit');button.disabled=true;button.textContent='Создаём…';
+      try{
+        const r=await fetch('/api/group/create',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({owner:myProfile.username,username:handle,name,description,members,is_public:document.getElementById('vgCreateGroupPrivacy').value==='public',avatar:vgCreateGroupAvatarData})});
+        const d=await r.json().catch(()=>({}));if(!r.ok)throw new Error(d.error||'Проверь название и username.');
+        vgCloseModal('vgCreateGroupModal');await pollServer();openedPeers.push(handle);openChatWith(handle);vgToast('Группа создана',`@${handle} · ссылка-приглашение доступна в настройках группы.`);
+      }catch(e){vgToast('Не удалось создать группу',e.message||'Попробуй ещё раз.');}
+      finally{button.disabled=false;button.textContent='Создать группу';}
+    });
+    async function vgCreateGroupFlow(){vgOpenCreateGroupModal();}
     document.getElementById('vgCreateGroupBtn').addEventListener('click',vgCreateGroupFlow);
     async function vgGroupMemberAction(handle,action,member) {
       const r=await fetch('/api/group/member',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({actor:myProfile.username,group:handle,action,member})});const d=await r.json().catch(()=>({}));
       if(!r.ok){vgToast('Не удалось изменить участников',d.error||'');return false;}await pollServer();vgToast('Группа обновлена',`@${member}`);return true;
     }
-    async function vgManageGroup(handle) {
-      const group=getPeerObject(handle);if(!group.is_group)return;
-      const action=prompt('Управление группой @'+handle+'\n1 — добавить участника\n2 — удалить участника\n3 — назначить администратора\n4 — снять администратора\n5 — настройки / медленный режим\n6 — скопировать приглашение\n\nВведи номер:','1');if(!action)return;
-      if(['1','2','3','4'].includes(action)) {const who=prompt('Username участника (@username):');if(!who)return;const member=who.trim().replace(/^@+/,'').toLowerCase();const act={'1':'add','2':'remove','3':'promote','4':'demote'}[action];await vgGroupMemberAction(handle,act,member);return;}
-      if(action==='5') {const name=prompt('Название группы:',group.name);if(name===null)return;const description=prompt('Описание:',group.cleanBio||group.bio||'');if(description===null)return;const slow=prompt('Медленный режим в секундах (0 = выключен, максимум 60):',String(group.slow_mode_seconds||0));if(slow===null)return;const r=await fetch('/api/group/settings',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({actor:myProfile.username,group:handle,name,description,slow_mode_seconds:Number(slow)})});const d=await r.json().catch(()=>({}));if(!r.ok){vgToast('Настройки не сохранены',d.error||'');return;}await pollServer();vgToast('Настройки группы сохранены','');return;}
-      if(action==='6') {const link=location.origin+location.pathname+'?joinGroup='+encodeURIComponent(group.invite_token||'');try{await navigator.clipboard.writeText(link);vgToast('Приглашение скопировано',link);}catch(_){prompt('Приглашение',link);}}
+    function vgCanManageGroup(group) { const me=String(myProfile?.username||'').toLowerCase();return Boolean(group&&(group.owner===me||(group.admins?.[me]?.manage_members)||(group.admins?.[me]?.manage_settings))); }
+    function vgRenderGroupMembers(group) {
+      const root=document.getElementById('vgGroupMemberList');root.innerHTML='';
+      const members=Array.isArray(group.members)?group.members:[];document.getElementById('vgManageMembersCount').textContent=String(group.member_count??members.length);
+      const me=String(myProfile?.username||'').toLowerCase();const canManage=vgCanManageGroup(group);const owner=group.owner===me;
+      document.getElementById('vgGroupAddMemberInput').disabled=!canManage;document.getElementById('vgGroupAddMemberBtn').disabled=!canManage;
+      document.getElementById('vgManageMembersHint').textContent=canManage?'Добавляй людей и назначай администраторов':'Список участников группы';
+      members.forEach(handle=>{
+        const member=usersMap[handle]||{username:handle,name:handle,color:'#2aabee'};const row=document.createElement('div');row.className='vg-group-member-row';
+        const avatar=document.createElement('div');avatar.className='vg-group-member-avatar';avatar.style.backgroundColor=member.color||'#2aabee';if(member.avatar){avatar.style.backgroundImage=`url("${member.avatar}")`;avatar.textContent='';}else avatar.textContent=getInitials(member.name||handle);
+        const details=document.createElement('div');details.className='vg-group-member-details';const title=document.createElement('strong');title.textContent=member.name||handle;const sub=document.createElement('span');sub.textContent='@'+handle;details.append(title,sub);
+        const role=document.createElement('span');role.className='vg-group-role';role.textContent=handle===group.owner?'Владелец':group.admins?.[handle]?'Администратор':'Участник';
+        row.append(avatar,details,role);
+        if(canManage&&handle!==group.owner&&handle!==me){const actions=document.createElement('div');actions.className='vg-group-member-actions';if(owner){const roleBtn=document.createElement('button');roleBtn.type='button';roleBtn.title=group.admins?.[handle]?'Снять администратора':'Назначить администратором';roleBtn.textContent=group.admins?.[handle]?'Снять админа':'Назначить';roleBtn.addEventListener('click',async()=>{await vgGroupMemberAction(group.username,group.admins?.[handle]?'demote':'promote',handle);await vgOpenGroupManager(group.username);});actions.appendChild(roleBtn);}const remove=document.createElement('button');remove.type='button';remove.className='danger';remove.textContent='Убрать';remove.addEventListener('click',async()=>{if(!confirm(`Убрать @${handle} из группы?`))return;const ok=await vgGroupMemberAction(group.username,'remove',handle);if(ok)await vgOpenGroupManager(group.username);});actions.appendChild(remove);row.appendChild(actions);}
+        root.appendChild(row);
+      });
+      if(!members.length)root.innerHTML='<div class="vg-helper" style="padding:12px">Пока нет участников.</div>';
     }
+    async function vgOpenGroupManager(handle) {
+      const group=usersMap[handle]||getPeerObject(handle);if(!group?.is_group)return;
+      vgManageGroupHandle=handle;vgManageGroupAvatarData='';
+      const me=String(myProfile?.username||'').toLowerCase();const owner=group.owner===me;const canManage=vgCanManageGroup(group);
+      document.getElementById('vgManageGroupNameHero').textContent=group.name||handle;document.getElementById('vgManageGroupMeta').textContent=`${group.member_count??(group.members||[]).length} участников · ${group.is_public===false?'приватная':'публичная'}`;document.getElementById('vgManageGroupHandle').textContent='@'+handle;
+      document.getElementById('vgManageGroupName').value=group.name||'';document.getElementById('vgManageGroupDescription').value=group.cleanBio||group.bio||'';document.getElementById('vgManageGroupPrivacy').value=group.is_public===false?'private':'public';document.getElementById('vgManageGroupSlowMode').value=String(group.slow_mode_seconds||0);
+      const avatar=document.getElementById('vgManageGroupAvatarPreview');avatar.style.backgroundImage=group.avatar?`url("${group.avatar}")`:'none';avatar.textContent=group.avatar?'':getInitials(group.name||group.username);
+      ['vgManageGroupName','vgManageGroupDescription','vgManageGroupPrivacy','vgManageGroupSlowMode','vgManageGroupSaveBtn','vgManageGroupAvatarBtn'].forEach(id=>{const el=document.getElementById(id);if(el)el.disabled=!canManage;});
+      document.getElementById('vgGroupDeleteBtn').hidden=!owner;document.getElementById('vgGroupLeaveBtn').textContent=owner?'Закрыть':'Покинуть группу';document.getElementById('vgGroupLeaveBtn').hidden=owner;
+      vgRenderGroupMembers(group);vgOpenModal('vgManageGroupModal');
+    }
+    async function vgManageGroup(handle) { return vgOpenGroupManager(handle); }
+    document.getElementById('vgManageGroupAvatarBtn').addEventListener('click',()=>document.getElementById('vgManageGroupAvatarFile').click());
+    document.getElementById('vgManageGroupAvatarFile').addEventListener('change',async ev=>{const file=ev.target.files?.[0];if(!file)return;try{vgManageGroupAvatarData=await vgReadOptimizedAvatar(file);const el=document.getElementById('vgManageGroupAvatarPreview');el.textContent='';el.style.backgroundImage=`url("${vgManageGroupAvatarData}")`;}catch(e){vgToast('Не удалось установить аватар',e.message);}ev.target.value='';});
+    document.getElementById('vgManageGroupSaveBtn').addEventListener('click',async()=>{
+      const handle=vgManageGroupHandle;if(!handle||!myProfile)return;const group=usersMap[handle]||getPeerObject(handle);
+      const body={actor:myProfile.username,group:handle,name:document.getElementById('vgManageGroupName').value.trim(),description:document.getElementById('vgManageGroupDescription').value.trim(),is_public:document.getElementById('vgManageGroupPrivacy').value==='public',slow_mode_seconds:Number(document.getElementById('vgManageGroupSlowMode').value)};
+      if(vgManageGroupAvatarData)body.avatar=vgManageGroupAvatarData;
+      const btn=document.getElementById('vgManageGroupSaveBtn');btn.disabled=true;
+      try{const r=await fetch('/api/group/settings',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify(body)});const d=await r.json().catch(()=>({}));if(!r.ok)throw new Error(d.error||'Настройки не сохранены.');vgCloseModal('vgManageGroupModal');await pollServer();if(activePeer===handle)renderActiveChat(true);vgToast('Группа обновлена','Настройки сохранены.');}
+      catch(e){vgToast('Ошибка настроек',e.message);}finally{btn.disabled=false;}
+    });
+    document.getElementById('vgGroupAddMemberBtn').addEventListener('click',async()=>{const handle=vgManageGroupHandle;const input=document.getElementById('vgGroupAddMemberInput');const member=input.value.trim().replace(/^@+/,'').toLowerCase();if(!member)return;const ok=await vgGroupMemberAction(handle,'add',member);if(ok){input.value='';await vgOpenGroupManager(handle);}});
+    document.getElementById('vgCopyGroupInviteBtn').addEventListener('click',async()=>{const g=usersMap[vgManageGroupHandle]||getPeerObject(vgManageGroupHandle);const link=location.origin+location.pathname+'?joinGroup='+encodeURIComponent(g.invite_token||'');try{await navigator.clipboard.writeText(link);vgToast('Приглашение скопировано','Отправь ссылку участникам группы.');}catch(_){prompt('Ссылка-приглашение',link);}});
+    document.getElementById('vgGroupLeaveBtn').addEventListener('click',async()=>{const handle=vgManageGroupHandle;if(!handle||!myProfile)return;if(!confirm('Покинуть эту группу?'))return;const r=await fetch('/api/group/leave',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({actor:myProfile.username,group:handle})});const d=await r.json().catch(()=>({}));if(!r.ok){vgToast('Не удалось покинуть группу',d.error||'Попробуй ещё раз.');return;}vgCloseModal('vgManageGroupModal');if(activePeer===handle){activePeer=null;appEl.classList.remove('mobile-chat-open');}openedPeers=openedPeers.filter(x=>x!==handle);await pollServer();vgToast('Группа покинута','');});
+    document.getElementById('vgGroupDeleteBtn').addEventListener('click',async()=>{const handle=vgManageGroupHandle;if(!handle||!myProfile||!confirm('Удалить группу навсегда? Сообщения группы также будут удалены.'))return;const r=await fetch('/api/group/delete',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({actor:myProfile.username,group:handle})});const d=await r.json().catch(()=>({}));if(!r.ok){vgToast('Не удалось удалить группу',d.error||'');return;}vgCloseModal('vgManageGroupModal');peerProfileModal.classList.remove('open');activePeer=null;appEl.classList.remove('mobile-chat-open');openedPeers=openedPeers.filter(x=>x!==handle);await pollServer();vgToast('Группа удалена','');});
     async function vgCheckGroupInvite() {
       if(!myProfile)return;
       const params=new URLSearchParams(location.search);const token=params.get('joinGroup');if(!token)return;
@@ -6027,5 +6444,127 @@
     document.addEventListener('click', ev=>{if(vgContextPopover&&!vgContextPopover.contains(ev.target)&&!ev.target.closest('.vg-chat-actions-btn')){vgContextPopover.remove();vgContextPopover=null;}},true);
 
   </script>
+
+<style id="vibegram-full-interface-polish">
+:root { --vg-accent:#2aabee; --vg-bg-deep:#0e1621; --vg-panel:#17212b; --vg-panel-2:#202b36; --vg-line:rgba(148,178,202,.15); --vg-text:#f3f7fb; --vg-muted:#93a7b8; }
+.side-drawer { background:linear-gradient(180deg,#17212b 0%,#111b26 100%); border-right:1px solid var(--vg-line); box-shadow:24px 0 64px rgba(0,0,0,.34); }
+.drawer-profile-card { margin:12px 12px 8px; border:1px solid var(--vg-line); border-radius:20px; background:linear-gradient(135deg,rgba(42,171,238,.16),rgba(108,92,231,.1)); padding:16px; }
+.drawer-group { margin:8px 10px 14px; padding:7px; border:1px solid transparent; border-radius:16px; }
+.drawer-group-title { padding:8px 10px 9px; font-size:10.5px; font-weight:800; letter-spacing:.12em; text-transform:uppercase; color:#8298aa; }
+.drawer-btn { min-height:54px; border-radius:12px; transition:background .16s ease,transform .16s ease,color .16s ease; }
+.drawer-btn:hover { background:rgba(85,164,213,.12); transform:translateX(2px); }
+.drawer-btn:focus-visible,.vg-drawer-entity:focus-within,.vg-directory-row:focus-within { outline:2px solid rgba(42,171,238,.65); outline-offset:1px; }
+.drawer-ico { width:38px;height:38px;border-radius:12px;display:grid;place-items:center;flex:0 0 auto; }
+.drawer-ico svg,.vg-drawer-entity-avatar svg,.vg-drawer-entity-open svg,.vg-directory-search-wrap svg,.vg-directory-empty svg,.vg-inline-action svg,.tg-row-icon svg { width:19px;height:19px;fill:none;stroke:currentColor;stroke-width:1.8;stroke-linecap:round;stroke-linejoin:round; }
+.drawer-section-heading {display:flex;align-items:center;justify-content:space-between;padding-right:8px;}
+.drawer-section-heading .drawer-group-title {margin:0;}
+.vg-drawer-communities-list {display:flex;flex-direction:column;gap:3px;}
+.vg-drawer-empty {padding:12px 10px;color:#7f94a5;font-size:12px;line-height:1.5;}
+.vg-drawer-entity {display:flex;align-items:center;gap:10px;padding:8px 9px;border-radius:12px;min-width:0;cursor:pointer;transition:background .16s ease;}
+.vg-drawer-entity:hover {background:rgba(120,170,205,.1);}
+.vg-drawer-entity-avatar {width:37px;height:37px;border-radius:50%;flex:0 0 auto;display:grid;place-items:center;background-size:cover;background-position:center;color:#fff;overflow:hidden;cursor:pointer;}
+.vg-drawer-entity-avatar svg {width:19px;height:19px;fill:none;stroke:currentColor;stroke-width:1.7;stroke-linecap:round;stroke-linejoin:round;}
+.vg-drawer-entity-body {flex:1;min-width:0;display:flex;flex-direction:column;gap:2px;}
+.vg-drawer-entity-name {appearance:none;border:0;background:transparent;padding:0;color:#e7f0f7;font-size:13px;font-weight:700;text-align:left;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;cursor:pointer;}
+.vg-drawer-entity-name:hover {color:#64d2ff;}
+.vg-drawer-entity-meta {font-size:10.5px;color:#8096a8;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;}
+.vg-drawer-entity-open {width:30px;height:30px;display:grid;place-items:center;border:0;border-radius:9px;background:transparent;color:#7892a7;cursor:pointer;flex:0 0 auto;}
+.vg-drawer-entity-open:hover {background:rgba(42,171,238,.14);color:#64d2ff;}
+.vg-drawer-more {width:100%;border:0;background:transparent;color:#64d2ff;font-size:12px;font-weight:700;padding:10px;cursor:pointer;border-radius:10px;}
+.vg-drawer-more:hover {background:rgba(42,171,238,.1);}
+.drawer-soon-dot {white-space:nowrap;font-size:9px!important;letter-spacing:.05em;background:rgba(255,185,80,.14);color:#ffc56c;border:1px solid rgba(255,185,80,.2);border-radius:6px;padding:4px 5px;}
+.vg-profile-tabs {display:flex;gap:5px;padding:10px 14px;position:sticky;top:0;background:rgba(17,27,38,.96);backdrop-filter:blur(18px);z-index:4;border-bottom:1px solid var(--vg-line);overflow-x:auto;scrollbar-width:none;}
+.vg-profile-tabs::-webkit-scrollbar {display:none;}
+.vg-profile-tabs button {display:inline-flex;align-items:center;justify-content:center;gap:7px;min-width:max-content;min-height:38px;padding:0 12px;border:1px solid transparent;border-radius:11px;background:transparent;color:#a7bac9;font-size:12px;font-weight:700;cursor:pointer;}
+.vg-profile-tabs button svg {width:16px;height:16px;fill:none;stroke:currentColor;stroke-width:1.8;stroke-linecap:round;stroke-linejoin:round;}
+.vg-profile-tabs button.active {background:rgba(42,171,238,.16);border-color:rgba(42,171,238,.22);color:#74d5ff;}
+.tg-settings-scroll [data-profile-panel][hidden] {display:none!important;}
+.tg-settings-scroll .tg-section-box {margin:12px 14px;padding:4px 0;border:1px solid var(--vg-line);border-radius:15px;background:rgba(255,255,255,.025);overflow:hidden;}
+.tg-settings-scroll .tg-section-header {padding:13px 15px;border-bottom:1px solid var(--vg-line);font-size:11px;letter-spacing:.08em;text-transform:uppercase;color:#92aabc;}
+.tg-settings-scroll .tg-row-item {padding:12px 14px;gap:12px;border-bottom:1px solid rgba(148,178,202,.08);}
+.tg-settings-scroll .tg-row-item:last-child {border-bottom:0;}
+.tg-row-icon {width:36px;height:36px;border-radius:11px;display:grid;place-items:center;color:#fff;flex:0 0 auto;}
+.tg-row-icon svg {width:18px;height:18px;fill:none;stroke:currentColor;stroke-width:1.8;stroke-linecap:round;stroke-linejoin:round;}
+.tg-inline-input,.tg-inline-select {border-radius:9px!important;min-height:35px;padding:6px 9px!important;background:#111d29!important;border:1px solid rgba(140,171,195,.16)!important;color:#eef5fa!important;}
+.tg-inline-input:focus,.tg-inline-select:focus,.vg-input:focus,.vg-textarea:focus {outline:none;border-color:rgba(42,171,238,.7)!important;box-shadow:0 0 0 3px rgba(42,171,238,.12);}
+.tg-save-footer {background:rgba(14,22,33,.96);backdrop-filter:blur(16px);border-top:1px solid var(--vg-line);padding:12px 16px calc(12px + env(safe-area-inset-bottom));}
+.vg-directory-card {width:min(720px,calc(100vw - 28px));max-height:min(86vh,900px);}
+.vg-modal-subtitle {display:block;margin-top:3px;font-size:11px;color:#8da4b6;}
+.vg-directory-search-wrap {position:relative;margin-bottom:12px;}
+.vg-directory-search-wrap svg {position:absolute;left:14px;top:50%;transform:translateY(-50%);color:#7f96aa;pointer-events:none;}
+.vg-directory-search-wrap .vg-input {padding-left:42px;}
+.vg-directory-filters {display:flex;gap:6px;overflow-x:auto;padding:2px 0 10px;scrollbar-width:none;}
+.vg-directory-filters button {border:1px solid var(--vg-line);border-radius:999px;background:#182635;color:#a8bdcd;padding:8px 14px;font-size:12px;font-weight:700;white-space:nowrap;cursor:pointer;}
+.vg-directory-filters button.active {background:#2aabee;color:white;border-color:#2aabee;box-shadow:0 4px 14px rgba(42,171,238,.18);}
+.vg-directory-summary {padding:3px 2px 10px;color:#8097a9;font-size:11px;}
+.vg-directory-results {display:flex;flex-direction:column;gap:5px;max-height:58vh;overflow:auto;padding-right:2px;}
+.vg-directory-row {display:flex;align-items:center;gap:12px;padding:11px;border:1px solid rgba(148,178,202,.1);border-radius:14px;background:rgba(255,255,255,.025);min-width:0;}
+.vg-directory-row:hover {border-color:rgba(42,171,238,.25);background:rgba(42,171,238,.05);}
+.vg-directory-avatar {width:46px;height:46px;border-radius:50%;display:grid;place-items:center;background-size:cover;background-position:center;color:white;flex:0 0 auto;font-size:15px;font-weight:800;cursor:pointer;}
+.vg-directory-info {flex:1;min-width:0;display:flex;flex-direction:column;gap:3px;text-align:left;border:0;background:transparent;color:#eaf3f9;padding:0;cursor:pointer;}
+.vg-directory-info strong {font-size:13px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;}
+.vg-directory-info small {font-size:10.5px;color:#8399aa;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;}
+.vg-directory-kind {font-size:10px;font-weight:700;color:#64d2ff;}
+.vg-directory-action {border:1px solid rgba(148,178,202,.18);border-radius:10px;background:#202f3e;color:#c0d1df;font-size:11px;font-weight:800;padding:9px 12px;white-space:nowrap;cursor:pointer;}
+.vg-directory-action.primary {border-color:#2aabee;background:#2aabee;color:white;}
+.vg-directory-action:disabled {opacity:.5;cursor:wait;}
+.vg-directory-empty {min-height:150px;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:9px;color:#8ea4b6;text-align:center;}
+.vg-directory-empty svg {width:27px;height:27px;}
+.vg-directory-empty strong {color:#e1edf6;font-size:14px;}
+.vg-directory-empty span {font-size:12px;}
+.vg-created-entity-row {transition:transform .15s ease,border-color .15s ease,background .15s ease;}
+.vg-created-entity-row:hover {transform:translateY(-1px);border-color:rgba(42,171,238,.35);background:rgba(42,171,238,.06);}
+.vg-inline-action {display:inline-flex;align-items:center;gap:6px;}
+.vg-inline-action svg {width:14px;height:14px;}
+.vg-primary,.vg-secondary,.vg-danger,.btn-primary {transition:filter .16s ease,transform .16s ease,box-shadow .16s ease;}
+.vg-primary:hover,.btn-primary:hover {filter:brightness(1.07);box-shadow:0 5px 18px rgba(42,171,238,.18);}
+.vg-primary:active,.vg-secondary:active,.vg-danger:active,.btn-primary:active {transform:translateY(1px);}
+button:disabled {cursor:not-allowed;}
+.vg-header-tool,.vg-composer-tool,.attach-btn,.sticker-send-btn {display:inline-flex;align-items:center;justify-content:center;}
+.vg-header-tool svg,.vg-composer-tool svg,.attach-btn svg,.sticker-send-btn svg {width:19px;height:19px;display:block;fill:none;stroke:currentColor;stroke-width:1.8;stroke-linecap:round;stroke-linejoin:round;}
+.vg-header-tool {border-radius:11px!important;}
+.vg-header-tool:hover,.vg-composer-tool:hover,.attach-btn:hover,.sticker-send-btn:hover {background:rgba(42,171,238,.12)!important;color:#75d5ff!important;}
+.ios-action-btn {display:flex;flex-direction:column;align-items:center;justify-content:center;gap:6px;}
+.ios-action-btn svg {width:20px;height:20px;display:block;fill:none;stroke:currentColor;stroke-width:1.8;stroke-linecap:round;stroke-linejoin:round;}
+.vg-folder-add {display:inline-grid;place-items:center;}
+.vg-folder-add svg {width:18px;height:18px;fill:none;stroke:currentColor;stroke-width:1.8;stroke-linecap:round;stroke-linejoin:round;}
+@media (max-width:768px) {
+  .vg-directory-card {width:100vw;max-height:92dvh;border-radius:20px 20px 0 0;align-self:end;}
+  .vg-directory-results {max-height:57dvh;}
+  .vg-directory-row {gap:9px;padding:9px;}
+  .vg-directory-avatar {width:42px;height:42px;}
+  .vg-directory-action {padding:8px 10px;}
+  .tg-settings-modal {width:100%;max-height:94dvh;border-radius:20px 20px 0 0;}
+  .vg-profile-tabs {padding:9px 11px;}
+}
+@media (prefers-reduced-motion:reduce) { .drawer-btn,.vg-directory-row,.vg-created-entity-row,.vg-primary,.vg-secondary,.vg-danger,.btn-primary {transition:none!important;} }
+
+.vg-copy-mini-icon { width:13px;height:13px;vertical-align:-2px;fill:none;stroke:currentColor;stroke-width:1.8;stroke-linecap:round;stroke-linejoin:round;opacity:.8; }
+.vg-entity-type-icon { display:inline-grid;place-items:center;color:#7acfff;width:16px;height:16px;vertical-align:-3px;margin-right:3px; }
+.vg-entity-type-icon svg { width:15px;height:15px;fill:none;stroke:currentColor;stroke-width:1.7;stroke-linecap:round;stroke-linejoin:round; }
+.tg-cam-fab { display:grid;place-items:center; }
+.tg-cam-fab svg { width:17px;height:17px;fill:none;stroke:currentColor;stroke-width:1.8;stroke-linecap:round;stroke-linejoin:round; }
+.vg-drawer-communities { background:rgba(255,255,255,.018);border-color:rgba(148,178,202,.07); }
+.vg-drawer-communities .drawer-group-title { letter-spacing:.09em; }
+.vg-workspace-card .vg-field-label { display:block;margin:13px 0 6px;font-weight:700;color:#a5bacb;font-size:12px; }
+.vg-modal .vg-input,.vg-modal .vg-textarea {box-sizing:border-box;width:100%;}
+.vg-directory-row button:focus-visible,.vg-drawer-entity button:focus-visible {outline:2px solid #2aabee;outline-offset:2px;}
+.user-nav-link {cursor:pointer;}
+.user-nav-link:hover {color:#64d2ff;text-decoration:underline;text-decoration-color:rgba(100,210,255,.45);}
+
+/* Consistent vector icons for navigation, context menus and call controls. */
+.vg-menu-icon{width:17px;height:17px;flex:0 0 17px;display:inline-block;fill:none;stroke:currentColor;stroke-width:1.8;stroke-linecap:round;stroke-linejoin:round;vertical-align:-3px;}
+.context-item .vg-menu-icon{margin-right:1px;}
+.vg-call-action-icon svg{width:21px;height:21px;display:block;fill:none;stroke:currentColor;stroke-width:1.9;stroke-linecap:round;stroke-linejoin:round;}
+.vg-call-pick-output{display:inline-flex;align-items:center;justify-content:center;gap:8px;}
+.vg-group-avatar-picker>span svg{width:27px;height:27px;fill:none;stroke:currentColor;stroke-width:1.8;stroke-linecap:round;stroke-linejoin:round;}
+.vg-created-entity-avatar{display:grid;place-items:center;}
+.vg-created-entity-avatar svg{width:22px;height:22px;fill:none;stroke:currentColor;stroke-width:1.7;stroke-linecap:round;stroke-linejoin:round;color:#fff;}
+.tg-cam-fab svg{display:block;}
+
+.vg-avatar-type-glyph{width:21px;height:21px;display:block;margin:auto;fill:none;stroke:currentColor;stroke-width:1.8;stroke-linecap:round;stroke-linejoin:round;}
+.react-emoji-btn{font-family:system-ui,-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;}
+</style>
+
 </body>
 </html>
