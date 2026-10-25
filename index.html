@@ -402,6 +402,9 @@
     .chat-item.active .chat-time { color: rgba(255, 255, 255, 0.85); }
 
     .avatar-wrap { position: relative; flex-shrink: 0; }
+    .clickable-avatar { cursor:pointer; touch-action:manipulation; -webkit-tap-highlight-color:transparent; }
+    [data-open-user] { cursor:pointer; touch-action:manipulation; -webkit-tap-highlight-color:transparent; }
+    [data-avatar-user]:focus-visible, [data-open-user]:focus-visible { outline:2px solid #64d2ff; outline-offset:3px; }
     .avatar {
       width: 50px;
       height: 50px;
@@ -1921,17 +1924,34 @@
     }, true);
 
     document.addEventListener('click', (ev) => {
+      // Capture before row-level click handlers: avatars and @usernames open profiles,
+      // while tapping the rest of the row still opens the conversation.
+      const avatarLink = ev.target.closest('[data-avatar-user]');
+      if (avatarLink) {
+        ev.preventDefault();
+        ev.stopPropagation();
+        const handle = avatarLink.getAttribute('data-avatar-user');
+        if (handle) openUserProfile(handle);
+        return;
+      }
       const userLink = ev.target.closest('[data-open-user]');
-      if (userLink && !ev.target.closest('[data-ver-user]')) { ev.stopPropagation(); const handle = userLink.getAttribute('data-open-user'); if (handle) openChatWith(handle); return; }
+      if (userLink && !ev.target.closest('[data-ver-user]')) {
+        ev.preventDefault();
+        ev.stopPropagation();
+        const handle = userLink.getAttribute('data-open-user');
+        if (handle) openUserProfile(handle);
+        return;
+      }
       const badgeEl = ev.target.closest('[data-ver-user]');
       if (badgeEl) {
+        ev.preventDefault();
         ev.stopPropagation();
         openBadgeExplanationModal(badgeEl.getAttribute('data-ver-user'), badgeEl.getAttribute('data-badge-type') || '');
         return;
       }
       msgContextWrap.classList.remove('open');
       document.getElementById('commentSendAsPopup').classList.remove('open');
-    });
+    }, true);
 
     lightboxOverlay.addEventListener('click', (e) => { if (e.target === lightboxOverlay) closeLightbox(); });
 
@@ -2435,16 +2455,10 @@
       });
 
       try {
+        // Avatar data is stored in the shared DB as a compact 160x160 data URL,
+        // not as a Render-local /uploads file that disappears after redeploy.
         if (typeof myProfile.avatar === 'string' && myProfile.avatar.startsWith('data:image/')) {
-          const avatarUpload = await fetch('/api/upload', {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({ data: myProfile.avatar, ext: 'jpg' })
-          });
-          const uploadedAvatar = await avatarUpload.json().catch(() => ({}));
-          if (!avatarUpload.ok || !uploadedAvatar.url) throw new Error(uploadedAvatar.error || 'Не удалось загрузить аватар.');
-          myProfile.avatar = uploadedAvatar.url;
-          selectedBase64Avatar = uploadedAvatar.url;
+          selectedBase64Avatar = myProfile.avatar;
         }
         const response = await fetch('/api/profile', {
           method: 'POST',
@@ -2775,8 +2789,15 @@
 
         usersMap = data.users || {};
         pinsMap = data.pins || {};
-        const openChatParam = new URLSearchParams(window.location.search).get('openChat');
-        if (openChatParam && usersMap[String(openChatParam).toLowerCase()]) {
+        const params = new URLSearchParams(window.location.search);
+        const openChatParam = params.get('openChat');
+        const profileParam = params.get('profile');
+        if (profileParam && usersMap[String(profileParam).toLowerCase().replace(/^@+/, '')]) {
+          const profileKey = String(profileParam).toLowerCase().replace(/^@+/, '');
+          window.history.replaceState({}, document.title, window.location.pathname);
+          if (profileKey === (myProfile?.username || '').toLowerCase()) openMyProfileModal();
+          else { openChatWith(profileKey); openPeerProfile(); }
+        } else if (openChatParam && usersMap[String(openChatParam).toLowerCase()]) {
           const openKey = String(openChatParam).toLowerCase();
           window.history.replaceState({}, document.title, window.location.pathname);
           if (activePeer !== openKey) openChatWith(openKey);
@@ -2935,14 +2956,14 @@
 
         item.innerHTML = `
           <div class="avatar-wrap">
-            <div class="avatar" style="${avatarBg}">${peer.avatar ? '' : defaultIcon}</div>
+            <div class="avatar clickable-avatar" data-avatar-user="${escapeHtml(peer.username)}" role="button" tabindex="0" aria-label="Открыть профиль @${escapeHtml(peer.username)}" style="${avatarBg}">${peer.avatar ? '' : defaultIcon}</div>
             ${online ? '<div class="online-dot"></div>' : ''}
           </div>
           <div class="chat-info">
             <div class="chat-top">
               <div class="chat-name">
                 ${peer.is_channel ? '<span>📢</span>' : ''}
-                <span>${escapeHtml(peer.name)}</span>
+                <span class="user-nav-link" data-open-user="${escapeHtml(peer.username)}" title="Открыть профиль">${escapeHtml(peer.name)}</span>
                 ${renderBadgesHtml(peer)} ${(pinsMap[`chatlist:${me}`] || []).includes(peer.username) ? '<span title="Закреплённый чат">📌</span>' : ''}
               </div>
               <div class="chat-time">${outTicks}<span>${lastMsg ? formatTime(lastMsg.time) : ''}</span></div>
@@ -2982,10 +3003,10 @@
             gItem.className = 'chat-item';
             const avatarBg = u.avatar ? `background-image:url('${u.avatar}')` : `background-color:${u.color}`;
             gItem.innerHTML = `
-              <div class="avatar" style="${avatarBg}">${u.avatar ? '' : (u.is_channel ? '📢' : getInitials(u.name))}</div>
+              <div class="avatar clickable-avatar" data-avatar-user="${escapeHtml(u.username)}" role="button" tabindex="0" aria-label="Открыть профиль @${escapeHtml(u.username)}" style="${avatarBg}">${u.avatar ? '' : (u.is_channel ? '📢' : getInitials(u.name))}</div>
               <div class="chat-info">
-                <div class="chat-name">${u.is_channel ? '📢 ' : ''}${escapeHtml(u.name)} ${renderBadgesHtml(u)}</div>
-                <div class="chat-preview">@${escapeHtml(u.username)} • ID: ${u.uid}</div>
+                <div class="chat-name"><span class="user-nav-link" data-open-user="${escapeHtml(u.username)}" title="Открыть профиль">${u.is_channel ? '📢 ' : ''}${escapeHtml(u.name)}</span> ${renderBadgesHtml(u)}</div>
+                <div class="chat-preview"><span class="user-nav-link" data-open-user="${escapeHtml(u.username)}">@${escapeHtml(u.username)}</span> • ID: ${u.uid}</div>
               </div>
             `;
             gItem.addEventListener('click', () => { searchInput.value = ''; openChatWith(u.username); });
@@ -3093,7 +3114,7 @@
         chatMessages = messagesList.filter(m => !m.is_channel_post && ((m.sender === me && m.to === activePeer) || (m.sender === activePeer && m.to === me)));
       }
 
-      const signature = activePeer + ':' + isModeratorUnlocked + ':' + Boolean(peer.is_verified) + ':' + chatMessages.map(m =>
+      const signature = activePeer + ':' + isModeratorUnlocked + ':' + Boolean(peer.is_verified) + ':' + String(peer.avatar || '') + ':' + String(peer.name || '') + ':' + chatMessages.map(m =>
         `${m.id}_${m.read}_${(m.views || []).length}_${(m.comments || []).length}_${m.verification_request?.status || ''}_${JSON.stringify(m.reactions || {})}`
       ).join('|');
       if (!forceScroll && signature === lastRenderedSignature) return;
@@ -3119,7 +3140,7 @@
         el.id = 'dom_' + msg.id;
 
         let channelHeaderHtml = isChannelPost
-          ? `<div class="channel-post-header"><span>${escapeHtml(peer.name)}</span>${renderBadgesHtml(peer)}</div>`
+          ? `<div class="channel-post-header"><span class="user-nav-link" data-open-user="${escapeHtml(peer.username)}" title="Открыть профиль канала">${escapeHtml(peer.name)}</span>${renderBadgesHtml(peer)}</div>`
           : '';
 
         let replyQuoteHtml = '';
@@ -3223,10 +3244,13 @@
           const rowWrap = document.createElement('div');
           rowWrap.className = 'channel-post-row';
           const chAv = document.createElement('div');
-          chAv.className = 'avatar';
+          chAv.className = 'avatar clickable-avatar';
+          chAv.dataset.avatarUser = peer.username;
+          chAv.setAttribute('role', 'button');
+          chAv.tabIndex = 0;
+          chAv.setAttribute('aria-label', `Открыть профиль @${peer.username}`);
           chAv.style.cssText = `width:36px;height:36px;font-size:14px;cursor:pointer;${avatarBg}`;
           chAv.textContent = peer.avatar ? '' : '📢';
-          chAv.addEventListener('click', openPeerProfile);
           rowWrap.appendChild(chAv);
           rowWrap.appendChild(el);
           messagesContainer.appendChild(rowWrap);
@@ -3282,7 +3306,7 @@
       const originCard = document.createElement('div');
       originCard.style.cssText = 'display:flex;gap:10px;align-items:center;padding:9px 12px;background:rgba(10,132,255,0.1);border-left:3px solid #0a84ff;border-radius:12px;margin-bottom:6px;';
       originCard.innerHTML = `
-        <div class="avatar" style="width:34px;height:34px;font-size:13px;${chAvBg}">${chObj.avatar ? '' : '📢'}</div>
+        <div class="avatar clickable-avatar" data-avatar-user="${escapeHtml(chObj.username)}" role="button" tabindex="0" aria-label="Открыть профиль канала @${escapeHtml(chObj.username)}" style="width:34px;height:34px;font-size:13px;cursor:pointer;${chAvBg}">${chObj.avatar ? '' : '📢'}</div>
         <div style="flex:1;min-width:0;">
           <div style="font-size:12.5px;font-weight:700;color:#64d2ff;display:flex;align-items:center;gap:4px;"><span class="user-nav-link" data-open-user="${escapeHtml(chObj.username)}">📢 ${escapeHtml(chObj.name)}</span>${renderBadgesHtml(chObj)}</div>
           <div style="font-size:12px;color:#dfe6e9;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">${escapeHtml(post.text || 'Медиа-пост канала')}</div>
@@ -3296,7 +3320,7 @@
         const row = document.createElement('div');
         row.className = 'comment-bubble';
         row.innerHTML = `
-          <div class="avatar" style="width:34px;height:34px;font-size:12px;${avBg}">${senderObj.avatar ? '' : (senderObj.is_channel ? '📢' : getInitials(senderObj.name))}</div>
+          <div class="avatar clickable-avatar" data-avatar-user="${escapeHtml(senderObj.username)}" role="button" tabindex="0" aria-label="Открыть профиль @${escapeHtml(senderObj.username)}" style="width:34px;height:34px;font-size:12px;cursor:pointer;${avBg}">${senderObj.avatar ? '' : (senderObj.is_channel ? '📢' : getInitials(senderObj.name))}</div>
           <div class="comment-card">
             <div class="comment-author">
               ${senderObj.is_channel ? '<span>📢</span>' : ''}
@@ -3647,10 +3671,15 @@
     });
     document.addEventListener('keydown', (ev) => {
       if (ev.key === 'Escape') closeStickerPicker();
-      if ((ev.key === 'Enter' || ev.key === ' ') && ev.target.matches('.mention-link[data-open-user]')) {
-        ev.preventDefault(); openChatWith(ev.target.getAttribute('data-open-user'));
+      if (ev.key !== 'Enter' && ev.key !== ' ') return;
+      const avatarLink = ev.target.closest?.('[data-avatar-user]');
+      const userLink = ev.target.closest?.('[data-open-user]');
+      if (avatarLink || userLink) {
+        ev.preventDefault();
+        ev.stopPropagation();
+        openUserProfile((avatarLink || userLink).getAttribute(avatarLink ? 'data-avatar-user' : 'data-open-user'));
       }
-    });
+    }, true);
 
     headerSubBtn.addEventListener('click', async () => {
       if (!activePeer || !myProfile) return;
@@ -4047,6 +4076,9 @@
         const name = document.createElement('div');
         name.className = 'profile-linked-channel-name';
         const title = document.createElement('span');
+        title.className = 'user-nav-link';
+        title.dataset.openUser = channel.username;
+        title.title = 'Открыть профиль канала';
         title.textContent = channel.name || channel.username;
         name.appendChild(title);
         const badges = document.createElement('span');
@@ -4250,6 +4282,30 @@
       document.getElementById('iosEditChannelQuickBtn').style.display = canManage ? 'flex' : 'none';
       document.getElementById('applyVerifyBtn').style.display = (canManage && !isVer) ? 'block' : 'none';
       peerProfileModal.classList.add('open');
+    }
+
+    async function openUserProfile(username) {
+      const handle = String(username || '').trim().toLowerCase().replace(/^@+/, '');
+      if (!handle || !myProfile) return;
+      const me = String(myProfile.username || '').toLowerCase();
+      if (handle === me) {
+        peerProfileModal.classList.remove('open');
+        openMyProfileModal();
+        return;
+      }
+      if (!usersMap[handle]) {
+        await pollServer();
+      }
+      if (!usersMap[handle] && handle !== 'verify_bot') {
+        showCustomIosBanner('Профиль не найден', `Аккаунт или канал @${handle} не найден на сервере.`);
+        return;
+      }
+      // Keep existing navigation semantics: open the selected conversation in the
+      // background, then present its profile on top, consistent on desktop and iOS.
+      const commentsOverlay = document.getElementById('commentsModal');
+      commentsOverlay?.classList.remove('open');
+      openChatWith(handle);
+      openPeerProfile();
     }
 
     document.getElementById('peerUsernameCell').addEventListener('click', () => {

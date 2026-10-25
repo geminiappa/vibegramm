@@ -61,3 +61,23 @@ After deploying this version to Render, share this link:
 `https://vibegramm.onrender.com/?install=1`
 
 It opens a dedicated Vibegram install guide automatically. iOS does not expose an API that lets a website open Apple's native “Add to Home Screen” sheet directly; the user must tap Share in Safari, select “Add to Home Screen”, and confirm. The guide explains those exact steps. The link will only show the guide after this updated `index.html` is deployed to Render.
+
+## Avatar synchronization and clickable profiles (this update)
+
+This revision fixes two cross-device issues:
+
+- New profile and channel avatars are saved as bounded image data URLs in the shared Vibegram database instead of relying on files in Render's ephemeral `uploads/` folder.
+- `/api/sync` returns lightweight, versioned URLs such as `/api/avatar?username=name&v=...`; `/api/avatar` serves the image from the shared database. This keeps the sync payload smaller while the image is the same on desktop browsers, mobile browsers, the iPhone Home Screen PWA, and the Electron desktop wrapper that loads the same site.
+- Existing `/uploads/...` avatars are migrated to DB storage at server startup when their legacy file is still present. If a legacy upload file was already lost during an earlier Render redeploy, that old image cannot be recovered by code; the user must upload it once again.
+- In the chat list and global search, tapping an avatar or the displayed name opens that person's/channel's profile. Tapping the rest of the chat row still opens the conversation. Names and `@mentions` in messages/comments and channel posts also open profiles. Avatar/profile links support keyboard activation.
+- Direct profile links can use `/?profile=username` after deployment.
+
+### Deploy
+
+1. Replace the deployed root `server.py` and `index.html` with these updated files. Keep `service-worker.js`, `manifest.webmanifest`, PWA icon files, `requirements.txt`, and any existing desktop files.
+2. Keep Render's `DATABASE_URL` configured to the same shared PostgreSQL database used by the current service. Without shared persistent DB storage, profiles cannot reliably synchronize across devices/restarts.
+3. Commit and push to GitHub, then wait for Render to deploy.
+4. Test by changing an avatar on device A and opening the account on device B. A change of avatar should create a new versioned `/api/avatar` URL.
+5. Search for a username. Click the avatar or display name to see the profile; click the rest of the row to open chat.
+
+The server validates the image MIME/type signature and size before storing it. User avatars are capped at 512 KiB and channel avatars at 1 MiB. `/api/sync` no longer transfers the base64 image bytes for every user; it transfers versioned image URLs instead.

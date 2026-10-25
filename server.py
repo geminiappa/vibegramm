@@ -8,6 +8,7 @@ import base64
 import threading
 import re
 import hmac
+import hashlib
 from urllib.parse import urlparse, parse_qs
 
 # Render and other hosting platforms provide the listening port via PORT.
@@ -109,12 +110,98 @@ def _push_configured():
                 os.environ.get('VAPID_PRIVATE_KEY', '').strip())
 
 
-def _absolute_public_url(path_or_url, base_url):
+def _avatar_mime_and_bytes(value):
+    """Decode a server-stored avatar data URL or a legacy local /uploads file."""
+    value = str(value or '').strip()
+    if value.startswith('data:image/') and ',' in value:
+        header, encoded = value.split(',', 1)
+        mime = header[5:].split(';', 1)[0].lower()
+        allowed = {'image/jpeg', 'image/png', 'image/webp', 'image/gif'}
+        if mime not in allowed or 'base64' not in header.lower():
+            return None, None
+        try:
+            binary = base64.b64decode(encoded, validate=True)
+        except Exception:
+            return None, None
+        if not binary or len(binary) > 1024 * 1024:
+            return None, None
+        # Verify that the bytes actually look like the claimed image format.
+        signatures = {
+            'image/jpeg': binary.startswith(b'\xff\xd8\xff'),
+            'image/png': binary.startswith(b'\x89PNG\r\n\x1a\n'),
+            'image/webp': len(binary) >= 12 and binary[:4] == b'RIFF' and binary[8:12] == b'WEBP',
+            'image/gif': binary.startswith((b'GIF87a', b'GIF89a')),
+        }
+        if not signatures.get(mime, False):
+            return None, None
+        return mime, binary
+    if value.startswith('/uploads/'):
+        filename = os.path.basename(urlparse(value).path)
+        if not filename or filename in ('.', '..'):
+            return None, None
+        filepath = os.path.join(UPLOAD_DIR, filename)
+        try:
+            if os.path.isfile(filepath) and os.path.getsize(filepath) <= 1024 * 1024:
+                with open(filepath, 'rb') as stream:
+                    binary = stream.read()
+                ext = os.path.splitext(filename)[1].lower()
+                mime = {'.jpg': 'image/jpeg', '.jpeg': 'image/jpeg', '.png': 'image/png', '.webp': 'image/webp', '.gif': 'image/gif'}.get(ext)
+                if mime and binary:
+                    return mime, binary
+        except OSError:
+            pass
+    return None, None
+
+
+def _store_avatar_value(candidate, existing='', max_bytes=1024 * 1024):
+    """Store avatars in the shared DB as bounded data URLs so they survive Render restarts."""
+    candidate = str(candidate or '').strip()
+    existing = str(existing or '').strip()
+    if not candidate:
+        return existing
+    mime, binary = _avatar_mime_and_bytes(candidate)
+    if binary:
+        if len(binary) > max_bytes:
+            raise ValueError(f'Аватар слишком большой. Максимум {max_bytes // 1024} КБ.')
+        return f'data:{mime};base64,{base64.b64encode(binary).decode("ascii")}'
+    # Preserve a previous good avatar if a new client sends an invalid/broken image.
+    if candidate.startswith('data:image/') or candidate.startswith('/uploads/'):
+        if existing:
+            return existing
+        return candidate if candidate.startswith('/uploads/') else ''
+    # External HTTPS avatars are retained for compatibility with previously imported profiles.
+    if candidate.startswith('https://') and len(candidate) <= 2048:
+        return candidate
+    return existing
+
+
+def _avatar_public_path(username, avatar_value):
+    handle = re.sub(r'[^a-z0-9_]', '', str(username or '').lower().lstrip('@'))
+    if not handle or not str(avatar_value or '').strip():
+        return ''
+    version = hashlib.sha1(str(avatar_value).encode('utf-8', errors='ignore')).hexdigest()[:12]
+    return f'/api/avatar?username={handle}&v={version}'
+
+
+def _public_user(username, user_obj):
+    """Return a lightweight profile: avatar bytes stay in DB, sync sends only a URL."""
+    result = dict(user_obj or {})
+    avatar_value = str(result.get('avatar') or '').strip()
+    if avatar_value:
+        result['avatar'] = _avatar_public_path(username, avatar_value)
+    else:
+        result['avatar'] = ''
+    return result
+
+
+def _absolute_public_url(path_or_url, base_url, username=''):
     value = str(path_or_url or '').strip()
+    handle = re.sub(r'[^a-z0-9_]', '', str(username or '').lower().lstrip('@'))
+    if value and handle:
+        # Versioned DB-backed endpoint keeps notification icons stable and refreshable.
+        return base_url.rstrip('/') + _avatar_public_path(handle, value)
     if value.startswith('https://') or value.startswith('http://'):
         return value
-    # Data-URL avatars are intentionally not included in push payloads: they can
-    # exceed push-service payload limits. Profile save uploads them as files.
     if value.startswith('/uploads/'):
         return base_url.rstrip('/') + value
     return base_url.rstrip('/') + '/facuicon.jpeg'
@@ -195,7 +282,7 @@ def dispatch_push_for_messages(messages, base_url):
             channel_name = str(msg.get('to') or '').strip().lower().lstrip('@')
             channel = USERS.get(channel_name, {})
             author = str(((msg.get('views') or [''])[0]) or '').lower().lstrip('@')
-            icon = _absolute_public_url(channel.get('avatar'), base_url)
+            icon = _absolute_public_url(channel.get('avatar'), base_url, channel_name)
             payload = {
                 'title': str(channel.get('name') or channel_name or 'Новый пост')[:100],
                 'body': text,
@@ -217,7 +304,7 @@ def dispatch_push_for_messages(messages, base_url):
         if not recipient or recipient == sender or recipient == 'verify_bot':
             continue
         sender_profile = USERS.get(sender, {})
-        icon = _absolute_public_url(sender_profile.get('avatar'), base_url)
+        icon = _absolute_public_url(sender_profile.get('avatar'), base_url, sender)
         payload = {
             'title': str(sender_profile.get('name') or sender or 'Новое сообщение')[:100],
             'body': text,
@@ -285,7 +372,16 @@ def load_db():
         if m.get('verification_request') and (m.get('verification_request') or {}).get('status') == 'approved'
     }
     state_changed = False
+    # Migrate legacy avatar files into the shared DB when the old file is still
+    # present. This repairs cross-device display and avoids future dependence on
+    # Render's ephemeral filesystem for profile/channel avatars.
     for username, user_obj in USERS.items():
+        avatar_value = str(user_obj.get('avatar') or '').strip()
+        if avatar_value.startswith('/uploads/'):
+            mime, binary = _avatar_mime_and_bytes(avatar_value)
+            if mime and binary and len(binary) <= 1024 * 1024:
+                user_obj['avatar'] = f'data:{mime};base64,{base64.b64encode(binary).decode("ascii")}'
+                state_changed = True
         # Legacy Premium flags did not record an auditable server-side grant.
         # Remove them once on migration; grants issued below carry versioned metadata.
         if user_obj.get('is_premium') and not (
@@ -384,6 +480,37 @@ class VibegramHandler(http.server.SimpleHTTPRequestHandler):
                 return self.send_json({'ok': False, 'enabled': False, 'error': 'Web Push не настроен на сервере.'}, 503)
             return self.send_json({'ok': True, 'enabled': True, 'publicKey': public_key})
 
+        if parsed.path == '/api/avatar':
+            qs = parse_qs(parsed.query)
+            handle = str(qs.get('username', [''])[0] or '').strip().lower().lstrip('@')
+            user_obj = USERS.get(handle, {})
+            avatar_value = str(user_obj.get('avatar') or '').strip()
+            mime, binary = _avatar_mime_and_bytes(avatar_value)
+            if not binary and avatar_value.startswith('https://'):
+                self.send_response(302)
+                self.send_header('Location', avatar_value)
+                self.send_header('Cache-Control', 'public, max-age=300')
+                self.end_headers()
+                return
+            if not binary:
+                fallback_path = os.path.join(BASE_DIR, 'pwa-192.png')
+                try:
+                    with open(fallback_path, 'rb') as image_file:
+                        binary = image_file.read()
+                    mime = 'image/png'
+                except OSError:
+                    binary, mime = b'', 'application/octet-stream'
+            self.send_response(200 if binary else 404)
+            self.send_header('Content-Type', mime or 'application/octet-stream')
+            self.send_header('X-Content-Type-Options', 'nosniff')
+            self.send_header('Cache-Control', 'public, max-age=300')
+            self.send_header('Access-Control-Allow-Origin', '*')
+            self.send_header('Content-Length', str(len(binary)))
+            self.end_headers()
+            if binary:
+                self.wfile.write(binary)
+            return
+
         if parsed.path == '/api/sync':
             qs = parse_qs(parsed.query)
             me = qs.get('me', [''])[0].strip().lower().lstrip('@')
@@ -411,7 +538,7 @@ class VibegramHandler(http.server.SimpleHTTPRequestHandler):
                 if m['sender'] == me or m['to'] == me or m['to'] in channels_set or m['sender'] in channels_set
             ]
             self.send_json({
-                'users': USERS,
+                'users': {name: _public_user(name, user_obj) for name, user_obj in USERS.items()},
                 'messages': my_messages,
                 'pins': PINS,
                 'verifyBotAdmin': VERIFY_BOT_ADMIN,
@@ -529,6 +656,10 @@ class VibegramHandler(http.server.SimpleHTTPRequestHandler):
                             admins[u] = admins.pop(old_u)
 
             existing = USERS.get(u, {})
+            try:
+                stored_avatar = _store_avatar_value(body.get('avatar'), existing.get('avatar', ''), max_bytes=512 * 1024)
+            except ValueError as exc:
+                return self.send_json({'error': str(exc)}, 413)
             user_id = existing.get('id')
             if not user_id:
                 user_id = assign_user_id(u)
@@ -565,7 +696,7 @@ class VibegramHandler(http.server.SimpleHTTPRequestHandler):
                 # Avatar is server-owned and synced across devices. A newly opened
                 # client can submit an empty avatar before it has downloaded the saved one;
                 # never let that blank value erase the existing image.
-                'avatar': (str(body.get('avatar') or '').strip() or existing.get('avatar', '')),
+                'avatar': stored_avatar,
                 'privacy': body.get('privacy') or existing.get('privacy', 'everyone'),
                 'profile_channels': profile_channels,
                 'is_premium': bool(existing.get('is_premium', False)),
@@ -588,7 +719,7 @@ class VibegramHandler(http.server.SimpleHTTPRequestHandler):
                 'typing_time': existing.get('typing_time', 0)
             }
             save_db()
-            return self.send_json({'ok': True, 'profile': USERS[u]})
+            return self.send_json({'ok': True, 'profile': _public_user(u, USERS[u])})
 
         # Создание или редактирование Telegram-канала (исправлена валидация и права админов)
         if parsed.path == '/api/channel/save':
@@ -636,22 +767,11 @@ class VibegramHandler(http.server.SimpleHTTPRequestHandler):
                     return self.send_json({'error': f'Канал @{handle} уже существует! Выберите другой @username.'}, 400)
 
             existing = USERS.get(handle, {})
-            avatar = avatar_input or existing.get('avatar', '')
+            try:
+                avatar = _store_avatar_value(avatar_input, existing.get('avatar', ''), max_bytes=1024 * 1024)
+            except ValueError as exc:
+                return self.send_json({'error': str(exc)}, 413)
             owner_final = existing.get('owner') or actor
-            if isinstance(avatar, str) and avatar.startswith('data:image/') and ',' in avatar:
-                try:
-                    data_header, encoded_avatar = avatar.split(',', 1)
-                    mime = data_header[5:].split(';', 1)[0].lower()
-                    avatar_ext = {'image/jpeg': 'jpg', 'image/jpg': 'jpg', 'image/png': 'png', 'image/webp': 'webp'}.get(mime, 'jpg')
-                    avatar_binary = base64.b64decode(encoded_avatar, validate=True)
-                    if len(avatar_binary) <= 2 * 1024 * 1024:
-                        safe_handle = re.sub(r'[^a-z0-9_]', '', handle)
-                        avatar_filename = f"avatar_channel_{now}_{safe_handle}.{avatar_ext}"
-                        with open(os.path.join(UPLOAD_DIR, avatar_filename), 'wb') as avatar_file:
-                            avatar_file.write(avatar_binary)
-                        avatar = f"/uploads/{avatar_filename}"
-                except Exception as exc:
-                    print(f'[Vibegram Avatar] channel avatar upload skipped: {exc}', flush=True)
             subs = existing.get('subscribers', [owner_final])
             if owner_final not in subs:
                 subs.append(owner_final)
@@ -692,7 +812,7 @@ class VibegramHandler(http.server.SimpleHTTPRequestHandler):
                 'last_seen': now
             }
             save_db()
-            return self.send_json({'ok': True, 'channel': USERS[handle]})
+            return self.send_json({'ok': True, 'channel': _public_user(handle, USERS[handle])})
 
         # Подписка / отписка от канала
         if parsed.path == '/api/channel/subscribe':
@@ -727,7 +847,7 @@ class VibegramHandler(http.server.SimpleHTTPRequestHandler):
                         'id': f"c_{now}_{len(comments)}",
                         'sender': user,
                         'name': user_obj.get('name', user),
-                        'avatar': user_obj.get('avatar', ''),
+                        'avatar': _avatar_public_path(user, user_obj.get('avatar', '')),
                         'color': user_obj.get('color', '#6c5ce7'),
                         'is_channel': bool(user_obj.get('is_channel', False)),
                         'is_premium': bool(user_obj.get('is_premium', False)),
