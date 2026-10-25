@@ -862,7 +862,7 @@
       <button type="button" class="auth-close-btn" id="cancelAddAccountBtn" title="Отмена">&times;</button>
       <div class="auth-logo">⚡</div>
       <div style="font-size:21px;font-weight:800;color:#fff;" id="authHeaderTitle">Вход в Vibegram</div>
-      <div style="font-size:13px;color:var(--text-secondary);">Укажите уникальный @username (у @paveldurov всегда ID: 1), телефон и Email для получения кода.</div>
+      <div style="font-size:13px;color:var(--text-secondary);">Создайте профиль: укажите имя, уникальный @username, телефон и Email. Подтверждение Email не требуется.</div>
       <div class="auth-field">
         <label>Имя и уникальный @username</label>
         <div style="display:flex;gap:8px;">
@@ -875,20 +875,10 @@
         <input type="tel" id="regPhoneInput" class="auth-input" value="+375 (29) " inputmode="tel" autocomplete="tel" maxlength="20">
       </div>
       <div class="auth-field">
-        <label>Email для получения кода</label>
+        <label>Email</label>
         <input type="email" id="regEmailInput" class="auth-input" placeholder="you@vibegram.org">
       </div>
-      <button type="button" class="btn-primary" id="sendEmailCodeBtn">Получить код на Email</button>
-    </div>
-
-    <div class="auth-card" id="authStep2" style="display:none;">
-      <div class="auth-logo">📩</div>
-      <div style="font-size:20px;font-weight:800;color:#fff;">Код подтверждения</div>
-      <div style="font-size:13px;color:var(--text-secondary);" id="authEmailSentDesc"></div>
-      <input type="text" id="regCodeInput" class="auth-input code-input" maxlength="6" inputmode="numeric" autocomplete="one-time-code" pattern="[0-9]{6}" placeholder="••••••">
-      <div id="authCodeHintBox" style="font-size:12.5px;color:#64d2ff;background:rgba(10,132,255,0.14);padding:8px 12px;border-radius:12px;"></div>
-      <button type="button" class="btn-primary" id="verifyEmailCodeBtn">Подтвердить и войти</button>
-      <button type="button" class="icon-btn" id="backToStep1Btn" style="margin:0 auto;font-size:13px;border-radius:10px;">← Назад</button>
+      <button type="button" class="btn-primary" id="createAccountBtn">Создать аккаунт и войти</button>
     </div>
   </div>
 
@@ -1722,11 +1712,8 @@
     }, true);
 
     /* =========================================================================
-       РЕГИСТРАЦИЯ И ДОБАВЛЕНИЕ АККАУНТОВ
+       РЕГИСТРАЦИЯ И ДОБАВЛЕНИЕ АККАУНТОВ (БЕЗ ПОДТВЕРЖДЕНИЯ EMAIL)
        ========================================================================= */
-    let generatedEmailCode = '';
-    let pendingRegData = null;
-
     function checkAuthAndShowScreen() {
       const authScreen = document.getElementById('authScreen');
       const closeBtn = document.getElementById('cancelAddAccountBtn');
@@ -1753,137 +1740,92 @@
     });
 
     document.getElementById('regPhoneInput').addEventListener('input', (event) => {
-      // Keep phone formatting characters, but never allow letters.
       event.target.value = event.target.value.replace(/[^0-9+()\s-]/g, '').replace(/(?!^)\+/g, '');
     });
-    document.getElementById('regCodeInput').addEventListener('input', (event) => {
-      event.target.value = event.target.value.replace(/\D/g, '').slice(0, 6);
-    });
 
-    document.getElementById('sendEmailCodeBtn').addEventListener('click', async () => {
+    document.getElementById('createAccountBtn').addEventListener('click', async () => {
       const name = document.getElementById('regNameInput').value.trim();
-      const username = document.getElementById('regUsernameInput').value.trim().replace(/^@+/, '').toLowerCase().replace(/[^a-z0-9_]/g, '');
+      const username = document.getElementById('regUsernameInput').value.trim().replace(/^@+/, '').toLowerCase();
       const phone = document.getElementById('regPhoneInput').value.trim() || '+375 (29) 000-00-00';
       const email = document.getElementById('regEmailInput').value.trim().toLowerCase();
 
-      if (!name || !username || !email || !email.includes('@')) {
-        alert('Заполните Имя, латинский @username и корректный Email.');
+      if (!name || !username || !email || !/^[^@\s]+@[^@\s]+\.[^@\s]+$/.test(email)) {
+        alert('Заполните имя, @username и корректный Email. Подтверждать Email не нужно.');
         return;
       }
-
-      try {
-        const res = await fetch(`/api/sync?me=${encodeURIComponent(username)}`);
-        if (res.ok) {
-          const data = await res.json();
-          usersMap = data.users || {};
-          if (usersMap[username]) {
-            const existing = enrichEntity(usersMap[username]);
-            if (existing.is_channel) {
-              alert(`Ник @${username} уже занят каналом! Выберите другой @username.`);
-              return;
-            }
-            if (existing.email && existing.email.toLowerCase() !== email) {
-              alert(`Ник @${username} уже занят другим пользователем! Каждый @username уникален.`);
-              return;
-            }
-          }
-        }
-      } catch (e) {}
-
+      if (!/^[a-z0-9_]{3,32}$/.test(username) || username === 'verify_bot') {
+        alert('Username: 3–32 символа, только латиница, цифры и _.');
+        return;
+      }
       const phoneDigits = phone.replace(/\D/g, '');
       if (phoneDigits.length < 7 || phoneDigits.length > 15) {
-        alert('Введите номер телефона только с 7–15 цифрами, включая код страны.');
+        alert('Введите номер телефона с 7–15 цифрами, включая код страны.');
         return;
       }
-      const assignedUid = username === 'paveldurov' ? 1 : (Object.keys(usersMap).length + 1);
-      const sendBtn = document.getElementById('sendEmailCodeBtn');
-      sendBtn.disabled = true;
-      sendBtn.textContent = 'Отправляем код…';
+
+      const createBtn = document.getElementById('createAccountBtn');
+      createBtn.disabled = true;
+      createBtn.textContent = 'Создаём аккаунт…';
       try {
-        const sendRes = await fetch('/api/auth/send-code', {
-          method: 'POST', headers: {'Content-Type': 'application/json'},
-          body: JSON.stringify({email, username, phone})
-        });
-        const sendData = await sendRes.json();
-        if (!sendRes.ok || !sendData.ok) {
-          alert(sendData.error || 'Не удалось отправить код.');
-          return;
+        try {
+          const res = await fetch(`/api/sync?me=${encodeURIComponent(username)}`);
+          if (res.ok) {
+            const data = await res.json();
+            usersMap = data.users || {};
+            if (usersMap[username]) {
+              const existing = enrichEntity(usersMap[username]);
+              if (existing.is_channel) {
+                alert(`Ник @${username} уже занят каналом! Выберите другой @username.`);
+                return;
+              }
+              if (existing.email && existing.email.toLowerCase() !== email) {
+                alert(`Ник @${username} уже занят другим пользователем! Каждый @username уникален.`);
+                return;
+              }
+            }
+          }
+        } catch (e) {
+          // Server sync is retried after the local profile is prepared.
         }
+
+        const assignedUid = username === 'paveldurov' ? 1 : (Object.keys(usersMap).length + 1);
+        saveChatsCacheForCurrentAccount();
+        myProfile = {
+          uid: assignedUid,
+          name,
+          username,
+          phone,
+          email,
+          bio: 'В Vibegram ⚡',
+          color: AVATAR_COLORS[Math.floor(Math.random() * AVATAR_COLORS.length)],
+          avatar: '',
+          privacy: 'everyone',
+          is_premium: false,
+          sticker: 'star',
+          is_verified: false,
+          verify_category: 'Популярный блогер',
+          verify_reason: ''
+        };
+        if (myProfile.username === 'paveldurov') {
+          isModeratorUnlocked = true;
+          localStorage.setItem(MODERATOR_UNLOCKED_KEY, '1');
+        }
+        upsertAccountInList(myProfile);
+        currentCommentSendAsUsername = myProfile.username;
+        isAddingSecondAccount = false;
+
+        document.getElementById('authScreen').classList.remove('active');
+        loadChatsCacheForCurrentAccount();
+        await syncMyProfileToServer();
+        await pollServer();
+        updateDrawerInfo();
       } catch (err) {
-        alert('Сервер недоступен. Не удалось отправить письмо.');
-        return;
+        console.error('Не удалось сохранить профиль Vibegram:', err);
+        alert('Не удалось сохранить профиль на сервере. Проверьте подключение и попробуйте ещё раз.');
       } finally {
-        sendBtn.disabled = false;
-        sendBtn.textContent = 'Получить код на Email';
+        createBtn.disabled = false;
+        createBtn.textContent = 'Создать аккаунт и войти';
       }
-
-      pendingRegData = {
-        uid: assignedUid,
-        name,
-        username,
-        phone,
-        email,
-        bio: 'В Vibegram ⚡',
-        color: AVATAR_COLORS[Math.floor(Math.random() * AVATAR_COLORS.length)],
-        avatar: '',
-        privacy: 'everyone',
-        is_premium: false,
-        sticker: 'star',
-        is_verified: false,
-        verify_category: 'Популярный блогер',
-        verify_reason: ''
-      };
-
-      document.getElementById('authStep1').style.display = 'none';
-      document.getElementById('authStep2').style.display = 'flex';
-      document.getElementById('authEmailSentDesc').innerHTML = `Код отправлен на <b>${escapeHtml(email)}</b>`;
-      document.getElementById('authCodeHintBox').textContent = `Проверьте входящие и папку «Спам». Код действует 10 минут. Ваш ID: ${assignedUid}.`;
-
-      showCustomIosBanner('Почта Vibegram', `Код подтверждения отправлен на ${email}`);
-      document.getElementById('regCodeInput').value = '';
-      document.getElementById('regCodeInput').focus();
-    });
-
-    document.getElementById('backToStep1Btn').addEventListener('click', () => {
-      document.getElementById('authStep2').style.display = 'none';
-      document.getElementById('authStep1').style.display = 'flex';
-    });
-
-    document.getElementById('verifyEmailCodeBtn').addEventListener('click', async () => {
-      const enteredCode = document.getElementById('regCodeInput').value.trim();
-      if (!/^\d{6}$/.test(enteredCode)) {
-        alert('Введите 6-значный код из письма.');
-        return;
-      }
-      try {
-        const verifyRes = await fetch('/api/auth/verify-code', {
-          method: 'POST', headers: {'Content-Type': 'application/json'},
-          body: JSON.stringify({email: pendingRegData?.email, username: pendingRegData?.username, code: enteredCode})
-        });
-        const verifyData = await verifyRes.json();
-        if (!verifyRes.ok || !verifyData.verified) {
-          alert(verifyData.error || 'Не удалось подтвердить код.');
-          return;
-        }
-      } catch (err) {
-        alert('Сервер недоступен. Не удалось проверить код.');
-        return;
-      }
-      saveChatsCacheForCurrentAccount();
-      myProfile = pendingRegData;
-      if (myProfile.username === 'paveldurov') {
-        isModeratorUnlocked = true;
-        localStorage.setItem(MODERATOR_UNLOCKED_KEY, '1');
-      }
-      upsertAccountInList(myProfile);
-      currentCommentSendAsUsername = myProfile.username;
-      isAddingSecondAccount = false;
-
-      document.getElementById('authScreen').classList.remove('active');
-      loadChatsCacheForCurrentAccount();
-      await syncMyProfileToServer();
-      await pollServer();
-      updateDrawerInfo();
     });
 
     /* =========================================================================
@@ -1963,7 +1905,6 @@
       document.getElementById('regNameInput').value = '';
       document.getElementById('regUsernameInput').value = '';
       document.getElementById('regEmailInput').value = '';
-      document.getElementById('authStep2').style.display = 'none';
       document.getElementById('authStep1').style.display = 'flex';
       document.getElementById('authScreen').classList.add('active');
     });
@@ -2010,8 +1951,7 @@
       } else {
         localStorage.removeItem(PROFILE_STORAGE_KEY);
         myProfile = null;
-        document.getElementById('authStep2').style.display = 'none';
-        document.getElementById('authStep1').style.display = 'flex';
+          document.getElementById('authStep1').style.display = 'flex';
         checkAuthAndShowScreen();
       }
     });

@@ -6,11 +6,7 @@ import socket
 import os
 import base64
 import threading
-import smtplib
-import ssl
-import secrets
 import re
-from email.message import EmailMessage
 from urllib.parse import urlparse, parse_qs
 
 # Render and other hosting platforms provide the listening port via PORT.
@@ -37,30 +33,6 @@ USERS = {}          # username -> профиль пользователя или
 MESSAGES = []       # список всех сообщений и постов
 PINS = {}           # закрепленные сообщения
 VERIFY_BOT_ADMIN = None  # username создателя, привязавшего бота по ID 1
-EMAIL_CHALLENGES = {}  # email -> {username, code, expires, attempts}
-EMAIL_CHALLENGES_LOCK = threading.RLock()
-
-
-def send_verification_email(email, code, username):
-    """Send a real verification code using Gmail SMTP App Password."""
-    smtp_user = os.environ.get('SMTP_EMAIL', '').strip()
-    smtp_password = os.environ.get('SMTP_APP_PASSWORD', '').replace(' ', '').strip()
-    if not smtp_user or not smtp_password:
-        raise RuntimeError('На сервере не настроены SMTP_EMAIL и SMTP_APP_PASSWORD')
-    message = EmailMessage()
-    message['Subject'] = 'Код подтверждения Vibegram'
-    message['From'] = f'Vibegram <{smtp_user}>'
-    message['To'] = email
-    message.set_content(
-        f'Здравствуйте!\n\nВаш код подтверждения Vibegram: {code}\n'
-        f'Аккаунт: @{username}\nКод действует 10 минут.\n\n'
-        'Если вы не запрашивали код, просто проигнорируйте это письмо.'
-    )
-    context = ssl.create_default_context()
-    with smtplib.SMTP_SSL('smtp.gmail.com', 465, context=context, timeout=15) as smtp:
-        smtp.login(smtp_user, smtp_password)
-        smtp.send_message(message)
-
 def get_chat_key(u1, u2):
     a = u1.strip().lower().lstrip('@')
     b = u2.strip().lower().lstrip('@')
@@ -270,66 +242,6 @@ class VibegramHandler(http.server.SimpleHTTPRequestHandler):
         length = int(self.headers.get('Content-Length', 0))
         body = json.loads(self.rfile.read(length).decode('utf-8')) if length > 0 else {}
         now = int(time.time() * 1000)
-
-        # Реальная отправка одноразового кода через Gmail SMTP; код никогда не возвращается клиенту.
-        if parsed.path == '/api/auth/send-code':
-            email = str(body.get('email') or '').strip().lower()
-            username = str(body.get('username') or '').strip().lower().lstrip('@')
-            phone = str(body.get('phone') or '').strip()
-            digits = re.sub(r'\D', '', phone)
-            if not re.fullmatch(r"[^@\s]+@[^@\s]+\.[^@\s]+", email):
-                return self.send_json({'error': 'Укажите корректный Email.'}, 400)
-            if not re.fullmatch(r'[a-z0-9_]{3,32}', username) or username == 'verify_bot':
-                return self.send_json({'error': 'Username: 3–32 символа, только латиница, цифры и _.'}, 400)
-            if not 7 <= len(digits) <= 15:
-                return self.send_json({'error': 'Телефон должен содержать от 7 до 15 цифр (код страны тоже считается).'}, 400)
-            now = time.time()
-            with EMAIL_CHALLENGES_LOCK:
-                old = EMAIL_CHALLENGES.get(email)
-                if old and now - old.get('sent_at', 0) < 45:
-                    return self.send_json({'error': 'Подождите 45 секунд перед повторной отправкой кода.'}, 429)
-            code = f'{secrets.randbelow(1000000):06d}'
-            try:
-                send_verification_email(email, code, username)
-          
-            except Exception as exc:
-                error_type = type(exc).__name__
-                error_message = str(exc)
-
-                print(
-                    f"[Vibegram SMTP] {error_type}: {error_message}",
-                    flush=True
-                )
-
-                return self.send_json({
-                    'error': (
-                        'Не удалось отправить код на Email. '
-                        'Проверьте настройки SMTP в Render и откройте Logs.'
-                    )
-                }, 503)
-            with EMAIL_CHALLENGES_LOCK:
-                EMAIL_CHALLENGES[email] = {'username': username, 'code': code, 'expires': now + 600, 'attempts': 0, 'sent_at': now}
-            return self.send_json({'ok': True, 'message': 'Код отправлен на указанный Email.'})
-
-        if parsed.path == '/api/auth/verify-code':
-            email = str(body.get('email') or '').strip().lower()
-            username = str(body.get('username') or '').strip().lower().lstrip('@')
-            code = str(body.get('code') or '').strip()
-            with EMAIL_CHALLENGES_LOCK:
-                challenge = EMAIL_CHALLENGES.get(email)
-                if not challenge or challenge.get('username') != username:
-                    return self.send_json({'error': 'Сначала запросите код подтверждения.'}, 400)
-                if time.time() > challenge['expires']:
-                    EMAIL_CHALLENGES.pop(email, None)
-                    return self.send_json({'error': 'Код истёк. Запросите новый.'}, 400)
-                challenge['attempts'] += 1
-                if challenge['attempts'] > 5:
-                    EMAIL_CHALLENGES.pop(email, None)
-                    return self.send_json({'error': 'Слишком много попыток. Запросите новый код.'}, 429)
-                if not re.fullmatch(r'\d{6}', code) or not secrets.compare_digest(code, challenge['code']):
-                    return self.send_json({'error': 'Неверный код подтверждения.'}, 400)
-                EMAIL_CHALLENGES.pop(email, None)
-            return self.send_json({'ok': True, 'verified': True})
 
         # Регистрация / сохранение личного профиля с проверкой уникальности @username и выдачей ID
         if parsed.path == '/api/profile':
