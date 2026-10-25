@@ -291,9 +291,22 @@ class VibegramHandler(http.server.SimpleHTTPRequestHandler):
             code = f'{secrets.randbelow(1000000):06d}'
             try:
                 send_verification_email(email, code, username)
+          
             except Exception as exc:
-                print('Ошибка отправки кода подтверждения:', repr(exc))
-                return self.send_json({'error': 'Не удалось отправить письмо. Проверьте SMTP_EMAIL и SMTP_APP_PASSWORD в настройках сервиса Render.'}, 503)
+                error_type = type(exc).__name__
+                error_message = str(exc)
+
+                print(
+                    f"[Vibegram SMTP] {error_type}: {error_message}",
+                    flush=True
+                )
+
+                return self.send_json({
+                    'error': (
+                        'Не удалось отправить код на Email. '
+                        'Проверьте настройки SMTP в Render и откройте Logs.'
+                    )
+                }, 503)
             with EMAIL_CHALLENGES_LOCK:
                 EMAIL_CHALLENGES[email] = {'username': username, 'code': code, 'expires': now + 600, 'attempts': 0, 'sent_at': now}
             return self.send_json({'ok': True, 'message': 'Код отправлен на указанный Email.'})
