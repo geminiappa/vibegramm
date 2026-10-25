@@ -64,16 +64,14 @@ def ensure_system_bot():
 
 def assign_user_id(username):
     u = username.strip().lower().lstrip('@')
-    # У создателя (@paveldurov или @vibegram) всегда ID = 1
+    # ID 1 is reserved for creator identities; ordinary first-time users do not
+    # become moderators only because they happened to register first.
     if u in ('paveldurov', 'vibegram'):
         return 1
-    # Если еще ни у кого нет ID = 1 среди реальных юзеров, первому зарегистрированному тоже можно дать ID = 1
-    real_users = [obj for k, obj in USERS.items() if not obj.get('is_channel') and not obj.get('is_bot')]
-    if not any(obj.get('id') == 1 for obj in real_users):
-        return 1
+    real_users = [obj for obj in USERS.values() if not obj.get('is_channel') and not obj.get('is_bot')]
     max_id = 1000
     for obj in real_users:
-        uid = int(obj.get('id') or 0)
+        uid = int(obj.get('id') or obj.get('uid') or 0)
         if uid > max_id:
             max_id = uid
     return max_id + 1
@@ -147,8 +145,20 @@ def load_db():
         print('Vibegram: DATABASE_URL не задан, используется локальный JSON-файл.')
 
     ensure_system_bot()
-    # Persist the system bot / initial state in PostgreSQL as well.
-    if DATABASE_URL:
+    # Migrate any old client-forged checkmarks away. Only retain a verified flag
+    # when the shared database contains a recorded approved @verify_bot request.
+    approved_targets = {
+        str((m.get('verification_request') or {}).get('target') or '').strip().lower().lstrip('@')
+        for m in MESSAGES
+        if m.get('verification_request') and (m.get('verification_request') or {}).get('status') == 'approved'
+    }
+    verification_state_changed = False
+    for username, user_obj in USERS.items():
+        if user_obj.get('is_verified') and not user_obj.get('is_bot') and username not in approved_targets:
+            user_obj['is_verified'] = False
+            verification_state_changed = True
+    # Persist the system bot, migrated verification states and initial state.
+    if DATABASE_URL or verification_state_changed:
         save_db()
 
 
@@ -299,13 +309,18 @@ class VibegramHandler(http.server.SimpleHTTPRequestHandler):
                 'phone': phone or existing.get('phone', '+375 (29) 000-00-00'),
                 'email': email or existing.get('email', ''),
                 'color': body.get('color') or existing.get('color', '#6c5ce7'),
-                'avatar': body.get('avatar') if 'avatar' in body else existing.get('avatar', ''),
+                # Avatar is server-owned and synced across devices. A newly opened
+                # client can submit an empty avatar before it has downloaded the saved one;
+                # never let that blank value erase the existing image.
+                'avatar': (str(body.get('avatar') or '').strip() or existing.get('avatar', '')),
                 'privacy': body.get('privacy') or existing.get('privacy', 'everyone'),
-                'is_premium': bool(body.get('is_premium', existing.get('is_premium', False))),
+                'is_premium': bool(existing.get('is_premium', False)),
                 'sticker_id': body.get('sticker_id') or existing.get('sticker_id', 'star'),
-                'is_verified': bool(body.get('is_verified', existing.get('is_verified', False))),
-                'verify_category': body.get('verify_category') or existing.get('verify_category', 'none'),
-                'verify_reason': body.get('verify_reason') if 'verify_reason' in body else existing.get('verify_reason', ''),
+                # Verified state may ONLY change in /api/verification/decide after bot review.
+                # Ignore any is_verified value supplied by a browser client.
+                'is_verified': bool(existing.get('is_verified', False)),
+                'verify_category': existing.get('verify_category', 'none'),
+                'verify_reason': existing.get('verify_reason', ''),
                 'is_channel': False,
                 'last_seen': now,
                 'typing_to': existing.get('typing_to', ''),
@@ -322,7 +337,7 @@ class VibegramHandler(http.server.SimpleHTTPRequestHandler):
             name = str(body.get('name') or '').strip()
             bio = str(body.get('bio') or '').strip()
             color = body.get('color') or '#039be5'
-            avatar = body.get('avatar') or ''
+            avatar_input = str(body.get('avatar') or '').strip()
             comments_enabled = bool(body.get('comments_enabled', True))
             sign_messages = bool(body.get('sign_messages', True))
             admins = body.get('admins') if isinstance(body.get('admins'), dict) else None
@@ -356,6 +371,7 @@ class VibegramHandler(http.server.SimpleHTTPRequestHandler):
                     return self.send_json({'error': f'Канал @{handle} уже существует! Выберите другой @username.'}, 400)
 
             existing = USERS.get(handle, {})
+            avatar = avatar_input or existing.get('avatar', '')
             owner_final = existing.get('owner') or actor
             subs = existing.get('subscribers', [owner_final])
             if owner_final not in subs:
@@ -446,8 +462,22 @@ class VibegramHandler(http.server.SimpleHTTPRequestHandler):
 
             if target not in USERS:
                 return self.send_json({'error': 'Профиль или канал не найден'}, 404)
+            if applicant not in USERS or USERS[applicant].get('is_channel'):
+                return self.send_json({'error': 'Не удалось определить заявителя'}, 400)
 
             target_obj = USERS[target]
+            # Only the account owner can request a personal badge. A channel owner
+            # or admin with promote permission can request a badge for that channel.
+            if target_obj.get('is_channel'):
+                channel_admin = (target_obj.get('admins') or {}).get(applicant, {})
+                if applicant != target_obj.get('owner') and not channel_admin.get('can_promote'):
+                    return self.send_json({'error': 'Подать заявку на канал может только владелец или администратор с правом управления'}, 403)
+            elif applicant != target:
+                return self.send_json({'error': 'Подать заявку на личный аккаунт может только его владелец'}, 403)
+
+            if target_obj.get('verify_pending'):
+                return self.send_json({'error': 'Заявка уже ожидает решения в @verify_bot'}, 409)
+
             target_obj['verify_pending'] = True
             target_obj['verify_category'] = category
             target_obj['verify_reason'] = reason
@@ -495,23 +525,37 @@ class VibegramHandler(http.server.SimpleHTTPRequestHandler):
 
         # Решение Создателя в боте @verify_bot: Выдать галочку или Отказать
         if parsed.path == '/api/verification/decide':
-            msg_id = body.get('msg_id', '')
-            decision = body.get('decision', '')  # 'approve' | 'reject'
+            msg_id = str(body.get('msg_id') or '')
+            decision = str(body.get('decision') or '')  # 'approve' | 'reject'
             target = str(body.get('target') or '').strip().lower().lstrip('@')
+            actor = str(body.get('actor') or '').strip().lower().lstrip('@')
 
-            applicant = ''
-            target_name = target
-            cat = 'Официальный статус'
-            rsn = 'Подлинность подтверждена создателем Vibegram'
+            # The server checks the creator binding; localStorage unlock flags are
+            # only a visual convenience and are not accepted as authorization.
+            creator = USERS.get(VERIFY_BOT_ADMIN or '', {})
+            if decision not in ('approve', 'reject'):
+                return self.send_json({'error': 'Недопустимое решение'}, 400)
+            if not VERIFY_BOT_ADMIN or actor != VERIFY_BOT_ADMIN or int(creator.get('id') or 0) != 1:
+                return self.send_json({'error': 'Рассматривать заявки может только создатель, привязавший @verify_bot с ID 1'}, 403)
 
-            for m in MESSAGES:
-                if m['id'] == msg_id and m.get('verification_request'):
-                    req = m['verification_request']
-                    req['status'] = 'approved' if decision == 'approve' else 'rejected'
-                    applicant = req.get('applicant', '')
-                    target_name = req.get('target_name', target)
-                    cat = req.get('category', cat)
-                    rsn = req.get('reason', rsn)
+            request_message = next((m for m in MESSAGES if str(m.get('id')) == msg_id and m.get('verification_request')), None)
+            if not request_message:
+                return self.send_json({'error': 'Заявка не найдена'}, 404)
+            req = request_message['verification_request']
+            if str(req.get('target') or '').lower() != target:
+                return self.send_json({'error': 'Цель заявки не совпадает'}, 400)
+            if req.get('status') != 'pending':
+                return self.send_json({'error': 'Эта заявка уже рассмотрена'}, 409)
+            if str(request_message.get('to') or '').lower() != actor:
+                return self.send_json({'error': 'Эта заявка не назначена вашему аккаунту в @verify_bot'}, 403)
+            if target not in USERS:
+                return self.send_json({'error': 'Профиль или канал не найден'}, 404)
+
+            applicant = req.get('applicant', '')
+            req['status'] = 'approved' if decision == 'approve' else 'rejected'
+            target_name = req.get('target_name', target)
+            cat = req.get('category', 'Официальный статус')
+            rsn = req.get('reason', 'Подлинность подтверждена создателем Vibegram')
 
             if target in USERS:
                 USERS[target]['verify_pending'] = False

@@ -2,8 +2,8 @@
 <html lang="ru">
 <head>
   <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-  <title>Vibegram iOS</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+  <title>Vibegram</title>
   <style>
     :root {
       --bg-main: #000000;
@@ -843,6 +843,96 @@
     }
     @media (prefers-reduced-motion: reduce) { *, *::before, *::after { animation-duration:.01ms !important; transition-duration:.01ms !important; scroll-behavior:auto !important; } }
 
+
+
+    /* Vibegram responsive polish 2026: GPU-friendly, low-jank chat rendering. */
+    .app { height:100dvh; min-height:0; overflow:hidden; }
+    .sidebar { width:clamp(300px, 32vw, 410px); min-width:300px; }
+    .chat-area, .chat-view, .messages-container, .chat-list { min-width:0; min-height:0; }
+    .sidebar-header { gap:8px; padding:12px 12px; }
+    .brand-title { flex:0 0 auto; white-space:nowrap; }
+    .notify-toggle { width:36px; height:36px; flex:0 0 36px; color:#b8c5d9; border:1px solid rgba(255,255,255,.075); background:rgba(255,255,255,.035); }
+    .notify-toggle.enabled { color:#fff; background:rgba(10,132,255,.19); border-color:rgba(10,132,255,.4); }
+    .notify-toggle svg { display:block; width:20px; height:20px; }
+    .chat-list { overscroll-behavior:contain; scrollbar-gutter:stable; }
+    .chat-item { min-height:70px; border:1px solid transparent; transition:background-color 130ms ease,border-color 130ms ease; }
+    .chat-item:hover { background:rgba(255,255,255,.045); }
+    .chat-item.active { background:linear-gradient(100deg,rgba(10,132,255,.2),rgba(94,92,230,.12)); border-color:rgba(92,154,255,.14); }
+    .avatar { background-size:cover; background-position:center; background-repeat:no-repeat; overflow:hidden; }
+    .avatar-wrap .avatar, #activeChatAvatar, #drawerAvatar, .tg-avatar-main, .ios-hero-avatar, #peerProfileAvatar { background-size:cover; background-position:center; background-repeat:no-repeat; }
+    .chat-name { gap:5px; overflow:hidden; }
+    .chat-name > span:not(.verified-badge):not(.prem-svg-badge) { overflow:hidden; text-overflow:ellipsis; }
+    .chat-preview { overflow:hidden; text-overflow:ellipsis; white-space:nowrap; }
+    .chat-area { background-color:#090c12; }
+    .chat-header { padding-left:clamp(10px,1.5vw,20px); padding-right:clamp(10px,1.5vw,20px); }
+    .messages-container { scroll-behavior:auto; overscroll-behavior:contain; contain:layout style; padding:clamp(12px,2vw,24px); gap:9px; }
+    .message { max-width:min(76%, 780px); contain:layout style; overflow-wrap:anywhere; animation:none !important; transition:background-color 130ms ease, border-color 130ms ease, transform 130ms ease; }
+    .message:active { transform:scale(.994); }
+    .message.channel-post { width:100%; max-width:100%; border-radius:18px; border:1px solid rgba(140,160,190,.15); background:linear-gradient(145deg,rgba(30,36,48,.96),rgba(21,25,35,.96)); box-shadow:0 7px 24px rgba(0,0,0,.13); }
+    .channel-post-row { width:min(900px,100%); max-width:100%; align-self:center; gap:9px; align-items:flex-start; }
+    .channel-post-header { color:#8bd8ff; font-size:13px; letter-spacing:.01em; }
+    .channel-comments-bar { min-height:34px; border-top-color:rgba(255,255,255,.09); }
+    .channel-readonly-bar { padding-bottom:max(9px,env(safe-area-inset-bottom)); }
+    .chat-input-bar { padding-bottom:max(10px,env(safe-area-inset-bottom)); background:rgba(13,15,21,.86); backdrop-filter:blur(20px); -webkit-backdrop-filter:blur(20px); }
+    .msg-input { min-width:0; }
+    .message-text { overflow-wrap:anywhere; word-break:break-word; }
+    .reaction-picker-bar { gap:5px; }
+    .react-emoji-btn { display:inline-flex; align-items:center; justify-content:center; width:36px; height:36px; border-radius:12px; background:rgba(255,255,255,.045); transition:transform 120ms ease,background-color 120ms ease; }
+    .react-emoji-btn:hover { background:rgba(10,132,255,.18); transform:translateY(-1px); }
+    .sticker-send-option svg, .prem-svg-badge svg, .verified-badge svg { display:block; flex:0 0 auto; }
+    .verified-badge, .prem-svg-badge { flex:0 0 auto; }
+    .modal-overlay { padding: max(10px,env(safe-area-inset-top)) 10px max(10px,env(safe-area-inset-bottom)); }
+    button, .chat-item, .ios-action-btn, .channel-sub-bottom-btn { touch-action:manipulation; }
+    @media (min-width:1200px) {
+      .messages-container { padding-left:clamp(24px,5vw,72px); padding-right:clamp(24px,5vw,72px); }
+      .message:not(.channel-post) { max-width:min(68%,780px); }
+    }
+    @media (max-width:900px) {
+      .sidebar { width:36vw; min-width:275px; }
+      .brand-title { font-size:16px; }
+      .sidebar-header { gap:6px; padding:10px 9px; }
+      .search-input { font-size:13px; padding-left:9px; }
+    }
+    @media (max-width:768px) {
+      .app { height:100dvh; height:100svh; }
+      .sidebar { width:100%; min-width:0; }
+      .sidebar-header { display:grid; grid-template-columns:38px minmax(0,1fr) 38px; grid-template-rows:36px 40px; gap:8px; padding:calc(8px + env(safe-area-inset-top)) 12px 9px; }
+      #openDrawerBtn { grid-column:1; grid-row:1; justify-self:start; }
+      .brand-title { grid-column:2; grid-row:1; justify-self:center; font-size:18px; }
+      .notify-toggle { grid-column:3; grid-row:1; justify-self:end; }
+      .search-wrapper { grid-column:1 / -1; grid-row:2; width:100%; min-width:0; }
+      .chat-list { padding:6px 7px max(10px,env(safe-area-inset-bottom)); }
+      .chat-item { min-height:68px; padding:8px 9px; border-radius:15px; }
+      .chat-area { padding-top:env(safe-area-inset-top); }
+      .chat-header { height:58px; min-height:58px; gap:8px; padding-left:9px; padding-right:9px; }
+      .chat-header-title { font-size:15px; }
+      .chat-header-status { font-size:11px; }
+      .header-sub-pill { max-width:112px; white-space:nowrap; text-overflow:ellipsis; overflow:hidden; padding:7px 10px; }
+      .messages-container { padding:12px 9px 10px; gap:7px; }
+      .message { max-width:87%; padding:8px 11px 7px; border-radius:17px; font-size:15px; }
+      .message.channel-post { max-width:100%; width:100%; padding:10px 11px 9px; }
+      .channel-post-row { width:100%; gap:6px; }
+      .channel-post-row > .avatar { width:30px !important; height:30px !important; flex:0 0 30px; }
+      .channel-post-header { flex-wrap:wrap; }
+      .bot-top-panel { align-items:flex-start; flex-direction:column; }
+      .bot-top-panel .header-sub-pill { max-width:none; width:100%; }
+      .chat-input-bar { gap:5px; padding-left:7px; padding-right:7px; }
+      .msg-input { font-size:16px; }
+      .sticker-send-panel { bottom:calc(100% + 7px); }
+      .ios-sheet-modal, .tg-settings-modal { max-height:calc(100dvh - env(safe-area-inset-top) - env(safe-area-inset-bottom) - 16px); overflow:auto; overscroll-behavior:contain; }
+      .modal-overlay { align-items:flex-end; padding:8px 8px max(8px,env(safe-area-inset-bottom)); }
+    }
+    @media (max-width:380px) {
+      .sidebar-header { padding-left:8px; padding-right:8px; gap:5px; }
+      .chat-name { font-size:13px; }
+      .chat-preview { font-size:11.5px; }
+      .message { max-width:91%; }
+      .react-emoji-btn { width:32px; height:34px; }
+    }
+    @media (prefers-reduced-motion: reduce) {
+      .message, .chat-item, .notify-toggle, .react-emoji-btn { transition:none !important; animation:none !important; }
+    }
+
     @media (max-width: 768px) {
       .sidebar { width: 100%; min-width: 100%; }
       .chat-area { position: fixed; inset: 0; z-index: 20; transform: translateX(100%); transition: transform 0.28s var(--spring); }
@@ -1153,6 +1243,11 @@
           </svg>
         </button>
         <div class="brand-title">Vibegram</div>
+        <button class="icon-btn notify-toggle" id="enableNotificationsBtn" type="button" title="Включить уведомления и звук" aria-label="Включить уведомления">
+          <svg viewBox="0 0 24 24" width="21" height="21" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+            <path d="M18 8a6 6 0 0 0-12 0c0 7-3 7-3 9h18c0-2-3-2-3-9"/><path d="M10 21h4"/>
+          </svg>
+        </button>
         <div class="search-wrapper">
           <input type="text" id="searchInput" class="search-input" placeholder="Поиск @юзеров и каналов...">
           <button class="clear-search" id="clearSearchBtn">&times;</button>
@@ -1389,6 +1484,7 @@
     const ACCOUNTS_LIST_KEY = 'vibegram_accounts_list_v8';
     const CHATS_CACHE_PREFIX = 'vibegram_chats_cache_v8_';
     const MODERATOR_UNLOCKED_KEY = 'vibegram_mod_unlocked_v8';
+    const NOTIFICATIONS_ENABLED_KEY = 'vibegram_notifications_enabled_v1';
 
     // Векторные SVG-эмодзи в стиле Telegram Premium
     const PREMIUM_SVG_STICKERS = {
@@ -2061,8 +2157,8 @@
       Array.from(toastStack.children).reverse().forEach((el, idx) => el.setAttribute('data-depth', String(Math.min(idx, 3))));
     }
 
-    function showCustomIosBanner(title, text) {
-      playPleasantSound();
+    function showCustomIosBanner(title, text, silent = false) {
+      if (!silent) playPleasantSound();
       const toast = document.createElement('div');
       toast.className = 'ios-toast';
       toast.innerHTML = `
@@ -2165,7 +2261,7 @@
       });
 
       try {
-        await fetch('/api/profile', {
+        const response = await fetch('/api/profile', {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify({
@@ -2179,8 +2275,68 @@
             is_premium: myProfile.is_premium
           })
         });
+        const saved = await response.json().catch(() => ({}));
+        if (!response.ok || saved.error) throw new Error(saved.error || 'Не удалось синхронизировать профиль');
+        if (saved.profile) {
+          myProfile.avatar = saved.profile.avatar || myProfile.avatar || '';
+          myProfile.color = saved.profile.color || myProfile.color;
+          myProfile.is_verified = Boolean(saved.profile.is_verified);
+          upsertAccountInList(myProfile);
+        }
       } catch (e) {}
     }
+
+    function notificationsEnabled() {
+      if (window.vibegramDesktop && window.vibegramDesktop.isDesktop) return true;
+      return localStorage.getItem(NOTIFICATIONS_ENABLED_KEY) === '1' ||
+        (('Notification' in window) && Notification.permission === 'granted');
+    }
+
+    function updateNotificationsButton() {
+      const button = document.getElementById('enableNotificationsBtn');
+      if (!button) return;
+      const enabled = notificationsEnabled();
+      button.classList.toggle('enabled', enabled);
+      button.title = enabled ? 'Уведомления включены' : 'Включить уведомления и звук';
+      button.setAttribute('aria-label', button.title);
+    }
+
+    async function enableNotifications() {
+      try {
+        if (!(window.vibegramDesktop && window.vibegramDesktop.isDesktop) && 'Notification' in window) {
+          if (Notification.permission === 'default') await Notification.requestPermission();
+          if (Notification.permission === 'denied') {
+            showCustomIosBanner('Уведомления отключены', 'Разреши уведомления для Vibegram в настройках браузера.');
+            updateNotificationsButton();
+            return;
+          }
+        }
+        localStorage.setItem(NOTIFICATIONS_ENABLED_KEY, '1');
+        updateNotificationsButton();
+        showCustomIosBanner('Уведомления включены', 'Новые сообщения будут приходить с уведомлением и звуком.');
+      } catch (error) {
+        showCustomIosBanner('Не удалось включить уведомления', 'Проверь разрешения уведомлений в системе.');
+      }
+    }
+
+    function notifyIncomingMessage(title, body) {
+      if (!notificationsEnabled()) return;
+      const safeTitle = String(title || 'Vibegram').slice(0, 100);
+      const safeBody = String(body || 'Новое сообщение').slice(0, 240);
+      if (window.vibegramDesktop && window.vibegramDesktop.isDesktop && typeof window.vibegramDesktop.notify === 'function') {
+        window.vibegramDesktop.notify(safeTitle, safeBody);
+        return;
+      }
+      if ('Notification' in window && Notification.permission === 'granted') {
+        try {
+          const n = new Notification(safeTitle, { body: safeBody, tag: 'vibegram-' + safeTitle });
+          n.onclick = () => { window.focus(); n.close(); };
+        } catch (_) {}
+      }
+    }
+
+    document.getElementById('enableNotificationsBtn')?.addEventListener('click', enableNotifications);
+    updateNotificationsButton();
 
     async function pollServer() {
       if (!myProfile) return;
@@ -2195,26 +2351,49 @@
         serverTime = data.serverTime || Date.now();
         messagesList = (data.messages || []).filter(m => !(m.media && (m.media.type === 'voice' || m.media.type === 'video_note')));
 
-        if (isModeratorUnlocked || me === 'paveldurov') {
-          const modRes = await fetch(`/api/sync?me=vibegram`);
-          if (modRes.ok) {
-            const modData = await modRes.json();
-            modQueueMessages = (modData.messages || []).filter(m => m.verification_request);
-          }
-        }
+        // Moderator state comes from the server's bot binding, never only from
+        // a localStorage flag. The creator must send the ID to @verify_bot first.
+        const isServerCreator = data.verifyBotAdmin === me && Number(usersMap[me]?.id || 0) === 1;
+        isModeratorUnlocked = Boolean(isServerCreator);
+        if (isServerCreator) localStorage.setItem(MODERATOR_UNLOCKED_KEY, '1');
+        else localStorage.removeItem(MODERATOR_UNLOCKED_KEY);
+        modQueueMessages = isServerCreator ? messagesList.filter(m => m.verification_request) : [];
 
         if (usersMap[me] && !usersMap[me].is_channel) {
-          const enrichedMe = enrichEntity(usersMap[me]);
+          const serverSelf = usersMap[me];
+          const enrichedMe = enrichEntity(serverSelf);
           myProfile.uid = me === 'paveldurov' ? 1 : enrichedMe.uid;
-          myProfile.is_verified = Boolean(usersMap[me].is_verified);
+          myProfile.is_verified = Boolean(serverSelf.is_verified);
+          // Server profile is the cross-device source of truth. Do not replace an
+          // existing local image with blank data, but download the saved avatar when
+          // this account is opened on a new phone/PC.
+          myProfile.avatar = serverSelf.avatar || myProfile.avatar || '';
+          myProfile.color = serverSelf.color || myProfile.color;
+          myProfile.name = serverSelf.name || myProfile.name;
+          myProfile.phone = serverSelf.phone || enrichedMe.phone || myProfile.phone;
+          myProfile.email = serverSelf.email || enrichedMe.email || myProfile.email;
+          myProfile.bio = enrichedMe.cleanBio || myProfile.bio;
+          myProfile.privacy = serverSelf.privacy || myProfile.privacy;
           upsertAccountInList(myProfile);
         }
 
         messagesList.forEach(msg => {
           if (!knownMsgIds.has(msg.id)) {
             knownMsgIds.add(msg.id);
-            if (!isFirstSync && msg.to === me && msg.sender !== me && activePeer !== msg.sender) {
-              showCustomIosBanner(getPeerObject(msg.sender).name, msg.text || 'Медиафайл');
+            if (!isFirstSync && msg.sender !== me) {
+              const isDirectIncoming = msg.to === me && msg.sender !== me;
+              const channel = usersMap[msg.to];
+              const isSubscribedChannelPost = Boolean(msg.is_channel_post && channel &&
+                Array.isArray(channel.subscribers) && channel.subscribers.includes(me));
+              if (isDirectIncoming || isSubscribedChannelPost) {
+                const peerKey = isSubscribedChannelPost ? msg.to : msg.sender;
+                const peerObj = getPeerObject(peerKey);
+                const preview = msg.text || (msg.media ? 'Медиафайл' : 'Новое сообщение');
+                const shouldNotifyOS = activePeer !== peerKey || document.hidden;
+                const systemSoundAvailable = shouldNotifyOS && notificationsEnabled();
+                if (activePeer !== peerKey) showCustomIosBanner(peerObj.name, preview, systemSoundAvailable);
+                if (shouldNotifyOS) notifyIncomingMessage(peerObj.name, preview);
+              }
             }
           }
         });
@@ -2565,15 +2744,22 @@
           btn.addEventListener('click', async (ev) => {
             ev.stopPropagation();
             const decision = btn.getAttribute('data-decide');
-            await fetch('/api/verification/decide', {
+            const decisionResponse = await fetch('/api/verification/decide', {
               method: 'POST',
               headers: { 'Content-Type': 'application/json' },
               body: JSON.stringify({
                 msg_id: msg.id,
                 decision: decision,
-                target: msg.verification_request.target
+                target: msg.verification_request.target,
+                actor: myProfile?.username || ''
               })
             });
+            const decisionData = await decisionResponse.json().catch(() => ({}));
+            if (!decisionResponse.ok || decisionData.error) {
+              showCustomIosBanner('Заявка не изменена', decisionData.error || 'Недостаточно прав');
+              return;
+            }
+            showCustomIosBanner(decision === 'approve' ? 'Галочка выдана' : 'Заявка отклонена', '@' + msg.verification_request.target);
             await pollServer();
           });
         });
@@ -2932,15 +3118,6 @@
     async function dispatchOutgoingMessage(text, mediaPayload, replyPayload) {
       if (!activePeer || !myProfile) return;
       const me = myProfile.username.toLowerCase();
-
-      if (activePeer === 'verify_bot' && (text.trim() === '1' || text.trim().toLowerCase() === '/admin 1' || text.trim().toLowerCase() === 'id 1')) {
-        isModeratorUnlocked = true;
-        localStorage.setItem(MODERATOR_UNLOCKED_KEY, '1');
-        showCustomIosBanner('Бот Верификации (@verify_bot)', `Пароль создателя (ID: 1) принят! Панель заявок привязана к @${me}.`);
-        await pollServer();
-        renderActiveChat(true);
-        return;
-      }
 
       const peerObj = getPeerObject(activePeer);
       const senderField = peerObj.is_channel ? (peerObj.owner || me) : me;
@@ -3418,18 +3595,24 @@
       myProfile.verify_reason = reason;
       await syncMyProfileToServer();
 
-      await fetch('/api/verification/request', {
+      const requestResponse = await fetch('/api/verification/request', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
           applicant: myProfile.username,
           target: myProfile.username,
-          reason: `[${cat}] ${reason}`
+          category: cat,
+          reason: reason
         })
       });
+      const requestData = await requestResponse.json().catch(() => ({}));
+      if (!requestResponse.ok || requestData.error) {
+        showCustomIosBanner('Заявка не отправлена', requestData.error || 'Повтори попытку позже.');
+        return;
+      }
 
       myProfileModal.classList.remove('open');
-      showCustomIosBanner('Заявка отправлена', 'Откройте @verify_bot (пароль создателя: 1), чтобы рассмотреть заявку!');
+      showCustomIosBanner('Заявка отправлена', 'Откройте @verify_bot: выдать галочку может только создатель после рассмотрения.');
       openChatWith('verify_bot');
       await pollServer();
     });
@@ -3560,7 +3743,7 @@
       await fetch('/api/verification/request', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ applicant: myProfile.username, target: peer.username, reason: `[${cat}] ${reason}` })
+        body: JSON.stringify({ applicant: myProfile.username, target: peer.username, category: cat, reason: reason })
       });
       peerProfileModal.classList.remove('open');
       openChatWith('verify_bot');
