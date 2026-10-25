@@ -729,6 +729,19 @@
     /* Модальные окна в стиле iOS Sheet */
     .modal-overlay { position: fixed; inset: 0; background: rgba(0,0,0,0.68); backdrop-filter: blur(10px); display: none; align-items: center; justify-content: center; z-index: 1000; padding: 14px; }
     .modal-overlay.open { display: flex; }
+    /* Badge details is a second-level modal. Keep it above profile/settings overlays. */
+    #badgeInfoModal { z-index: 30000 !important; align-items: center; isolation: isolate; padding: max(12px, env(safe-area-inset-top)) max(12px, env(safe-area-inset-right)) max(12px, env(safe-area-inset-bottom)) max(12px, env(safe-area-inset-left)); }
+    #badgeInfoModal .badge-info-card { position: relative; width: min(100%, 355px); max-width: 355px; max-height: calc(100dvh - env(safe-area-inset-top) - env(safe-area-inset-bottom) - 24px); overflow-y: auto; overscroll-behavior: contain; padding: 30px 22px 22px; border-radius: 28px; gap: 12px; text-align: center; align-items: center; background: linear-gradient(155deg, rgba(37,40,49,.99), rgba(20,21,26,.99)); border: 1px solid rgba(255,255,255,.13); box-shadow: 0 28px 90px rgba(0,0,0,.72), 0 0 0 1px rgba(255,255,255,.025) inset; }
+    .badge-modal-close { position: absolute; top: 10px; right: 10px; z-index: 2; width: 38px; height: 38px; display: inline-flex; align-items: center; justify-content: center; border: 1px solid rgba(255,255,255,.10); border-radius: 50%; color: rgba(255,255,255,.88); background: rgba(255,255,255,.085); cursor: pointer; -webkit-tap-highlight-color: transparent; transition: background .16s ease, border-color .16s ease, transform .16s ease; }
+    .badge-modal-close:hover { background: rgba(255,255,255,.17); border-color: rgba(255,255,255,.2); }
+    .badge-modal-close:active { transform: scale(.92); }
+    .badge-modal-close:focus-visible { outline: 2px solid var(--accent, #0a84ff); outline-offset: 3px; }
+    .badge-modal-close svg { width: 19px; height: 19px; display: block; }
+    @media (max-width: 600px) {
+      #badgeInfoModal .badge-info-card { width: min(100%, 420px); max-width: none; padding: 34px 20px 20px; border-radius: 25px; }
+      .badge-modal-close { width: 42px; height: 42px; top: 9px; right: 9px; }
+    }
+    @media (prefers-reduced-motion: reduce) { .badge-modal-close { transition: none; } }
     @keyframes popIn { from { transform: scale(0.92); opacity: 0; } to { transform: scale(1); opacity: 1; } }
 
     .tg-settings-modal, .ios-sheet-modal {
@@ -1074,14 +1087,17 @@
     </div>
   </aside>
 
-  <!-- Модальное окно объяснения галочки верификации -->
-  <div class="modal-overlay" id="badgeInfoModal">
-    <div class="ios-sheet-modal" style="max-width:355px;padding:24px 20px;text-align:center;align-items:center;gap:11px;">
+  <!-- Модальное окно объяснения галочки/значка. Оно расположено поверх окна профиля. -->
+  <div class="modal-overlay" id="badgeInfoModal" role="dialog" aria-modal="true" aria-labelledby="badgeInfoTitle">
+    <div class="ios-sheet-modal badge-info-card">
+      <button type="button" class="badge-modal-close" id="closeBadgeInfoXBtn" aria-label="Закрыть описание значка" title="Закрыть">
+        <svg viewBox="0 0 24 24" fill="none" aria-hidden="true"><path d="M6 6L18 18M18 6L6 18" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"/></svg>
+      </button>
       <div id="badgeInfoIcon" style="width:64px;height:64px;border-radius:50%;background:rgba(10,132,255,0.14);display:flex;align-items:center;justify-content:center;"></div>
-      <div style="font-size:18px;font-weight:800;color:#fff;" id="badgeInfoTitle"></div>
-      <div style="font-size:12.5px;font-weight:700;color:#64d2ff;background:rgba(100,210,255,0.12);padding:4px 12px;border-radius:10px;" id="badgeInfoCategory"></div>
-      <div style="font-size:13.5px;color:#dfe6e9;line-height:1.45;" id="badgeInfoReason"></div>
-      <button type="button" class="btn-primary" id="closeBadgeInfoBtn" style="margin-top:6px;">Понятно</button>
+      <div style="font-size:18px;font-weight:800;color:#fff;line-height:1.3;overflow-wrap:anywhere;" id="badgeInfoTitle"></div>
+      <div style="font-size:12.5px;font-weight:700;color:#64d2ff;background:rgba(100,210,255,0.12);padding:5px 12px;border-radius:10px;max-width:100%;overflow-wrap:anywhere;" id="badgeInfoCategory"></div>
+      <div style="font-size:13.5px;color:#dfe6e9;line-height:1.55;overflow-wrap:anywhere;" id="badgeInfoReason"></div>
+      <button type="button" class="btn-primary" id="closeBadgeInfoBtn" style="margin-top:5px;width:100%;max-width:220px;">Понятно</button>
     </div>
   </div>
 
@@ -1840,8 +1856,17 @@
       modal.classList.add('open');
     }
 
-    document.getElementById('closeBadgeInfoBtn').addEventListener('click', () => { document.getElementById('badgeInfoModal').classList.remove('open'); });
-    document.getElementById('badgeInfoModal').addEventListener('click', (e) => { if (e.target.id === 'badgeInfoModal') e.currentTarget.classList.remove('open'); });
+    const badgeInfoModal = document.getElementById('badgeInfoModal');
+    const closeBadgeInfoModal = () => badgeInfoModal.classList.remove('open');
+    document.getElementById('closeBadgeInfoBtn').addEventListener('click', closeBadgeInfoModal);
+    document.getElementById('closeBadgeInfoXBtn').addEventListener('click', closeBadgeInfoModal);
+    badgeInfoModal.addEventListener('click', (e) => { if (e.target === badgeInfoModal) closeBadgeInfoModal(); });
+    document.addEventListener('keydown', (e) => {
+      if (e.key === 'Escape' && badgeInfoModal.classList.contains('open')) {
+        e.stopPropagation();
+        closeBadgeInfoModal();
+      }
+    }, true);
 
     document.addEventListener('click', (ev) => {
       const userLink = ev.target.closest('[data-open-user]');
