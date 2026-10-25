@@ -6909,5 +6909,95 @@ button:disabled {cursor:not-allowed;}
 }
 </style>
 
+
+<style id="vibegram-global-layout-polish-2026">
+/* Unified, compact dialog system for profiles, channels, group management and settings. */
+:root{--vg-dialog-bg:#17212b;--vg-dialog-border:rgba(170,205,230,.14);--vg-dialog-shadow:0 24px 80px rgba(0,0,0,.48);--vg-dialog-radius:22px}
+*,*::before,*::after{box-sizing:border-box}
+html{scroll-behavior:smooth;-webkit-text-size-adjust:100%}
+body{overflow-wrap:anywhere}
+button,input,textarea,select{font:inherit}
+button{ -webkit-tap-highlight-color:transparent }
+.modal-overlay,.vg-modal{box-sizing:border-box;align-items:center!important;justify-content:center!important;padding:max(14px,env(safe-area-inset-top)) max(14px,env(safe-area-inset-right)) max(14px,env(safe-area-inset-bottom)) max(14px,env(safe-area-inset-left))!important;overflow-y:auto;overscroll-behavior:contain}
+.modal-overlay>.tg-settings-modal,.modal-overlay>.ios-sheet-modal,.vg-modal>.vg-modal-card{
+  width:min(100%,560px)!important;max-width:min(560px,calc(100vw - 28px))!important;
+  min-width:0!important;height:auto!important;min-height:0!important;max-height:calc(100dvh - env(safe-area-inset-top) - env(safe-area-inset-bottom) - 28px)!important;
+  margin:auto!important;flex:0 1 auto!important;align-self:center!important;position:relative;overflow:hidden!important;
+  border:1px solid var(--vg-dialog-border)!important;border-radius:var(--vg-dialog-radius)!important;box-shadow:var(--vg-dialog-shadow)!important;
+}
+#myProfileModal>.tg-settings-modal{width:min(540px,calc(100vw - 28px))!important;max-width:540px!important}
+#channelEditorModal>.tg-settings-modal{width:min(540px,calc(100vw - 28px))!important;max-width:540px!important}
+#peerProfileModal>.ios-sheet-modal{width:min(420px,calc(100vw - 28px))!important;max-width:420px!important}
+#badgeInfoModal>.badge-info-card{width:min(390px,calc(100vw - 28px))!important;max-width:390px!important}
+#vgManageGroupModal>.vg-modal-card{width:min(650px,calc(100vw - 28px))!important;max-width:650px!important}
+#vgDirectoryModal>.vg-modal-card,#vgApplicationsModal>.vg-modal-card{width:min(760px,calc(100vw - 28px))!important;max-width:760px!important}
+#vgSearchModal>.vg-modal-card{width:min(640px,calc(100vw - 28px))!important;max-width:640px!important}
+#vgCreateGroupModal>.vg-modal-card{width:min(540px,calc(100vw - 28px))!important;max-width:540px!important}
+.tg-settings-modal,.ios-sheet-modal,.vg-modal-card{display:flex;flex-direction:column;min-width:0;max-width:100%;background:var(--vg-dialog-bg)}
+.tg-profile-banner,.tg-settings-modal>.tg-profile-banner,.ios-hero{flex:0 0 auto;min-width:0;max-width:100%;overflow:hidden}
+.tg-settings-scroll,.ios-sheet-body,.vg-modal-body{width:100%;min-width:0;max-width:100%;min-height:0;overflow-y:auto;overflow-x:hidden;overscroll-behavior:contain;-webkit-overflow-scrolling:touch}
+.tg-settings-scroll{flex:1 1 auto}
+.vg-modal-body{padding:16px;flex:1 1 auto}
+.tg-section-box,.ios-card-group,.vg-group-manage-section,.vg-card,.vg-settings-card{min-width:0;max-width:100%;overflow-wrap:anywhere}
+.tg-row-item,.tg-row-body,.ios-cell,.ios-cell-val,.vg-group-hero-copy,.vg-group-add-member,.vg-action-row,.vg-group-section-heading{min-width:0;max-width:100%}
+.tg-inline-input,.tg-inline-select,.vg-input,.vg-textarea,.ios-cell input,.ios-cell select,.ios-cell textarea{width:100%;min-width:0;max-width:100%;box-sizing:border-box}
+.tg-row-item{gap:10px}
+.tg-row-body{flex:1 1 auto}
+.tg-row-hint,.vg-helper,.ios-cell-val{line-height:1.45;overflow-wrap:anywhere}
+.tg-banner-top,.vg-modal-head{display:flex;align-items:center;gap:12px;min-width:0}
+.tg-banner-top>span,.vg-modal-head>span{min-width:0;overflow-wrap:anywhere}
+.tg-banner-top button,.vg-modal-head button{flex:0 0 auto}
+.vg-modal-head{padding:15px 17px;min-height:54px}
+.vg-modal-head>span{font-size:15px;font-weight:800;line-height:1.3}
+.vg-modal-head button{margin-left:auto;width:34px;height:34px;display:grid;place-items:center;border-radius:50%;font-size:22px}
+.vg-action-row,.vg-group-add-member,.vg-group-footer-actions{display:flex;flex-wrap:wrap;gap:9px}
+.vg-action-row>* ,.vg-group-add-member>*{min-width:0;max-width:100%}
+.vg-action-row>*{flex:1 1 160px}
+.vg-group-add-member input{flex:1 1 180px}
+.vg-group-add-member button{flex:0 0 auto}
+.vg-group-footer-actions>*{flex:1 1 130px}
+.profile-linked-channel-card,.vg-created-entity-row,.vg-drawer-entity{width:100%;min-width:0;max-width:100%;overflow:hidden}
+.profile-linked-channel-name,.vg-created-entity-row strong,.vg-group-hero-copy strong{min-width:0;overflow-wrap:anywhere;word-break:break-word}
+.profile-linked-channel-avatar,.vg-created-entity-avatar{flex:0 0 auto}
+/* Keep the chat frame and navigation from causing horizontal overflow. */
+#app,.app-shell,.main-content,.chat-layout,.chat-main,.chat-panel,.chat-list,.chat-list-panel{min-width:0;max-width:100%}
+.chat-header,.chat-header-identity,.chat-header-info,.chat-header-title,.chat-header-status{min-width:0}
+.chat-header-title{overflow-wrap:anywhere}
+.message,.message-content,.message-text,.channel-post,.channel-post-row{min-width:0;overflow-wrap:anywhere;word-break:break-word}
+img,video,canvas,svg{max-width:100%}
+/* Consistent touch target, focus and motion across the whole app. */
+button,a,[role="button"],.chat-item,.drawer-btn{touch-action:manipulation}
+button:focus-visible,a:focus-visible,input:focus-visible,textarea:focus-visible,select:focus-visible{outline:2px solid #2aabee;outline-offset:2px}
+.modal-overlay.open>.tg-settings-modal,.modal-overlay.open>.ios-sheet-modal,.vg-modal.open>.vg-modal-card{animation:vgGlobalDialogIn .2s cubic-bezier(.2,.75,.25,1) both}
+@keyframes vgGlobalDialogIn{from{opacity:.5;transform:translateY(8px) scale(.985)}to{opacity:1;transform:translateY(0) scale(1)}}
+@media(max-width:768px){
+  .modal-overlay,.vg-modal{padding:max(10px,env(safe-area-inset-top)) 10px max(10px,env(safe-area-inset-bottom))!important;}
+  .modal-overlay>.tg-settings-modal,.modal-overlay>.ios-sheet-modal,.vg-modal>.vg-modal-card{width:min(100%,560px)!important;max-width:calc(100vw - 20px)!important;max-height:calc(100dvh - env(safe-area-inset-top) - env(safe-area-inset-bottom) - 20px)!important;margin:auto!important;border-radius:21px!important;}
+  #peerProfileModal>.ios-sheet-modal{width:min(420px,calc(100vw - 24px))!important;max-width:420px!important}
+  #myProfileModal>.tg-settings-modal,#channelEditorModal>.tg-settings-modal{width:min(540px,calc(100vw - 20px))!important;max-width:540px!important}
+  #vgManageGroupModal>.vg-modal-card{width:min(650px,calc(100vw - 20px))!important;max-width:650px!important}
+  .tg-settings-scroll,.ios-sheet-body,.vg-modal-body{overscroll-behavior:contain;-webkit-overflow-scrolling:touch}
+  .vg-modal-body{padding:13px}
+  .tg-section-header{padding-left:13px;padding-right:13px}
+  .tg-row-item{padding:10px 12px;gap:9px}
+  .vg-action-row>*{flex:1 1 130px}
+  .vg-group-add-member{align-items:stretch}
+  .vg-group-add-member button{min-height:42px}
+  .ios-actions-grid{max-width:100%}
+  .ios-action-btn{min-width:0;overflow-wrap:anywhere}
+  .vg-apps-grid{grid-template-columns:repeat(2,minmax(0,1fr))!important}
+}
+@media(max-width:390px){
+  .modal-overlay,.vg-modal{padding-left:7px!important;padding-right:7px!important}
+  .modal-overlay>.tg-settings-modal,.modal-overlay>.ios-sheet-modal,.vg-modal>.vg-modal-card{max-width:calc(100vw - 14px)!important}
+  #peerProfileModal>.ios-sheet-modal{max-width:calc(100vw - 18px)!important}
+  .vg-modal-body{padding:11px}
+  .vg-action-row>*{flex-basis:100%}
+  .vg-group-footer-actions>*{flex-basis:100%}
+  .vg-modal-head{padding:13px}
+}
+@media(prefers-reduced-motion:reduce){.modal-overlay.open>.tg-settings-modal,.modal-overlay.open>.ios-sheet-modal,.vg-modal.open>.vg-modal-card{animation:none!important}}
+</style>
+
 </body>
 </html>
